@@ -2,7 +2,7 @@
 # docker run -v /path/to/local/db.sqlite3:/app/db.sqlite3 -p 8000:8000 your_image_name
 
 # Use an official Python runtime based on Debian 10 "buster" as a parent image.
-FROM python:3.12.2-bookworm
+FROM python:3.8-slim-buster
 
 # Add user that will be used in the container.
 RUN useradd wagtail
