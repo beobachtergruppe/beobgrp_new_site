@@ -85,9 +85,13 @@ WSGI_APPLICATION = "beobgrp_site.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'beobgrp_site',
+        'USER': 'wagtail',
+        'PASSWORD': os.environ['WAGTAIL_DB_PASSWORD'],
+        'HOST': 'localhost',  # or use IP address of the host
+        'PORT': '3306',
     }
 }
 
