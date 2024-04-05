@@ -89,7 +89,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'beobgrp_site',
         'USER': 'wagtail',
-        'PASSWORD': os.environ['WAGTAIL_DB_PASSWORD'],
+        'PASSWORD': os.environ.get('WAGTAIL_DB_PASSWORD',''),
         'HOST': 'localhost',  # or use IP address of the host
         'PORT': '3306',
     }

@@ -2,7 +2,7 @@
 # docker run -v /path/to/local/db.sqlite3:/app/db.sqlite3 -p 8000:8000 your_image_name
 
 # Use an official Python runtime based on Debian 10 "buster" as a parent image.
-FROM python:3.8.1-slim-buster
+FROM python:3.12.2-slim-buster
 
 # Add user that will be used in the container.
 RUN useradd wagtail
@@ -25,6 +25,9 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
     libjpeg62-turbo-dev \
     zlib1g-dev \
     libwebp-dev \
+    pkg-config \
+    python3-dev \
+    default-libmysqlclient-dev \
  && rm -rf /var/lib/apt/lists/*
 
 # Install the application server.
