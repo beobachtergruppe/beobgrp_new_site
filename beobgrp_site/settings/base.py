@@ -86,12 +86,12 @@ WSGI_APPLICATION = "beobgrp_site.wsgi.application"
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'beobgrp_site',
         'USER': 'wagtail',
-        'PASSWORD': os.environ.get('WAGTAIL_DB_PASSWORD',''),
-        'HOST': 'localhost',  # or use IP address of the host
-        'PORT': '3306',
+        'PASSWORD': os.environ['WAGTAIL_DB_PASSWORD'],
+        'HOST': 'postgres',  # or use IP address of the host
+        'PORT': '5432'
     }
 }
 
