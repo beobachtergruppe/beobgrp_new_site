@@ -4,6 +4,9 @@
 # Use an official Python runtime based on Debian 10 "buster" as a parent image.
 FROM python:3.12.2-slim-bullseye
 
+# Get the database password from the build argument
+ENV WAGTAIL_DB_PASSWORD=${WAGTAIL_DB_PASSWORD}
+
 # Add user that will be used in the container.
 RUN useradd wagtail
 
