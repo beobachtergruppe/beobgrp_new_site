@@ -1,5 +1,8 @@
 version: '3.9'
 
+volumes:
+  beobgrp_site: {}
+
 services:
   wagtail:
     build: .
@@ -8,7 +11,9 @@ services:
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
     networks:
       - wagtail_network
 
@@ -24,7 +29,7 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - /beobgrp_site/postgres:/var/lib/postgresql/data
+      - beobgrp_site:/var/lib/postgresql/data
     networks:
       - wagtail_network
 
