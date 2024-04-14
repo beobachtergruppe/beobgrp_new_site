@@ -1,7 +1,5 @@
-version: '3.9'
-
 volumes:
-  beobgrp_site: {}
+  internal: {}
 
 services:
   wagtail:
@@ -29,7 +27,7 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - beobgrp_site:/var/lib/postgresql/data
+      - internal:/var/lib/postgresql/data
     networks:
       - wagtail_network
 

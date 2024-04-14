@@ -2,7 +2,7 @@
 # docker run -v /path/to/local/db.sqlite3:/app/db.sqlite3 -p 8000:8000 your_image_name
 
 # Use an official Python runtime based on Debian 10 "buster" as a parent image.
-FROM python:3.12.2-slim-bullseye
+FROM python:3.12.2-slim-bullseye AS builder
 
 # Get the database password from the build argument
 ENV WAGTAIL_DB_PASSWORD=${WAGTAIL_DB_PASSWORD}

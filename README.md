@@ -16,7 +16,7 @@ export WAGTAIL_DB_PASSWORD="some_password"
 Im Project Folder:
 
 ```shell
-docker compose up -d
+docker compose up -d --build
 ```
 
 Dann ist die Site auf https://localhost:8000 erreichbar.
