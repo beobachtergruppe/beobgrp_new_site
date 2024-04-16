@@ -1,0 +1,36 @@
+volumes:
+  internal: {}
+
+services:
+  wagtail:
+    build: .
+    environment:
+      WAGTAIL_DB_PASSWORD: ${WAGTAIL_DB_PASSWORD}
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - wagtail_network
+
+  postgres:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_USER: wagtail
+      POSTGRES_PASSWORD: ${WAGTAIL_DB_PASSWORD}
+      POSTGRES_DB: beobgrp_site
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "wagtail", "-d", "beobgrp_site" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - internal:/var/lib/postgresql/data
+    networks:
+      - wagtail_network
+
+networks:
+  wagtail_network:
+
