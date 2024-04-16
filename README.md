@@ -1,6 +1,6 @@
 # Website Beobachtergruppe
 
-Dieses Project enhält die neue Website der Beobachtergruppe, welche auf wagtail
+Dieses Project enthält die neue Website der Beobachtergruppe, welche auf wagtail
 basiert is.
 
 ## Installation
