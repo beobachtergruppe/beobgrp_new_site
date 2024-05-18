@@ -24,5 +24,5 @@ Dann ist die Site auf https://localhost:8000 erreichbar.
 ## Weitere Konfiguration
 
 Mit `docker compose` Kommandozeilen kann man die Services 'wagtail' und 
-'postgres' erreichen und z.B. wagtail Kommandos mit `docker compose exec` ausführen.
+'postgres' erreichen und z.B. wagtail Kommandos mit `docker compose -p beobgrp_site exec` ausführen.
 
