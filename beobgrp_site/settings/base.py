@@ -89,8 +89,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'beobgrp_site',
         'USER': 'wagtail',
-        'PASSWORD': os.environ['WAGTAIL_DB_PASSWORD'],
-        'HOST': 'postgres',  # or use IP address of the host
+        'PASSWORD': os.environ.get('WAGTAIL_DB_PASSWORD',''),
+        'HOST': os.environ.get('WAGTAIL_DB_HOST','localhost'),  # or use IP address of the host
         'PORT': '5432'
     }
 }

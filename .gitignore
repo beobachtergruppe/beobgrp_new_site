@@ -125,3 +125,4 @@ celerybeat.pid
 env/
 venv/
 /.idea/
+/db/

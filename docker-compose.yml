@@ -21,6 +21,9 @@ services:
       POSTGRES_USER: wagtail
       POSTGRES_PASSWORD: ${WAGTAIL_DB_PASSWORD}
       POSTGRES_DB: beobgrp_site
+# Expose this port only for development / debug purposes!
+#    ports:
+#      - "127.0.0.1:54320:5432"
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "wagtail", "-d", "beobgrp_site" ]
       interval: 10s

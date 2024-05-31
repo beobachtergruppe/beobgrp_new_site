@@ -7,6 +7,9 @@ FROM python:3.12.2-slim-bullseye AS builder
 # Get the database password from the build argument
 ENV WAGTAIL_DB_PASSWORD=${WAGTAIL_DB_PASSWORD}
 
+# Host of the postgres container in the docker network
+ENV WAGTAIL_DB_HOST=postgres
+
 # Add user that will be used in the container.
 RUN useradd wagtail
 
