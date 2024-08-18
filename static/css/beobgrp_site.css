@@ -1,0 +1,211 @@
+h1 {
+  color: gold;
+  margin-bottom: 0.5em;
+  font-weight: bolder; }
+
+h2 {
+  color: gold;
+  margin-bottom: 0.5em;
+  font-weight: bold; }
+
+h3 {
+  color: gold;
+  margin-bottom: 0.25em; }
+
+h4 {
+  color: gold;
+  margin-bottom: 0.25em; }
+
+b {
+  color: gold; }
+
+a {
+  color: #cccc00; }
+
+iframe {
+  border: none;
+  display: block; }
+
+html, body, .container-fluid, .left-part, .main-part, .bottom-part {
+  height: 120%; }
+
+body {
+  background-color: black;
+  color: white;
+  padding-top: 1%;
+  padding-right: 1%;
+  padding-bottom: 1%;
+  padding-left: 1%; }
+
+.event-link {
+  background-color: #000099; }
+
+.top-part {
+  padding-top: 1%;
+  padding-right: 1%;
+  padding-bottom: 1%;
+  padding-left: 1%; }
+
+#banner {
+  background-image: url("/static/images/banner.jpg");
+  background-repeat: no-repeat; }
+
+.bottom-part {
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("/static/images/Background_Oststernwarte_1600.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  padding-top: 1%;
+  padding-right: 1%;
+  padding-bottom: 1%;
+  padding-left: 1%; }
+
+.card {
+  margin-top: 1%;
+  margin-bottom: 1%;
+  margin-left: 1%;
+  margin-right: 1%; }
+
+.card-header {
+  font-size: 1.2em; }
+
+.btn {
+  background-color: #00004e;
+  color: white;
+  font-size: 1em; }
+  .btn:hover, .btn:focus, .btn:active {
+    background-color: #0000b4;
+    color: white;
+    font-size: 1em; }
+
+.btn-default {
+  background-color: #00004e;
+  color: white;
+  font-size: 1em; }
+  .btn-default:hover, .btn-default:focus, .btn-default:active {
+    background-color: #0000b4;
+    color: white;
+    font-size: 1em; }
+
+.dropdown-item {
+  background-color: #00004e;
+  color: white;
+  font-size: 1em; }
+  .dropdown-item:hover, .dropdown-item:focus, .dropdown-item:active {
+    background-color: #0000b4;
+    color: white;
+    font-size: 1em; }
+
+.dropdown-toggle.btn-default {
+  background-color: #00004e;
+  color: white;
+  font-size: 1em; }
+  .dropdown-toggle.btn-default:hover, .dropdown-toggle.btn-default:focus, .dropdown-toggle.btn-default:active {
+    background-color: #0000b4;
+    color: white;
+    font-size: 1em; }
+
+.open > dropdown-toggle.btn-default {
+  background-color: #00004e;
+  color: white;
+  font-size: 1em; }
+  .open > dropdown-toggle.btn-default:hover, .open > dropdown-toggle.btn-default:focus, .open > dropdown-toggle.btn-default:active {
+    background-color: #0000b4;
+    color: white;
+    font-size: 1em; }
+
+.selected {
+  background-color: #0000b4;
+  color: white;
+  font-size: 1em; }
+
+.dropdown-menu {
+  background-color: #00004e;
+  color: white;
+  font-size: 1em; }
+  .dropdown-menu li a {
+    background-color: #00004e;
+    color: white;
+    font-size: 1em; }
+  .dropdown-menu li a:hover, .dropdown-menu li a:focus, .dropdown-menu li a:active {
+    background-color: #0000b4;
+    color: white;
+    font-size: 1em; }
+
+.image-with-caption img {
+  margin: auto; }
+
+.image-with-caption p {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 20px; }
+
+.side-menu {
+  font-size: 0.8em; }
+
+.gallery-item {
+  border: solid 1px;
+  border-radius: 6px;
+  border-color: #666600;
+  padding: 5px;
+  margin: 5px; }
+
+.gallery-button {
+  font-weight: bold;
+  font-size: 1.5em;
+  border: solid 1px;
+  border-radius: 3px;
+  background-color: #5d5d5d;
+  margin: 2px; }
+
+.modal {
+  border: solid 2px;
+  border-radius: 10px;
+  border-color: #666600;
+  padding: 5px; }
+
+.modal-header, .modal-content, .modal-footer {
+  background-color: #000025;
+  color: white; }
+  .modal-header button, .modal-content button, .modal-footer button {
+    opacity: 1.0; }
+
+.event {
+  text-align: center;
+  background-color: #000099;
+  font-size: 1.0em; }
+
+.warning {
+  background-color: red;
+  text-align: center;
+  color: yellow;
+  font-size: 1.2em; }
+
+.black-background {
+  background-color: black; }
+
+.bg-event {
+  background-color: #000099; }
+
+.bg-ok {
+  background-color: #006700; }
+
+.bg-unclear {
+  background-color: #999900; }
+  .bg-unclear a {
+    color: darkred; }
+
+.embed-full {
+  display: block;
+  width: 70vw;
+  height: 70vw; }
+
+.author {
+  text-align: center;
+  font-style: italic; }
+
+.bg-success a {
+  color: yellow; }
+
+/*# sourceMappingURL=beobgrp_site.css.map */

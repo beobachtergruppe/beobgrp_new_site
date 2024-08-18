@@ -94,14 +94,15 @@ body {
 }
 
 #banner {
-  background-image: url('/main/images/banner.jpg');
+  background-image: url('/static/images/banner.jpg');
   background-repeat: no-repeat
 }
 
 // left part style
 .bottom-part {
 
-  background: linear-gradient(rgba(0, 0, 0, $background-opacity), rgba(0, 0, 0, $background-opacity));
+  background: linear-gradient(rgba(0, 0, 0, $background-opacity), rgba(0, 0, 0, $background-opacity)),
+  url('/static/images/Background_Oststernwarte_1600.jpg');
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
