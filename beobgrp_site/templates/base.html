@@ -3,20 +3,12 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <title>{{ page.title }}</title>
         <meta charset="utf-8" />
-        <title>
-            {% block title %}
-            {% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %}
-            {% endblock %}
-            {% block title_suffix %}
-            {% wagtail_site as current_site %}
-            {% if current_site and current_site.site_name %}- {{ current_site.site_name }}{% endif %}
-            {% endblock %}
-        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
         {% if page.search_description %}
         <meta name="description" content="{{ page.search_description }}" />
         {% endif %}
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
 
         {# Force all links in the live preview panel to be opened in a new tab #}
         {% if request.in_preview_panel %}
@@ -25,7 +17,6 @@
 
         {# Global stylesheets #}
         <link rel="stylesheet" type="text/css" href="{% sass_src 'css/beobgrp_site.scss' %}">
-        <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
 
         {% block extra_css %}
         {# Override this in templates to add extra stylesheets #}
@@ -35,10 +26,48 @@
     <body class="{% block body_class %}{% endblock %}">
         {% wagtailuserbar %}
 
-        {% block content %}{% endblock %}
+        <header>
+            <div class="logo"><a href="{% pageurl site.root_page %}">MyLogo</a></div>
+
+            <!-- Desktop Menu -->
+            <nav id="desktop-nav">
+                <ul>
+                    {% for child in site_root.get_children.live.in_menu %}
+                        <li><a href="{% pageurl child %}">{{ child.title }}</a></li>
+                    {% endfor %}
+                </ul>
+            </nav>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+
+            <!-- Mobile Navigation -->
+            <nav id="mobile-nav">
+                <ul>
+                    {% for child in page.get_children.filter(in_menu=True) %}
+                        <li><a href="{% pageurl child %}">{{ child.title }}</a></li>
+                    {% endfor %}
+                </ul>
+            </nav>
+        </header>
+
+        <div class="container">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                {% block sidebar %}{% endblock %}
+            </aside>
+
+            <!-- Main Content -->
+            <main id="main-content">
+                <div id="content">
+                    {% block content %}{% endblock %}
+                </div>
+            </main>
+        </div>
+
+
 
         {# Global javascript #}
-        <script type="text/javascript" src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/beobgrp_site.js' %}"></script>
 
         {% block extra_js %}

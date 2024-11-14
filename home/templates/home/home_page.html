@@ -9,39 +9,6 @@
 
 {% block content %}
 
-    <div class="row top-part">
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-col-xl-12">
-            <div class="row" id="banner">
-                <img src="{%  static "images/logo-beobachtergruppe.jpg" %}" class="img-responsive"/>
-            </div>
-            <div class="row" id="menu">
-                <table>
-                    <tr>
-                        <td>
-                            <div class="d-none d-sm-none d-md-block d-lg-block d-xl-block">
-                                {# TODO: add menu #}
-                            </div>
-                            <div class="d-block d-sm-block d-md-none d-lg-none d-xl-none">
-                                {# TODO: add menu #}
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <div class="d-block d-sm-block d-md-none d-lg-none d-xl-none">
-                <div class="row event tourstatus"></div><br>
-            </div>
-        </div>
-    </div>
-    <div class="row bottom-part">
-        <div class="col-md-2 col-lg-2 col-xl-2 d-none d-sm-none d-md-block d-lg-block d-xl-block">
-            <div class="row event tourstatus"></div><br>
-        </div>
-        <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-xl-10">
-            <div class="container-fluid ">
-                {%  include_block page.body %}
-            </div>
-        </div>
-    </div>
+  {% include page.body %}
 
 {% endblock content %}
