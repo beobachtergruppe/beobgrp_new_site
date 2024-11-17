@@ -27,12 +27,11 @@
         {% wagtailuserbar %}
 
         <header>
-            <div class="logo"><a href="{% pageurl site.root_page %}">MyLogo</a></div>
 
             <!-- Desktop Menu -->
             <nav id="desktop-nav">
                 <ul>
-                    {% for child in site_root.get_children.live.in_menu %}
+                    {% for child in site.root_page.get_children.live.in_menu %}
                         <li><a href="{% pageurl child %}">{{ child.title }}</a></li>
                     {% endfor %}
                 </ul>
@@ -44,7 +43,7 @@
             <!-- Mobile Navigation -->
             <nav id="mobile-nav">
                 <ul>
-                    {% for child in page.get_children.filter(in_menu=True) %}
+                    {% for child in site.root_page.get_children.live.in_menu %}
                         <li><a href="{% pageurl child %}">{{ child.title }}</a></li>
                     {% endfor %}
                 </ul>
