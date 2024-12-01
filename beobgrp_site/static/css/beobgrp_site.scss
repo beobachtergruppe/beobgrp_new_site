@@ -9,24 +9,24 @@ $event-color: darken(blue, 20%);
 
 $background-opacity: 0.7;
 
-h1 {
+.block-h1 {
   color: gold;
   margin-bottom: 0.5em;
   font-weight: bolder;
 }
 
-h2 {
+.block-h2 {
   color: gold;
   margin-bottom: 0.5em;
   font-weight: bold;
 }
 
-h3 {
+.block-h3 {
   color: gold;
   margin-bottom: 0.25em;
 }
 
-h4 {
+.block-h4 {
   color: gold;
   margin-bottom: 0.25em
 }
@@ -40,10 +40,6 @@ a {
   color: darken(yellow, 10%);
 }
 
-iframe {
-  border: none;
-  display: block
-}
 
 // default colors for text and background
 @mixin default-colors {
@@ -74,19 +70,8 @@ iframe {
 }
 
 
-html, body, .container-fluid, .left-part, .main-part, .bottom-part {
-  height: 120%
-}
 
-// main body style
-body {
-  @include default-colors;
-  @include border-style
-}
 
-.event-link {
-  background-color: $event-color;
-}
 
 // top part style
 .top-part {
@@ -99,7 +84,7 @@ body {
 }
 
 // left part style
-.bottom-part {
+.main-content {
 
   background: linear-gradient(rgba(0, 0, 0, $background-opacity), rgba(0, 0, 0, $background-opacity)),
   url('/static/images/Background_Oststernwarte_1600.jpg');
@@ -110,151 +95,95 @@ body {
   @include border-style
 }
 
-.card {
-  margin-top: 1%;
-  margin-bottom: 1%;
-  margin-left: 1%;
-  margin-right: 1%
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.card-header {
-  font-size: 1.2em
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  @include default-colors;
+  @include border-style
 }
 
-// make sure that styles are used in all button states
-@each $button in btn, btn-default, dropdown-item, "dropdown-toggle.btn-default", "open > dropdown-toggle.btn-default" {
-  .#{$button} {
-    @include button-style;
-
-    &:hover, &:focus, &:active {
-      @include button-style-active
-    }
-  }
+/* Header */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1em;
+  background-color: #333;
+  color: #fff;
 }
 
-.selected {
-  @include button-style-active
-}
-
-// and for the dropdown menu
-.dropdown-menu {
-  @include button-style;
-
-  li {
-    a {
-      @include button-style
-    }
-
-    a:hover, a:focus, a:active {
-      @include button-style-active
-    }
-  }
-}
-
-// style for image boxes
-.image-with-caption {
-  img {
-    margin: auto;
-  }
-
-  p {
-    text-align: center;
-    font-weight: bold;
-    margin-bottom: 20px
-  }
-}
-
-// styles for side menu
-.side-menu {
-  font-size: 0.8em
-}
-
-// style for gallery overview
-.gallery-item {
-  border: solid 1px;
-  border-radius: 6px;
-  border-color: darken(yellow, 30%);
-  padding: 5px;
-  margin: 5px
-}
-
-.gallery-button {
-  font-weight: bold;
+.logo a {
+  color: #fff;
+  text-decoration: none;
   font-size: 1.5em;
-  border: solid 1px;
-  border-radius: 3px;
-  background-color: darken(darkgrey, 30%);
-  margin: 2px
 }
 
-.modal {
-  border: solid 2px;
-  border-radius: 10px;
-  border-color: darken(yellow, 30%);
-  padding: 5px
+#desktop-nav ul {
+  list-style: none;
+  display: flex;
+  gap: 1em;
 }
 
-// style for gallery zoom
-.modal-header, .modal-content, .modal-footer {
-  background-color: darken(darkblue, 20%);
-  color: white;
-
-  button {
-    opacity: 1.0
-  }
+#desktop-nav ul li a {
+  color: #fff;
+  text-decoration: none;
 }
 
-// style for events
-.event {
+/* Mobile Menu */
+.menu-toggle {
+  display: none;
+}
+
+.menu-icon {
+  display: none;
+  font-size: 1.5em;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* Hide Mobile Navigation by Default */
+#mobile-nav {
+  display: none;
+  position: absolute;
+  top: 60px;
+  right: 0;
+  width: 100%;
+  background-color: #333;
   text-align: center;
-  background-color: $event-color;
-  font-size: 1.0em
 }
 
-.warning {
-  background-color: red;
-  text-align: center;
-  color: yellow;
-  font-size: 1.2em
+#mobile-nav ul {
+  list-style: none;
+  padding: 1em;
 }
 
-.black-background {
-  background-color: black
-}
-
-.bg-event {
-  background-color: $event-color;
-}
-
-.bg-ok {
-  background-color: darken(green, 5%);
-
-}
-
-.bg-unclear {
-  a {
-    color: darkred;
-  }
-
-  background-color: darken(yellow, 20%);
-}
-
-.embed-full {
+#mobile-nav ul li a {
   display: block;
-  width: 70vw;
-  height: 70vw;
+  color: #fff;
+  padding: 0.5em;
+  text-decoration: none;
 }
 
-// style for author text at end of report
-
-.author {
-  text-align: center;
-  font-style: italic;
+/* When checkbox is checked, show the mobile menu */
+.menu-toggle:checked + .menu-icon + #mobile-nav {
+  display: block;
 }
 
-.bg-success {
-  a {
-    color: yellow
+/* Responsive Styles */
+@media (max-width: 768px) {
+  #desktop-nav {
+    display: none;
+  }
+
+  .menu-icon {
+    display: block;
   }
 }
 
