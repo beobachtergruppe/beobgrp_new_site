@@ -3,7 +3,7 @@ from typing import Tuple
 from django.db.models import TextChoices
 from django.db.models.fields import DateTimeField, CharField, BooleanField
 from django.db.models.fields.files import ImageField
-from django.utils.timezone import localtime
+from django.utils.timezone import localtime, now
 from wagtail.admin.forms.pages import WagtailAdminPageForm
 from wagtail.admin.panels.field_panel import FieldPanel
 from wagtail.blocks.field_block import RichTextBlock, CharBlock, ChoiceBlock, FieldBlock
@@ -84,6 +84,27 @@ class SingleEvent(Page):
 class EventListBlock(StructBlock):
     event_type = ChoiceBlock(choices=EventTypes.choices, required=True, label="Art der Veranstaltung",
                              help_text="Liste von Veranstaltungen")
+
+    def get_context(self, value, parent_context=None):
+        context = super().get_context(value, parent_context)
+
+        if parent_context is not None:
+            # Get the current page (parent page)
+            parent_page = parent_context['page']
+
+            # Query child pages of the parent that are of type SingleEvent
+            events = SingleEvent.objects.child_of(parent_page).live().filter(
+                event_type=value['event_type'],  # Match the event type
+                start_time__gte=now()  # Match events at or after the current time
+            ).order_by('start_time')  # Order by start time
+
+            # Add events to the context
+            context['events'] = events
+
+        return context
+
+    class Meta:
+        template = "blocks/event_list_block.html"  # Template for rendering the block
 
 blocks_for_event_body = deepcopy(gen_body_content)
 blocks_for_event_body.append(('event_list', EventListBlock())) # type: ignore

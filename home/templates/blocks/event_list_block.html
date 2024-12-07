@@ -1,0 +1,17 @@
+<div class="event-list">
+    {% if events %}
+        <ul>
+            {% for event in events %}
+                <li>
+                    <strong>{{ event.event_title }}</strong><br>
+                    <span>{{ event.start_time|date:"Y-m-d H:i" }}</span><br>
+                    {% if event.location %}
+                        <span>{{ event.location }}</span>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Keine Veranstaltungen geplant</p>
+    {% endif %}
+</div>
