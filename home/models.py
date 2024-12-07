@@ -3,6 +3,8 @@ from typing import Tuple
 from django.db.models import TextChoices
 from django.db.models.fields import DateTimeField, CharField, BooleanField
 from django.db.models.fields.files import ImageField
+from django.utils.timezone import localtime
+from wagtail.admin.forms.pages import WagtailAdminPageForm
 from wagtail.admin.panels.field_panel import FieldPanel
 from wagtail.blocks.field_block import RichTextBlock, CharBlock, ChoiceBlock, FieldBlock
 from wagtail.blocks.struct_block import StructBlock
@@ -34,21 +36,42 @@ class EventTypes(TextChoices):
     OBSERVE = "Beobachtungsabend"
     EXCURSION = "Ausflug"
 
+class SingleEventForm(WagtailAdminPageForm):
+    def clean(self):
+        cleaned_data = super().clean()
+        start_time = cleaned_data.get('start_time')
+        event_title = cleaned_data.get('event_title')
+
+        if start_time:
+            # Format start_time into 'YYYY-MM-DD HH:MM'
+            formatted_start_time = localtime(start_time).strftime('%Y-%m-%d %H:%M')
+            # Auto-generate the title
+            cleaned_data['title'] = f"{formatted_start_time} - {event_title or 'Event'}"
+        return cleaned_data
 
 class SingleEvent(Page):
     start_time = DateTimeField()
     event_type = CharField(choices=EventTypes)
-    location = CharField(blank=True, max_length=120, default="Deutsches Museum")
-    referent = CharField(blank=True, max_length=120)
-    abstract = RichTextField(blank=True, max_length=800)
+    event_title = CharField(max_length=100,default='')
+    location = CharField(max_length=120, default="Deutsches Museum")
+    referent = CharField(max_length=120)
+    abstract = RichTextField(max_length=800)
     image = ImageField(blank=True)
     cancelled = BooleanField(default=False)
     booked_out = BooleanField(default=False)
 
+    base_form_class = SingleEventForm
+
+    # Override the save method to update the title
+    def save(self, *args, **kwargs):
+        if self.start_time:
+            self.title = f"{localtime(self.start_time).strftime('%Y-%m-%d %H:%M')} - {self.event_title}"
+        super().save(*args, **kwargs)
+
     content_panels = Page.content_panels + [
         FieldPanel('start_time', heading='Zeit'),
         FieldPanel('event_type', heading='Art der Veranstaltung'),
-        FieldPanel('title', heading='Titel'),
+        FieldPanel('event_title', heading='Titel'),
         FieldPanel('location', heading='Ort'),
         FieldPanel('referent', heading='Referent'),
         FieldPanel('abstract', heading='Zusammenfassung'),
