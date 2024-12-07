@@ -1,20 +1,24 @@
-.block-h1 {
+.block-h1 h1 {
   color: gold;
   margin-bottom: 0.5em;
-  font-weight: bolder; }
+  font-weight: bolder;
+  font-size: 2rem; }
 
-.block-h2 {
+.block-h2 h2 {
   color: gold;
   margin-bottom: 0.5em;
-  font-weight: bold; }
+  font-weight: bold;
+  font-size: 1.75rem; }
 
-.block-h3 {
+.block-h3 h3 {
   color: gold;
-  margin-bottom: 0.25em; }
+  margin-bottom: 0.25em;
+  font-size: 1.5rem; }
 
-.block-h4 {
+.block-h4 h4 {
   color: gold;
-  margin-bottom: 0.25em; }
+  margin-bottom: 0.25em;
+  font-size: 1.25rem; }
 
 b {
   color: gold; }
@@ -22,17 +26,8 @@ b {
 a {
   color: #cccc00; }
 
-.top-part {
-  padding-top: 1%;
-  padding-right: 1%;
-  padding-bottom: 1%;
-  padding-left: 1%; }
-
-#banner {
-  background-image: url("/static/images/banner.jpg");
-  background-repeat: no-repeat; }
-
-.main-content {
+main {
+  height: 100vh;
   background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("/static/images/Background_Oststernwarte_1600.jpg");
   background-position: center;
   background-repeat: no-repeat;
@@ -42,14 +37,14 @@ a {
   padding-right: 1%;
   padding-bottom: 1%;
   padding-left: 1%; }
+  main * {
+    background: transparent; }
 
 /* Reset */
 * {
   margin: 0;
   padding: 0;
-  box-sizing: border-box; }
-
-body {
+  box-sizing: border-box;
   font-family: Arial, sans-serif;
   line-height: 1.6;
   background-color: black;
@@ -66,12 +61,15 @@ header {
   justify-content: space-between;
   padding: 1em;
   background-color: #333;
-  color: #fff; }
-
-.logo a {
   color: #fff;
-  text-decoration: none;
-  font-size: 1.5em; }
+  padding-top: 1%;
+  padding-right: 1%;
+  padding-bottom: 1%;
+  padding-left: 1%;
+  background-image: url("/static/images/banner.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover; }
 
 #desktop-nav ul {
   list-style: none;

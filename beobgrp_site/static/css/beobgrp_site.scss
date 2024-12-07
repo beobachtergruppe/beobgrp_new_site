@@ -9,39 +9,40 @@ $event-color: darken(blue, 20%);
 
 $background-opacity: 0.7;
 
-.block-h1 {
+.block-h1 h1 {
   color: gold;
   margin-bottom: 0.5em;
   font-weight: bolder;
+  font-size: 2rem;
 }
 
-.block-h2 {
+.block-h2 h2 {
   color: gold;
   margin-bottom: 0.5em;
   font-weight: bold;
+  font-size: 1.75rem;
 }
 
-.block-h3 {
+.block-h3 h3 {
   color: gold;
   margin-bottom: 0.25em;
+  font-size: 1.5rem;
 }
 
-.block-h4 {
+.block-h4 h4 {
   color: gold;
-  margin-bottom: 0.25em
+  margin-bottom: 0.25em;
+  font-size: 1.25rem;
 }
 
 b {
   color: gold
 }
 
-// style for links
 a {
   color: darken(yellow, 10%);
 }
 
-
-// default colors for text and background
 @mixin default-colors {
   background-color: $main-background;
   color: $main-foreground;
@@ -61,38 +62,25 @@ a {
   padding-left: 1%;
 }
 
-
-// style for active buttons
 @mixin button-style-active {
   background-color: lighten($button-background, 20%);
   color: lighten($button-foreground, 20%);
   font-size: 1em
 }
 
-
-
-
-
-// top part style
-.top-part {
-  @include border-style
-}
-
-#banner {
-  background-image: url('/static/images/banner.jpg');
-  background-repeat: no-repeat
-}
-
-// left part style
-.main-content {
-
+main {
+  height: 100vh;
   background: linear-gradient(rgba(0, 0, 0, $background-opacity), rgba(0, 0, 0, $background-opacity)),
   url('/static/images/Background_Oststernwarte_1600.jpg');
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-size: cover;
-  @include border-style
+  @include border-style;
+
+  * {
+    background: transparent;
+  }
 }
 
 /* Reset */
@@ -100,9 +88,6 @@ a {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-
-body {
   font-family: Arial, sans-serif;
   line-height: 1.6;
   @include default-colors;
@@ -117,12 +102,11 @@ header {
   padding: 1em;
   background-color: #333;
   color: #fff;
-}
-
-.logo a {
-  color: #fff;
-  text-decoration: none;
-  font-size: 1.5em;
+  @include border-style;
+  background-image: url('/static/images/banner.jpg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover
 }
 
 #desktop-nav ul {
