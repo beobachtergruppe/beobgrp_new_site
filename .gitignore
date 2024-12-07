@@ -126,3 +126,4 @@ env/
 venv/
 /.idea/
 /db/
+/media/

@@ -1,4 +1,4 @@
-{% load static sass_tags wagtailcore_tags wagtailuserbar %}
+{% load static sass_tags wagtailcore_tags navigation_tags wagtailuserbar %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -27,14 +27,15 @@
         {% wagtailuserbar %}
 
         <header>
-
+            {% get_site_root as site_root %}
             <!-- Desktop Menu -->
             <nav id="desktop-nav">
-                <ul>
-                    {% for child in site.root_page.get_children.live.in_menu %}
-                        <li><a href="{% pageurl child %}">{{ child.title }}</a></li>
+                <p>
+                    <a href="{% pageurl site_root %}">Home</a> |
+                    {% for menuitem in site_root.get_children.live.in_menu %}
+                        <a href="{% pageurl menuitem %}">{{ menuitem.title }}</a>
                     {% endfor %}
-                </ul>
+                </p>
             </nav>
 
             <!-- Mobile Menu Button -->
@@ -42,11 +43,12 @@
 
             <!-- Mobile Navigation -->
             <nav id="mobile-nav">
-                <ul>
-                    {% for child in site.root_page.get_children.live.in_menu %}
-                        <li><a href="{% pageurl child %}">{{ child.title }}</a></li>
+                <p>
+                    <a href="{% pageurl site_root %}">Home</a> |
+                    {% for menuitem in site_root.get_children.live.in_menu %}
+                        <a href="{% pageurl menuitem %}">{{ menuitem.title }}</a>
                     {% endfor %}
-                </ul>
+                </p>
             </nav>
         </header>
 

@@ -1,21 +1,21 @@
-.block-h1 h1 {
+h1, .block-h1 {
   color: gold;
   margin-bottom: 0.5em;
   font-weight: bolder;
   font-size: 2rem; }
 
-.block-h2 h2 {
+h2, .block-h2 {
   color: gold;
   margin-bottom: 0.5em;
   font-weight: bold;
   font-size: 1.75rem; }
 
-.block-h3 h3 {
+h3, .block-h3 {
   color: gold;
   margin-bottom: 0.25em;
   font-size: 1.5rem; }
 
-.block-h4 h4 {
+h4, .block-h4 {
   color: gold;
   margin-bottom: 0.25em;
   font-size: 1.25rem; }
