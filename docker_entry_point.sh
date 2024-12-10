@@ -15,12 +15,15 @@ case "$SITE_INIT_MODE" in
     python manage.py dbrestore --noinput
     python manage.py mediarestore --noinput
     ;;
+  none)
+    ;;
   *)
-    echo "Error: SITE_INIT_MODE must be set to migrate or restore"
+    echo "Error: SITE_INIT_MODE must be set to migrate, restore or none"
     exit 1
     ;;
 esac
 
+python manage.py clearsessions
 gunicorn beobgrp_site.wsgi:application
 
 
