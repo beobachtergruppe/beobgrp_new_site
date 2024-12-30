@@ -127,7 +127,8 @@ header {
 .menu-item:hover {
   background-color: #0000b4;
   color: white;
-  font-size: 1em; }
+  font-size: 1em;
+  background-color: #3e8f3e; }
 
 /* Active state for the last clicked button */
 .menu-item.active {

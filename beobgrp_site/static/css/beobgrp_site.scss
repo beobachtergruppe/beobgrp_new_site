@@ -167,7 +167,8 @@ header {
 
 /* Hover effect for buttons */
 .menu-item:hover {
-  @include button-style-active
+  @include button-style-active;
+  background-color: #3e8f3e;
 }
 
 /* Active state for the last clicked button */

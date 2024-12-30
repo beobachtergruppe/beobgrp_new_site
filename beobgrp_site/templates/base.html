@@ -30,7 +30,7 @@
             {% get_site_root as site_root %}
             <!-- Desktop Menu -->
             <nav id="desktop-nav">
-                <ul class="menubar">
+                <ul>
                     <li><a  class="menu-item {% add_active_class site_root.url %}" href="{% pageurl site_root %}">Home</a></li>
                     {% for menuitem in site_root.get_children.live.in_menu %}
                         <li><a  class="menu-item {% add_active_class menuitem.url %}" href="{% pageurl menuitem %}">{{ menuitem.title }}</a></li>
@@ -39,16 +39,17 @@
             </nav>
 
             <!-- Mobile Menu Button -->
-            <button id="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+            <input type="checkbox" id="menu-toggle" class="menu-toggle">
+            <label for="menu-toggle" class="menu-icon">&#9776;</label>
 
             <!-- Mobile Navigation -->
             <nav id="mobile-nav">
-                <p>
-                    <a href="{% pageurl site_root %}">Home</a> |
+                <ul>
+                    <li><a  class="menu-item {% add_active_class site_root.url %}" href="{% pageurl site_root %}">Home</a></li>
                     {% for menuitem in site_root.get_children.live.in_menu %}
-                        <a href="{% pageurl menuitem %}">{{ menuitem.title }}</a>
+                        <li><a  class="menu-item {% add_active_class menuitem.url %}" href="{% pageurl menuitem %}">{{ menuitem.title }}</a></li>
                     {% endfor %}
-                </p>
+                </ul>
             </nav>
         </header>
 
