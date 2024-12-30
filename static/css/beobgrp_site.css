@@ -110,6 +110,31 @@ header {
   padding: 0.5em;
   text-decoration: none; }
 
+.menu-item {
+  text-decoration: none;
+  /* Remove underline */
+  color: white;
+  padding: 0.5em 1em;
+  border: 1px solid #555;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  /* Smooth hover effect */
+  background-color: #00004e;
+  color: white;
+  font-size: 1em; }
+
+/* Hover effect for buttons */
+.menu-item:hover {
+  background-color: #0000b4;
+  color: white;
+  font-size: 1em; }
+
+/* Active state for the last clicked button */
+.menu-item.active {
+  background-color: #0000b4;
+  color: white;
+  font-size: 1em; }
+
 /* When checkbox is checked, show the mobile menu */
 .menu-toggle:checked + .menu-icon + #mobile-nav {
   display: block; }
