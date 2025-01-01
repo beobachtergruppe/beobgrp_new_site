@@ -28,29 +28,14 @@
 
         <header>
             {% get_site_root as site_root %}
-            <!-- Desktop Menu -->
-            <nav id="desktop-nav">
-                <ul>
-                    <li><a  class="menu-item {% add_active_class site_root.url %}" href="{% pageurl site_root %}">Home</a></li>
-                    {% for menuitem in site_root.get_children.live.in_menu %}
-                        <li><a  class="menu-item {% add_active_class menuitem.url %}" href="{% pageurl menuitem %}">{{ menuitem.title }}</a></li>
-                    {% endfor %}
-                </ul>
-            </nav>
+            {%  include "includes/site_menu.html" with menu_id="desktop-nav" %} <!-- Desktop Menu -->
 
             <!-- Mobile Menu Button -->
             <input type="checkbox" id="menu-toggle" class="menu-toggle">
             <label for="menu-toggle" class="menu-icon">&#9776;</label>
 
             <!-- Mobile Navigation -->
-            <nav id="mobile-nav">
-                <ul>
-                    <li><a  class="menu-item {% add_active_class site_root.url %}" href="{% pageurl site_root %}">Home</a></li>
-                    {% for menuitem in site_root.get_children.live.in_menu %}
-                        <li><a  class="menu-item {% add_active_class menuitem.url %}" href="{% pageurl menuitem %}">{{ menuitem.title }}</a></li>
-                    {% endfor %}
-                </ul>
-            </nav>
+            {% include "includes/site_menu.html" with menu_id="mobile-nav" %}
         </header>
 
         <div class="container">
