@@ -11,27 +11,27 @@ $background-opacity: 0.7;
 
 h1, .block-h1 {
   color: gold;
-  margin-bottom: 0.5em;
+  margin-bottom: 0.25em;
   font-weight: bolder;
   font-size: 2rem;
 }
 
 h2, .block-h2 {
   color: gold;
-  margin-bottom: 0.5em;
+  margin-bottom: 0.25em;
   font-weight: bold;
   font-size: 1.75rem;
 }
 
 h3, .block-h3 {
   color: gold;
-  margin-bottom: 0.25em;
+  margin-bottom: 0.125em;
   font-size: 1.5rem;
 }
 
 h4, .block-h4 {
   color: gold;
-  margin-bottom: 0.25em;
+  margin-bottom: 0.125em;
   font-size: 1.25rem;
 }
 
@@ -56,10 +56,10 @@ a {
 }
 
 @mixin border-style {
-  padding-top: 1%;
-  padding-right: 1%;
-  padding-bottom: 1%;
-  padding-left: 1%;
+  padding-top: 0.5%;
+  padding-right: 0.5%;
+  padding-bottom: 0.5%;
+  padding-left: 0.5%;
 }
 
 @mixin button-style-active {
@@ -89,7 +89,7 @@ main {
   padding: 0;
   box-sizing: border-box;
   font-family: Arial, sans-serif;
-  line-height: 1.6;
+  line-height: 1.2em;
   @include default-colors;
   @include border-style
 }
@@ -109,15 +109,20 @@ header {
   background-size: cover
 }
 
+#desktop-nav {
+  background: transparent;
+}
+
 #desktop-nav ul {
   list-style: none;
   display: flex;
   gap: 1em;
+  background: transparent;
 }
 
 #desktop-nav ul li a {
   color: #fff;
-  text-decoration: none;
+  text-decoration: none
 }
 
 /* Mobile Menu */
