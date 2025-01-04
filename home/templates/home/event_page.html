@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% load static wagtailcore_tags %}
+{% load static sass_tags wagtailcore_tags %}
 
 {% block body_class %}template-eventpage{% endblock %}
 
 {% block extra_css %}
-
+    <link rel="stylesheet" type="text/css" href="{% sass_src 'css/event_info.scss' %}">
 {% endblock extra_css %}
 
 {% block content %}
