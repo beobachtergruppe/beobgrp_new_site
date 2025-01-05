@@ -1,8 +1,11 @@
+from copy import deepcopy
 from typing import Tuple
 
 from django.db.models import TextChoices
 from django.db.models.fields import DateTimeField, CharField, BooleanField
 from django.db.models.fields.files import ImageField
+from django.forms.widgets import DateTimeInput
+from django.utils.text import slugify
 from django.utils.timezone import localtime, now
 from wagtail.admin.forms.pages import WagtailAdminPageForm
 from wagtail.admin.panels.field_panel import FieldPanel
@@ -10,9 +13,11 @@ from wagtail.blocks.field_block import RichTextBlock, CharBlock, ChoiceBlock, Fi
 from wagtail.blocks.struct_block import StructBlock
 from wagtail.fields import StreamField, RichTextField
 from wagtail.images.blocks import ImageChooserBlock
-
 from wagtail.models import Page
-from copy import deepcopy
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 gen_body_content: list[Tuple[str, FieldBlock]] = [
     ('h1', CharBlock(form_classname='h1', label='Kopfzeile 1')),
@@ -37,17 +42,16 @@ class EventTypes(TextChoices):
     EXCURSION = "Ausflug"
 
 class SingleEventForm(WagtailAdminPageForm):
-    def clean(self):
-        cleaned_data = super().clean()
-        start_time = cleaned_data.get('start_time')
-        event_title = cleaned_data.get('event_title')
 
-        if start_time:
-            # Format start_time into 'YYYY-MM-DD HH:MM'
-            formatted_start_time = localtime(start_time).strftime('%Y-%m-%d %H:%M')
-            # Auto-generate the title
-            cleaned_data['title'] = f"{formatted_start_time} - {event_title or 'Event'}"
+    def clean(self):
+        if not self.data.get('title'):
+            self.data = self.data.copy()
+            self.data['title'] = "Default Placeholder Title"
+            self.data['slug'] = "default-placeholder-slug"
+
+        cleaned_data = super().clean()
         return cleaned_data
+
 
 class SingleEvent(Page):
     start_time = DateTimeField()
@@ -60,18 +64,13 @@ class SingleEvent(Page):
     cancelled = BooleanField(default=False)
     booked_out = BooleanField(default=False)
 
-    base_form_class = SingleEventForm
-
-    # Override the save method to update the title
-    def save(self, *args, **kwargs):
-        if self.start_time:
-            self.title = f"{localtime(self.start_time).strftime('%Y-%m-%d %H:%M')} - {self.event_title}"
-        super().save(*args, **kwargs)
+    def __post_init__(self):
+        self.title.editable = False
 
     content_panels = Page.content_panels + [
-        FieldPanel('start_time', heading='Zeit'),
         FieldPanel('event_type', heading='Art der Veranstaltung'),
         FieldPanel('event_title', heading='Titel'),
+        FieldPanel('start_time', heading='Zeit'),
         FieldPanel('location', heading='Ort'),
         FieldPanel('referent', heading='Referent'),
         FieldPanel('abstract', heading='Zusammenfassung'),
@@ -79,6 +78,22 @@ class SingleEvent(Page):
         FieldPanel('cancelled', heading='Abgesagt'),
         FieldPanel('booked_out', heading='Ausgebucht')
     ]
+
+    # Override the save method to auto-generate title and slug
+    def save(self, *args, **kwargs):
+        self.title = _get_default_event_title(self.start_time, self.event_title)
+        self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+
+    base_form_class = SingleEventForm
+
+
+def _get_default_event_title(start_time, event_title):
+    if start_time and event_title:
+        formatted_start_time = localtime(start_time).strftime('%Y-%m-%d %H:%M')
+        return f"{formatted_start_time} - {event_title}"
+    return "Default Title"
+
 
 
 class EventListBlock(StructBlock):
