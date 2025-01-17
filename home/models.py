@@ -1,10 +1,10 @@
+import logging
 from copy import deepcopy
 from typing import Tuple
 
 from django.db.models import TextChoices
 from django.db.models.fields import DateTimeField, CharField, BooleanField
 from django.db.models.fields.files import ImageField
-from django.forms.widgets import DateTimeInput
 from django.utils.text import slugify
 from django.utils.timezone import localtime, now
 from wagtail.admin.forms.pages import WagtailAdminPageForm
@@ -14,8 +14,6 @@ from wagtail.blocks.struct_block import StructBlock
 from wagtail.fields import StreamField, RichTextField
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.models import Page
-
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -35,11 +33,11 @@ class HomePage(Page):
     ]
 
 class EventTypes(TextChoices):
-    TALK = "Vortrag"
-    HYBRID = "Hybride Vortrag"
-    ONLINE = "Online Vortrag"
-    OBSERVE = "Beobachtungsabend"
-    EXCURSION = "Ausflug"
+    TALK = "Vortrag", "Vortrag"
+    HYBRID = "Hybride Vortrag", "Hybride Vortrag"
+    ONLINE = "Online Vortrag", "Online Vortrag"
+    OBSERVE = "Beobachtungsabend", "Beobachtungsabend"
+    EXCURSION = "Ausflug", "Ausflug"
 
 class SingleEventForm(WagtailAdminPageForm):
 
@@ -55,7 +53,7 @@ class SingleEventForm(WagtailAdminPageForm):
 
 class SingleEvent(Page):
     start_time = DateTimeField()
-    event_type = CharField(choices=EventTypes)
+    event_type = CharField(choices=EventTypes.choices)
     event_title = CharField(max_length=100,default='')
     location = CharField(max_length=120, default="Deutsches Museum")
     referent = CharField(max_length=120)
