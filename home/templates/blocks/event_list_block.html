@@ -2,19 +2,23 @@
     {% if events %}
         <ul>
             {% for event in events %}
+                <style>
+                    .card .card-body .toggle-checkbox-{{ event.web_id }} {
+                        display: none;
+                    }
+                    .card .card-body .toggle-checkbox-{{ event.web_id }}:checked + .btn-info + .btn-reservation + .card-abstract {
+                        display: block;
+                    }
+                </style>                        
                 <div class="card">
                     <div class="card-header">Vortrag im Museum</div>
                     <div class="card-body">
                         <h2 class="card-title">{{ event.start_time|date:"l" }}, den
-                            {{ event.start_time|date:"m.d, H:i" }} Uhr</h2>
+                            {{ event.start_time|date:"d.m, H:i" }} Uhr</h2>
                         <p class="card-subtitle">{{ event.event_title }}<br>{{ event.referent }}</p>
-
-                        <!-- Hidden checkbox to toggle the abstract -->
-                        <input type="checkbox" id="toggle-info" class="toggle-checkbox">
-                        <label for="toggle-info" class="btn btn-info">Info</label>
+                        <input type="checkbox" id="toggle-info-{{ event.web_id }}" class="toggle-checkbox-{{ event.web_id }}">
+                        <label for="toggle-info-{{ event.web_id }}" class="btn btn-info">Info</label>
                         <a href="#" class="btn btn-reservation">Reservierung</a>
-
-                        <!-- Abstract content -->
                         <div class="card-abstract">
                             <p>{{ event.abstract|striptags }}</p>
                         </div>

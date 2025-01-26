@@ -1,8 +1,6 @@
-import urllib
 
 from django import template
 from urllib.parse import urlparse
-# import site:
 from wagtail.models import Site, Page
 
 register = template.Library()
@@ -19,3 +17,4 @@ def add_active_class(context: dict, menu_url: str)->str:
         return "active"
     else:
         return ""
+

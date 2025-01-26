@@ -1,3 +1,5 @@
+from functools import cached_property
+import hashlib
 import logging
 from copy import deepcopy
 from typing import Tuple
@@ -83,6 +85,11 @@ class SingleEvent(Page):
         self.slug = slugify(self.title)
         super().save(*args, **kwargs)
 
+    @cached_property
+    def web_id(self)->str:
+        hash_code = hashlib.sha256(str(self).encode('utf-8')).hexdigest()
+        return hash_code[:8]
+    
     base_form_class = SingleEventForm
 
 
@@ -91,7 +98,6 @@ def _get_default_event_title(start_time, event_title):
         formatted_start_time = localtime(start_time).strftime('%Y-%m-%d %H:%M')
         return f"{formatted_start_time} - {event_title}"
     return "Default Title"
-
 
 
 class EventListBlock(StructBlock):
