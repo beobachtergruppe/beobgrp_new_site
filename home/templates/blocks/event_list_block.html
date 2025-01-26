@@ -13,9 +13,9 @@
                 <div class="card">
                     <div class="card-header">Vortrag im Museum</div>
                     <div class="card-body">
-                        <h2 class="card-title">{{ event.start_time|date:"l" }}, den
-                            {{ event.start_time|date:"d.m, H:i" }} Uhr</h2>
-                        <p class="card-subtitle">{{ event.event_title }}<br>{{ event.referent }}</p>
+                        <p class="card-title">{{ event.start_time|date:"l" }}, den
+                            {{ event.start_time|date:"d.m, H:i" }} Uhr</p>
+                        <p class="card-subtitle"><b>{{ event.event_title }}</b><br>{{ event.referent }}</p>
                         <input type="checkbox" id="toggle-info-{{ event.web_id }}" class="toggle-checkbox-{{ event.web_id }}">
                         <label for="toggle-info-{{ event.web_id }}" class="btn btn-info">Info</label>
                         <a href="#" class="btn btn-reservation">Reservierung</a>
