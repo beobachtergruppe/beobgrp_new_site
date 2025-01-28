@@ -18,7 +18,7 @@
                         <p class="card-subtitle"><b>{{ event.event_title }}</b><br>{{ event.referent }}</p>
                         <input type="checkbox" id="toggle-info-{{ event.web_id }}" class="toggle-checkbox-{{ event.web_id }}">
                         <label for="toggle-info-{{ event.web_id }}" class="btn btn-info">Info</label>
-                        <a href="#" class="btn btn-reservation">Reservierung</a>
+                        <a href="{{ event.reservation_mailto_link }}" class="btn btn-reservation">Reservierung</a>
                         <div class="card-abstract">
                             <p>{{ event.abstract|striptags }}</p>
                         </div>
