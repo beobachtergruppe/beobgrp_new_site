@@ -111,7 +111,7 @@ class SingleEvent(Page):
     def reservation_mailto_link(self) -> str:
         return create_email_link(
             email_address="reservierung@beobachtergruppe.de",
-            subject=f"Anmeldung für den Vortrag am {self.start_time.date} ({self.event_title})",
+            subject=f"Anmeldung für den Vortrag am {self.start_time:%d.%m.%y} ({self.event_title})",
             body=textwrap.dedent(f"""
                   Liebe Beobachtergruppe,
                   

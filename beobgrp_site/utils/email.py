@@ -1,31 +1,34 @@
 import urllib.parse
 
+import locale
+
+locale.setlocale(locale.LC_TIME, "de_DE.UTF-8")
+
 
 def create_email_link(email_address, subject="", body=""):
     """
-    Create a mailto link for an email address with optional subject and body.
+    Create a properly encoded mailto link for an email address with an optional subject and body.
 
     Args:
-        email_address (str): The email address to send to.
+        email_address (str): The recipient email address.
         subject (str): The subject of the email (optional).
         body (str): The body content of the email (optional).
 
     Returns:
-        str: A mailto link that can be used in a web page.
+        str: A correctly formatted mailto link for embedding in a webpage.
     """
     # Base mailto link
     mailto_link = f"mailto:{urllib.parse.quote(email_address)}"
 
-    # Add subject and body if provided
-    params = {}
+    # Create query parameters
+    params = []
     if subject:
-        params["subject"] = subject
+        params.append(f"subject={urllib.parse.quote(subject)}")
     if body:
-        params["body"] = body
+        params.append(f"body={urllib.parse.quote(body)}")
 
-    # Encode parameters and append to the mailto link
+    # Append parameters if available
     if params:
-        query_string = urllib.parse.urlencode(params)
-        mailto_link += f"?{query_string}"
+        mailto_link += "?" + "&".join(params)
 
     return mailto_link
