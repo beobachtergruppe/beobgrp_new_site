@@ -49,6 +49,14 @@ RUN wget -qO - https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmo
     && apt-get update --yes --quiet && apt-get install postgresql-client-14 --yes --quiet \
     && rm -rf /var/lib/apt/lists/*
 
+# Install the german locale
+RUN apt-get update && apt-get install -y locales \
+&& sed -i '/de_DE.UTF-8/s/^# //g' /etc/locale.gen \
+&& locale-gen de_DE.UTF-8
+ENV LANG=de_DE.UTF-8
+ENV LANGUAGE=de_DE:de
+ENV LC_ALL=de_DE.UTF-8
+
 # Install the application server.
 RUN pip install "gunicorn==20.0.4"
 
