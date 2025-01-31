@@ -1,73 +1,74 @@
 # Website Beobachtergruppe
 
-Dieses Project enthält die neue Website der Beobachtergruppe, welche auf wagtail
-basiert is.
+This project contains the new website of https://www.beobachtergruppe.de
 
-## Installation
+## Installation 
 
-Die Website kann einfach mit einem docker compose setup gestartet werden:
+This has been tested with Linux, but the Windows Subsystem for Linux (WSL) should also work.
 
-Definiere das Passwort in der folgenden Environment Variable:
+### Development environment
 
-```shell
-export WAGTAIL_DB_PASSWORD="some_password"
-```
+Make sure that your development tools are installed:
+* Python 3.12
+* Database: Postgresql 14 (see e.g. https://ubuntu.com/server/docs/install-and-configure-postgresql)
+* git utilities
+* vscode IDE
 
-Im Project Folder:
-
-```shell
-docker compose up -d --build
-```
-
-Dann ist die Site auf https://localhost:8000 erreichbar. 
-
-Mit unserem Apache Server kann die Site Live geschaltet werden.
-
-## Entwickler Information
-
-### docker compose 
-
-Mit `docker compose` Kommandozeilen kann man die Services 'wagtail' und 
-'postgres' erreichen und z.B. wagtail Kommandos mit `docker compose -p beobgrp_site exec` ausführen.
-
-### Backup/Restore Database
-
-Auf dem Server kann man den Database mit dieser Kommandozeile speichern:
-```shell
-docker compose -p beobgrp_site exec postgres pg_dump --create -U wagtail beobgrp_site > beobgrp_site.sql
-```
-
-Mit diesem Kommando kann man den auf einem anderen Computer wieder restoren (sollte wagtail user haben):
+To install the development environment you first need to clone 
+the git repository (for that you need to have your public SSH key setup in Githib):
 
 ```shell
-psql -U postgres < beobgrp_site.sql
+git clone git@github.com:beobachtergruppe/beobgrp_site.git
 ```
 
-Hier ist angenommen, dass einen Postgres mit lokalen Rechten ohne Authentifizierung auf allen Datenbanken 
-installiert ist. Das ist völlig in Ordnung für Entwicklung, wenn der Datenbank nur Lokal erreichbar ist.
+Then go into the newly created project `beobgrp_site` and do the following:
 
-### Entwicklungsumgebung Linux
-
-Wenn man die Website entwickelt, dann möchte man alles einfach lokal testen. Dafür braucht man:
-
-- Eine lokale Postgresql Installation (Version 14), am einfachsten
-ohne Authentifizierung (siehe z.B. https://wiki.ubuntuusers.de/PostgreSQL/).
-  - Installiere Postgresql mit Ubuntu/Debian als folgt:
-    ```shell
-    apt install postgresql-14
-    ```
-  - Man kann die Authentifizierung in Linux ausschalten, wenn man
-  in `/etc/postgresql/14/main/pg_hba.conf` alle lokale Verbindungen
-  auf 'trust' setzt und alle anderen auf 'reject'. Siehe Konfigdatei [development_files/pg_hba.conf]()
-- Der beobgrp_site Datenbank restored (siehe oben).
-- Der User 'wagtail' existiert: `createuser -U postgres wagtail`.
-
-Dann kann man Wagtail im Entwicklermodus starten mit der folgenden Kommandozeile
-im project folder:
-
-```shell
-python manage.py runserver 8001
+* Setup the virtual environment (see e.g. https://virtualenv.pypa.io/en/latest/user_guide.html):
 ```
+virtualenv venv
+```
+* Upgrade the pip Python package installation tool:
+```
+pip install --upgrade pip
+```
+* Install all the packages for this project:
+```
+pip install -r requirements.txt
+```
+* Set the database password
+```
+export WAGTAIL_DB_PASSWORD="some_password" 
+```
+* Run the database migration to create the database:
+```
+./manage.py migrate
+```
+* Optionally restore a backup of the site data:
+```
+export DJANGO_BACKUP_DIR=/your/backup/dir
+./manage.py dbrestore
+./manage.py mediarestore
+```
+* Collect all static files:
+```
+manage.py collectstatic --noinput --clear
+```
+* Start the server in development mode:
+```
+./manage.py runserver 8001
+```
+Now you can access the server on http://localhost:8001
 
-und die Website auf http://localhost:8001 erreichen. 
-Nach jeder Änderung wird die Site neu geladen.
+### Production
+
+The production server runs with a Docker compose configuration.
+
+* Define the environment variables as in the previous section 
+(DJANGO_DB_PASSWORD and DJANGO_BACKUP_DIR)
+* Run the startup script `start_docker.sh` with one of the following modes:
+  - none: Just start the server without anything else
+  - restore: Restore the data before starting the server
+  - migrate: Run the migrations (should be done after any model change)
+
+- The server is reachable under http://localhost:8000
+
