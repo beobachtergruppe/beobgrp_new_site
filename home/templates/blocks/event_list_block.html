@@ -1,0 +1,32 @@
+<div class="event-list">
+    {% if events %}
+        <ul>
+            {% for event in events %}
+                <style>
+                    .card .card-body .toggle-checkbox-{{ event.web_id }} {
+                        display: none;
+                    }
+                    .card .card-body .toggle-checkbox-{{ event.web_id }}:checked + .btn-info + .btn-reservation + .card-abstract {
+                        display: block;
+                    }
+                </style>                        
+                <div class="card">
+                    <div class="card-header">Vortrag im Museum</div>
+                    <div class="card-body">
+                        <p class="card-title">{{ event.start_time|date:"l" }}, den
+                            {{ event.start_time|date:"d.m, H:i" }} Uhr</p>
+                        <p class="card-subtitle"><b>{{ event.event_title }}</b><br>{{ event.referent }}</p>
+                        <input type="checkbox" id="toggle-info-{{ event.web_id }}" class="toggle-checkbox-{{ event.web_id }}">
+                        <label for="toggle-info-{{ event.web_id }}" class="btn btn-info">Info</label>
+                        <a href="{{ event.reservation_mailto_link }}" class="btn btn-reservation">Reservierung</a>
+                        <div class="card-abstract">
+                            <p>{{ event.abstract|striptags }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Keine Veranstaltungen geplant</p>
+    {% endif %}
+</div>

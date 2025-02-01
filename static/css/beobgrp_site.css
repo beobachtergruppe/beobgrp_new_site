@@ -1,0 +1,154 @@
+h1, .block-h1 {
+  color: gold;
+  margin-bottom: 0.25em;
+  font-weight: bolder;
+  font-size: 2rem; }
+
+h2, .block-h2 {
+  color: gold;
+  margin-bottom: 0.25em;
+  font-weight: bold;
+  font-size: 1.75rem; }
+
+h3, .block-h3 {
+  color: gold;
+  margin-bottom: 0.125em;
+  font-size: 1.5rem; }
+
+h4, .block-h4 {
+  color: gold;
+  margin-bottom: 0.125em;
+  font-size: 1.25rem; }
+
+b {
+  color: gold; }
+
+a {
+  color: #cccc00; }
+
+main {
+  height: 100vh;
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("/static/images/Background_Oststernwarte_1600.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  padding-top: 0.5%;
+  padding-right: 0.5%;
+  padding-bottom: 0.5%;
+  padding-left: 0.5%; }
+  main * {
+    background: transparent; }
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  line-height: 1.2em;
+  background-color: black;
+  color: white;
+  padding-top: 0.5%;
+  padding-right: 0.5%;
+  padding-bottom: 0.5%;
+  padding-left: 0.5%; }
+
+/* Header */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1em;
+  background-color: #333;
+  color: #fff;
+  padding-top: 0.5%;
+  padding-right: 0.5%;
+  padding-bottom: 0.5%;
+  padding-left: 0.5%;
+  background-image: url("/static/images/banner.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover; }
+
+#desktop-nav {
+  background: transparent; }
+
+#desktop-nav ul {
+  list-style: none;
+  display: flex;
+  gap: 1em;
+  background: transparent; }
+
+#desktop-nav ul li a {
+  color: #fff;
+  text-decoration: none; }
+
+/* Mobile Menu */
+.menu-toggle {
+  display: none; }
+
+.menu-icon {
+  display: none;
+  font-size: 1.5em;
+  color: #fff;
+  cursor: pointer; }
+
+/* Hide Mobile Navigation by Default */
+#mobile-nav {
+  display: none;
+  position: absolute;
+  top: 60px;
+  right: 0;
+  width: 100%;
+  background-color: #333;
+  text-align: center; }
+
+#mobile-nav ul {
+  list-style: none;
+  padding: 1em; }
+
+#mobile-nav ul li a {
+  display: block;
+  color: #fff;
+  padding: 0.5em;
+  text-decoration: none; }
+
+.menu-item {
+  text-decoration: none;
+  /* Remove underline */
+  color: white;
+  padding: 0.5em 1em;
+  border: 1px solid #555;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  /* Smooth hover effect */
+  background-color: #00004e;
+  color: white;
+  font-size: 1em; }
+
+/* Hover effect for buttons */
+.menu-item:hover {
+  background-color: #0000b4;
+  color: white;
+  font-size: 1em;
+  background-color: #3e8f3e; }
+
+/* Active state for the last clicked button */
+.menu-item.active {
+  background-color: #0000b4;
+  color: white;
+  font-size: 1em; }
+
+/* When checkbox is checked, show the mobile menu */
+.menu-toggle:checked + .menu-icon + #mobile-nav {
+  display: block; }
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  #desktop-nav {
+    display: none; }
+  .menu-icon {
+    display: block; } }
+
+/*# sourceMappingURL=beobgrp_site.css.map */

@@ -1,0 +1,62 @@
+.card {
+  background-color: #1e1e2d;
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  width: 90%;
+  max-width: 500px; }
+  .card .card-header {
+    background-color: #33cc33;
+    padding: 10px;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold; }
+  .card .card-body {
+    padding: 15px; }
+    .card .card-body .card-title {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      color: #ffcc00; }
+    .card .card-body .card-subtitle {
+      font-size: 1rem;
+      margin-bottom: 15px;
+      color: #ffcc00; }
+    .card .card-body .btn-info {
+      background-color: #3333ff;
+      color: #fff;
+      display: inline-block;
+      padding: 8px 15px;
+      font-size: 0.9rem;
+      text-align: center;
+      border-radius: 4px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.3s; }
+      .card .card-body .btn-info:hover {
+        background-color: #6666ff; }
+    .card .card-body .btn-reservation {
+      background-color: #ffcc00;
+      color: #1e1e2d;
+      display: inline-block;
+      padding: 8px 15px;
+      font-size: 0.9rem;
+      text-align: center;
+      border-radius: 4px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.3s; }
+      .card .card-body .btn-reservation:hover {
+        background-color: #ffd633; }
+    .card .card-body .card-abstract {
+      display: none;
+      margin-top: 15px;
+      font-size: 0.9rem;
+      color: #ddd;
+      line-height: 1.4; }
+    .card .card-body .toggle-checkbox {
+      display: none; }
+    .card .card-body .toggle-checkbox:checked + .btn-info + .btn-reservation + .card-abstract {
+      display: block; }
+
+/*# sourceMappingURL=event_info.css.map */

@@ -126,3 +126,6 @@ env/
 venv/
 /.idea/
 /db/
+/media/
+/beobgrp_site.sql
+/beobgrp_site.sqlc

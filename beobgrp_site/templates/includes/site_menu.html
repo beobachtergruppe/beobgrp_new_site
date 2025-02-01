@@ -1,0 +1,11 @@
+{% load wagtailcore_tags navigation_tags %}
+
+<nav id="{{ menu_id }}">
+    <ul>
+        <li><a class="menu-item {% add_active_class site_root.url %}" href="{% pageurl site_root %}">Home</a></li>
+        {% for menuitem in site_root.get_children.live.in_menu %}
+            <li><a class="menu-item {% add_active_class menuitem.url %}"
+                   href="{% pageurl menuitem %}">{{ menuitem.title }}</a></li>
+        {% endfor %}
+    </ul>
+</nav>

@@ -2,13 +2,20 @@
 # docker run -v /path/to/local/db.sqlite3:/app/db.sqlite3 -p 8000:8000 your_image_name
 
 # Use an official Python runtime based on Debian 10 "buster" as a parent image.
-FROM python:3.12.2-slim-bullseye AS builder
+FROM python:3.12.8-bookworm AS builder
 
 # Get the database password from the build argument
 ENV WAGTAIL_DB_PASSWORD=${WAGTAIL_DB_PASSWORD}
 
+# Get the site init mode from an environment variable
+# The value may be 'migrate' or 'restore'
+ENV SITE_INIT_MODE=${SITE_INIT_MODE}
+
 # Host of the postgres container in the docker network
 ENV WAGTAIL_DB_HOST=postgres
+
+# Directory with the site_backup. This must be mounted in docker compose
+ENV DJANGO_BACKUP_DIR=/site_backup
 
 # Add user that will be used in the container.
 RUN useradd wagtail
@@ -32,7 +39,23 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
     libwebp-dev \
     pkg-config \
     python3-dev \
- && rm -rf /var/lib/apt/lists/*
+    wget \
+    gnupg \
+    lsb-release
+
+# Install Postgres 14 from a dedicated repository
+RUN wget -qO - https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/pgdg.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/pgdg.gpg] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+    && apt-get update --yes --quiet && apt-get install postgresql-client-14 --yes --quiet \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install the german locale
+RUN apt-get update && apt-get install -y locales \
+&& sed -i '/de_DE.UTF-8/s/^# //g' /etc/locale.gen \
+&& locale-gen de_DE.UTF-8
+ENV LANG=de_DE.UTF-8
+ENV LANGUAGE=de_DE:de
+ENV LC_ALL=de_DE.UTF-8
 
 # Install the application server.
 RUN pip install "gunicorn==20.0.4"
@@ -58,13 +81,4 @@ USER wagtail
 # Collect static files.
 RUN python manage.py collectstatic --noinput --clear
 
-# Runtime command that executes when "docker run" is called, it does the
-# following:
-#   1. Migrate the database.
-#   2. Start the application server.
-# WARNING:
-#   Migrating database at the same time as starting the server IS NOT THE BEST
-#   PRACTICE. The database should be migrated manually or using the release
-#   phase facilities of your hosting platform. This is used only so the
-#   Wagtail instance can be started with a simple "docker run" command.
-CMD set -xe; python manage.py migrate --noinput; gunicorn beobgrp_site.wsgi:application
+ENTRYPOINT ./docker_entry_point.sh
