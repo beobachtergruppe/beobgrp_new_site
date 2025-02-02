@@ -11,4 +11,4 @@ if [ -z "$WAGTAIL_DB_PASSWORD" ]; then
   exit 1
 fi
 
-docker compose up -d --build
+cd $(dirname $0) && docker compose up -d --build
