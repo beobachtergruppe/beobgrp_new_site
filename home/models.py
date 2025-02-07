@@ -99,7 +99,7 @@ class SingleEvent(Page):
 
     @cached_property
     def first_reservation_date(self) -> date:
-        return self.start_time.date - timedelta(weeks=4)
+        return self.start_time.date() - timedelta(weeks=4)
 
     @cached_property
     def is_reservable(self) -> bool:
@@ -107,7 +107,7 @@ class SingleEvent(Page):
         An event is reservable up to 4 weeks in advance if not cancelled or booked out
         """
         is_open = not self.cancelled and not self.booked_out
-        return datetime.now() >= self.first_reservation_date and is_open
+        return date.today() >= self.first_reservation_date and is_open
 
     @cached_property
     def reservation_mailto_link(self) -> str:

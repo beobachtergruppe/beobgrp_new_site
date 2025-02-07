@@ -6,7 +6,7 @@
                     .card .card-body .toggle-checkbox-{{ event.web_id }} {
                         display: none;
                     }
-                    .card .card-body .toggle-checkbox-{{ event.web_id }}:checked + .btn-info + .btn-reservation + .card-abstract {
+                    .card .card-body .toggle-checkbox-{{ event.web_id }}:checked + .btn-info + .card-abstract {
                         display: block;
                     }
                 </style>                        
@@ -18,7 +18,15 @@
                         <p class="card-subtitle"><b>{{ event.event_title }}</b><br>{{ event.referent }}</p>
                         <input type="checkbox" id="toggle-info-{{ event.web_id }}" class="toggle-checkbox-{{ event.web_id }}">
                         <label for="toggle-info-{{ event.web_id }}" class="btn btn-info">Info</label>
-                        <a href="{{ event.reservation_mailto_link }}" class="btn btn-reservation">Reservierung</a>
+                        {% if event.needs_reservation %}
+                            {% if event.is_reservable %}
+                                <a href="{{ event.reservation_mailto_link }}" class="btn btn-reservation">Reservierung</a>
+                            {% else %}
+                                Reservierbar ab dem {{ event.first_reservation_date|date:"d.m" }}
+                            {% endif %}
+                        {% else %}
+                            Keine Reservierung erforderlich
+                        {% endif %}
                         <div class="card-abstract">
                             <p>{{ event.abstract|striptags }}</p>
                         </div>
