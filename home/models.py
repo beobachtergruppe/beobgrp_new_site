@@ -68,20 +68,22 @@ class SingleEvent(Page):
     image = ImageField(blank=True)
     cancelled = BooleanField(default=False)
     booked_out = BooleanField(default=False)
+    needs_reservation = BooleanField(default=True)
 
     def __post_init__(self):
         self.title.editable = False
 
     content_panels = Page.content_panels + [
-        FieldPanel("cancelled", heading="Abgesagt"),
-        FieldPanel("booked_out", heading="Ausgebucht"),
         FieldPanel("event_type", heading="Art der Veranstaltung"),
         FieldPanel("event_title", heading="Titel"),
+        FieldPanel("needs_reservation", heading="Reservierung erforderlich"),
+        FieldPanel("cancelled", heading="Abgesagt"),
+        FieldPanel("booked_out", heading="Ausgebucht"),
         FieldPanel("start_time", heading="Zeit"),
         FieldPanel("location", heading="Ort"),
         FieldPanel("referent", heading="Referent"),
         FieldPanel("abstract", heading="Zusammenfassung"),
-        FieldPanel("image", heading="Foto"),
+        FieldPanel("image", heading="Foto")
     ]
 
     # Override the save method to auto-generate title and slug
