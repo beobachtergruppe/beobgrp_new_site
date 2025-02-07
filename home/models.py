@@ -68,20 +68,22 @@ class SingleEvent(Page):
     image = ImageField(blank=True)
     cancelled = BooleanField(default=False)
     booked_out = BooleanField(default=False)
+    needs_reservation = BooleanField(default=True)
 
     def __post_init__(self):
         self.title.editable = False
 
     content_panels = Page.content_panels + [
-        FieldPanel("cancelled", heading="Abgesagt"),
-        FieldPanel("booked_out", heading="Ausgebucht"),
         FieldPanel("event_type", heading="Art der Veranstaltung"),
         FieldPanel("event_title", heading="Titel"),
+        FieldPanel("needs_reservation", heading="Reservierung erforderlich"),
+        FieldPanel("cancelled", heading="Abgesagt"),
+        FieldPanel("booked_out", heading="Ausgebucht"),
         FieldPanel("start_time", heading="Zeit"),
         FieldPanel("location", heading="Ort"),
         FieldPanel("referent", heading="Referent"),
         FieldPanel("abstract", heading="Zusammenfassung"),
-        FieldPanel("image", heading="Foto"),
+        FieldPanel("image", heading="Foto")
     ]
 
     # Override the save method to auto-generate title and slug
@@ -97,7 +99,7 @@ class SingleEvent(Page):
 
     @cached_property
     def first_reservation_date(self) -> date:
-        return self.start_time.date - timedelta(weeks=4)
+        return self.start_time.date() - timedelta(weeks=4)
 
     @cached_property
     def is_reservable(self) -> bool:
@@ -105,7 +107,7 @@ class SingleEvent(Page):
         An event is reservable up to 4 weeks in advance if not cancelled or booked out
         """
         is_open = not self.cancelled and not self.booked_out
-        return datetime.now() >= self.first_reservation_date and is_open
+        return date.today() >= self.first_reservation_date and is_open
 
     @cached_property
     def reservation_mailto_link(self) -> str:
