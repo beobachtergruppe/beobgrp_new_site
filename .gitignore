@@ -129,3 +129,6 @@ venv/
 /media/
 /beobgrp_site.sql
 /beobgrp_site.sqlc
+
+# Static files are collected by collectstatic
+/static/

@@ -1,5 +1,6 @@
 volumes:
-  internal: {}
+  internal1: {}
+  internal2: {}
 
 services:
   wagtail:
@@ -9,6 +10,7 @@ services:
       SITE_INIT_MODE: ${SITE_INIT_MODE}
     volumes:
       - ${DJANGO_BACKUP_DIR}:/site_backup
+      - internal2:/media
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:
@@ -32,7 +34,7 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - internal:/var/lib/postgresql/data
+      - internal1:/var/lib/postgresql/data
     networks:
       - wagtail_network
 
