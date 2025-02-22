@@ -1,6 +1,6 @@
 volumes:
-  internal1: {}
-  internal2: {}
+  internal_postgres16: {}
+  internal_wagtail: {}
 
 services:
   wagtail:
@@ -10,7 +10,7 @@ services:
       SITE_INIT_MODE: ${SITE_INIT_MODE}
     volumes:
       - ${DJANGO_BACKUP_DIR}:/site_backup
-      - internal2:/media
+      - internal_wagtail:/media
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:
@@ -21,7 +21,7 @@ services:
       - wagtail_network
 
   postgres:
-    image: postgres:14-alpine
+    image: postgres:16-alpine
     environment:
       POSTGRES_USER: wagtail
       POSTGRES_PASSWORD: ${WAGTAIL_DB_PASSWORD}
@@ -29,12 +29,12 @@ services:
     ports:
       - "127.0.0.1:54320:5432"
     healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "wagtail", "-d", "beobgrp_site" ]
+      test: [ "CMD-SHELL", "pg_isready -U wagtail" ]
       interval: 10s
       timeout: 5s
       retries: 5
     volumes:
-      - internal1:/var/lib/postgresql/data
+      - internal_postgres16:/var/lib/postgresql/data
     networks:
       - wagtail_network
 
