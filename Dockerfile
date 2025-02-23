@@ -42,8 +42,6 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
     libwebp-dev \
     pkg-config \
     python3-dev \
-    wget \
-    gnupg \
     lsb-release
 
 # Install Postgres 16 from a dedicated repository
@@ -62,8 +60,10 @@ ENV LANG=de_DE.UTF-8
 ENV LANGUAGE=de_DE:de
 ENV LC_ALL=de_DE.UTF-8
 
+RUN pip install --upgrade pip
+
 # Install the application server.
-RUN pip install "gunicorn==20.0.4"
+RUN pip install "gunicorn==23.0.0"
 
 # Install the project requirements.
 COPY requirements.txt /

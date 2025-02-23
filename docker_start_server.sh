@@ -20,6 +20,7 @@ python manage.py collectstatic --noinput --clear
 case "$SITE_INIT_MODE" in
   migrate)
     python manage.py migrate --noinput
+    python manage.py migrate --noinput
     ;;
   restore)
     python manage.py migrate --noinput
