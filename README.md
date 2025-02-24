@@ -10,9 +10,10 @@ This has been tested with Linux, but the Windows Subsystem for Linux (WSL) shoul
 
 Make sure that your development tools are installed:
 * Python 3.12
-* Database: Postgresql 14 (see e.g. https://ubuntu.com/server/docs/install-and-configure-postgresql)
+* Database: Postgresql 16 (see https://www.postgresql.org/download/)
 * git utilities
 * vscode IDE
+
 
 To install the development environment you first need to clone 
 the git repository (for that you need to have your public SSH key setup in Githib):
@@ -39,6 +40,16 @@ pip install -r requirements.txt
 ```
 export WAGTAIL_DB_PASSWORD="some_password" 
 ```
+* Create the role 'wagtail' with the password as above 
+(on Linux using postgres account from installation):
+```
+sudo -u postgres psql -c "CREATE USER wagtail WITH PASSWORD '$WAGTAIL_DB_PASSWORD';"
+```
+* Create the database beobgrp_site and allow access for user 'wagtail':
+```
+sudo -u postgres createb beobgrp_site
+sudo -u postgres psql -c "ALTER DATABASE beobgrp_site OWNER TO wagtail;"
+```
 * Run the database migration to create the database:
 ```
 ./manage.py migrate
@@ -49,6 +60,7 @@ export DJANGO_BACKUP_DIR=/your/backup/dir
 ./manage.py dbrestore
 ./manage.py mediarestore
 ```
+Your backup directory may contain a backup from our server.
 * Collect all static files:
 ```
 manage.py collectstatic --noinput --clear

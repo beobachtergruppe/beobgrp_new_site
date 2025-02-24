@@ -42,15 +42,15 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
     libwebp-dev \
     pkg-config \
     python3-dev \
-    wget \
-    gnupg \
     lsb-release
 
-# Install Postgres 14 from a dedicated repository
-RUN wget -qO - https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/pgdg.gpg \
-    && echo "deb [signed-by=/usr/share/keyrings/pgdg.gpg] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
-    && apt-get update --yes --quiet && apt-get install postgresql-client-14 --yes --quiet \
-    && rm -rf /var/lib/apt/lists/*
+# Install Postgres 16 from a dedicated repository
+COPY dpdg.list /etc/apt/sources.list.d/
+RUN apt install curl ca-certificates && \
+    install -d /usr/share/postgresql-common/pgdg && \
+    curl -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc --fail https://www.postgresql.org/media/keys/ACCC4CF8.asc && \
+    apt update && \
+    apt install -y postgresql-client-16
 
 # Install the german locale
 RUN apt-get update && apt-get install -y locales \
@@ -60,8 +60,10 @@ ENV LANG=de_DE.UTF-8
 ENV LANGUAGE=de_DE:de
 ENV LC_ALL=de_DE.UTF-8
 
+RUN pip install --upgrade pip
+
 # Install the application server.
-RUN pip install "gunicorn==20.0.4"
+RUN pip install "gunicorn==23.0.0"
 
 # Install the project requirements.
 COPY requirements.txt /
