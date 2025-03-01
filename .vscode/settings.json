@@ -1,4 +1,6 @@
 {
     "files.autoSave": "afterDelay",
-    "editor.fontSize": 16
+    "editor.fontSize": 14,
+    "window.zoomLevel": 1,
+    "git.autofetch": false
 }
