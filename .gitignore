@@ -134,3 +134,6 @@ venv/
 /static/
 
 tmp/
+
+# CSS files are compiled from SCSS
+*.css
