@@ -132,3 +132,5 @@ venv/
 
 # Static files are collected by collectstatic
 /static/
+
+tmp/

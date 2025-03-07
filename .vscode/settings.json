@@ -2,5 +2,17 @@
     "files.autoSave": "afterDelay",
     "editor.fontSize": 14,
     "window.zoomLevel": 1,
-    "git.autofetch": false
+    "git.autofetch": false,
+    "sqltools.connections": [
+
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "local django",
+            "database": "beobgrp_site",
+            "username": "wagtail"
+        }
+    ]
 }
