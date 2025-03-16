@@ -136,4 +136,7 @@ venv/
 tmp/
 
 # CSS files are compiled from SCSS
-*.css
+/beobgrp_site/**/*.css*
+/home/**/*.css*
+/node_modules/
+package-lock.json

@@ -26,7 +26,6 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 INSTALLED_APPS = [
     "home",
     "search",
-    "sass_processor",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
     "wagtail.embeds",
@@ -47,7 +46,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "beobgrp_site",
-    "dbbackup"
+    "dbbackup",
+    "compressor"
 ]
 
 MIDDLEWARE = [
@@ -133,11 +133,11 @@ USE_TZ = True
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-    'sass_processor.finders.CssFinder'
+    'compressor.finders.CompressorFinder'
 ]
 
 STATICFILES_DIRS = [
-    os.path.join(PROJECT_DIR, "static"),
+    os.path.join(PROJECT_DIR, directory) for directory in ["static", "beobgrp_site/static","home/static"]
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
@@ -161,9 +161,6 @@ STORAGES = {
     }
 }
 
-# Required for bootstrap SASS
-SASS_PRECISION = 8
-
 # Wagtail settings
 
 WAGTAIL_SITE_NAME = "beobgrp_site"
@@ -183,3 +180,10 @@ WAGTAILADMIN_BASE_URL = "https://www.beobachtergruppe.de"
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_STORAGE_OPTIONS = {'location': os.environ.get("DJANGO_BACKUP_DIR","../beobgrp_site_backup")}
 
+SASS_LOAD_PATH = os.environ.get("SASS_LOAD_PATH", os.path.join(BASE_DIR,'node_modules'))
+
+COMPRESS_PRECOMPILERS = (
+    ('text/x-scss', f'dart-sass --load-path {SASS_LOAD_PATH} --update '+'{infile} {outfile}'),
+)
+
+COMPRESS_ENABLED = True
