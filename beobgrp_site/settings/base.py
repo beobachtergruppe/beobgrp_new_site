@@ -20,10 +20,32 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
+# Logging
+
+LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['console'],
+                'level': 'INFO',  # Or 'INFO', 'WARNING', etc.
+            },
+            'compressor': { #for debugging compressor
+                'handlers': ['console'],
+                'level': 'DEBUG',
+            }
+        },
+    }
 
 # Application definition
 
 INSTALLED_APPS = [
+    "beobgrp_site",
     "home",
     "search",
     "wagtail.contrib.forms",
@@ -45,7 +67,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "beobgrp_site",
     "dbbackup",
     "compressor"
 ]
@@ -136,10 +157,6 @@ STATICFILES_FINDERS = [
     'compressor.finders.CompressorFinder'
 ]
 
-STATICFILES_DIRS = [
-    os.path.join(PROJECT_DIR, directory) for directory in ["static", "beobgrp_site/static","home/static"]
-]
-
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_URL = "/static/"
 
@@ -183,7 +200,8 @@ DBBACKUP_STORAGE_OPTIONS = {'location': os.environ.get("DJANGO_BACKUP_DIR","../b
 SASS_LOAD_PATH = os.environ.get("SASS_LOAD_PATH", os.path.join(BASE_DIR,'node_modules'))
 
 COMPRESS_PRECOMPILERS = (
-    ('text/x-scss', f'dart-sass --load-path {SASS_LOAD_PATH} --update '+'{infile} {outfile}'),
+    ('text/x-scss', f'dart-sass --load-path {SASS_LOAD_PATH} '+'{infile}'),
 )
 
 COMPRESS_ENABLED = True
+COMPRESS_VERBOSE = True
