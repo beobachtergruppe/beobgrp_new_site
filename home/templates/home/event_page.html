@@ -5,9 +5,7 @@
 {% block body_class %}template-eventpage{% endblock %}
 
 {% block extra_css %}
-{% compress css %}
     <link rel="stylesheet" type="text/x-scss" href="{% static 'css/event_info.scss' %}"/>
-{% endcompress %}
 {% endblock extra_css %}
 
 {% event_checkbox_style test }

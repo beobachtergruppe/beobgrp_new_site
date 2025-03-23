@@ -200,7 +200,7 @@ DBBACKUP_STORAGE_OPTIONS = {'location': os.environ.get("DJANGO_BACKUP_DIR","../b
 SASS_LOAD_PATH = os.environ.get("SASS_LOAD_PATH", os.path.join(BASE_DIR,'node_modules'))
 
 COMPRESS_PRECOMPILERS = (
-    ('text/x-scss', f'dart-sass --load-path {SASS_LOAD_PATH} '+'{infile}'),
+    ('text/x-scss', f'dart-sass -q --load-path {SASS_LOAD_PATH} '+'{infile}'),
 )
 
 COMPRESS_ENABLED = True
