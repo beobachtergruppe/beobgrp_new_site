@@ -139,4 +139,5 @@ tmp/
 /beobgrp_site/**/*.css*
 /home/**/*.css*
 /node_modules/
+
 package-lock.json
