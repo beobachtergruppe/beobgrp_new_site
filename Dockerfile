@@ -43,7 +43,7 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
     pkg-config \
     python3-dev \
     lsb-release \
-    snapd
+    npm
 
 # Install Postgres 16 from a dedicated repository
 COPY dpdg.list /etc/apt/sources.list.d/
@@ -61,8 +61,7 @@ ENV LANG=de_DE.UTF-8
 ENV LANGUAGE=de_DE:de
 ENV LC_ALL=de_DE.UTF-8
 
-# Install bulma and dart-sass with snap and npm
-RUN snap install dart-sass npm 
+RUN npm install --global sass
 
 RUN pip install --upgrade pip
 
