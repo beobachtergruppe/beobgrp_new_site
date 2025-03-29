@@ -2,7 +2,7 @@
 {% load compress %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="theme-dark">
     <head>
         <title>{{ page.title }}</title>
         <meta charset="utf-8" />
@@ -33,15 +33,16 @@
         <header>
             {% get_site_root as site_root %}
         
-            <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+            <nav class="navbar" role="navigation" aria-label="main navigation">
                 <div class="container">
                     <div class="navbar-brand">
-                        <a class="navbar-item" href="{% pageurl site_root %}">
-                            <img src="{% static 'images/logo-beobachtergruppe.jpg' %}" alt="Logo" width="112" height="28">
+                        <a class="navbar-logo" href="{% pageurl site_root %}">
+                            <img class="image" src="{% static 'images/logo-beobachtergruppe.jpg' %}" alt="Logo">
                         </a>
             
                         <!-- Bulma's navbar-burger toggle -->
-                        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
+                        <a role="button" class="navbar-burger is-info" aria-label="menu" aria-expanded="false" data-target="navMenu">
+                            <span aria-hidden="true"></span>
                             <span aria-hidden="true"></span>
                             <span aria-hidden="true"></span>
                             <span aria-hidden="true"></span>
@@ -62,13 +63,13 @@
         </header>
                 
         {# Main Layout #}
-        <div class="container mt-5">
+        <div class="container mt-3">
             <div class="columns">
-                <aside class="column is-one-quarter">
+                <aside class="aside-column is-one-fifth">
                     {% block sidebar %}{% endblock %}
                 </aside>
 
-                <main id="main-content" class="column">
+                <main id="main-content" class="content-column">
                     <section class="section">
                         <div id="content">
                             {% block content %}{% endblock %}

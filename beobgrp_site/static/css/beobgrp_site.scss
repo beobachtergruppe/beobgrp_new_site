@@ -4,7 +4,10 @@ $link: darken(yellow, 10%);
 $text-strong: white;
 $text: white;
 $background: black;
-$body-background-color: black;
+
+// other colors
+$content-background-color: #08286c;
+$aside-background-color: #0c358e;
 
 // Navbar
 $navbar-background-color: #333;
@@ -58,3 +61,40 @@ $background-opacity: 0.7;
 }
 
 
+.navbar {
+  min-height: 5rem; // Increase navbar height for larger logo
+
+  @media (max-width: 1024px) {
+    min-height: 3rem; // Adjust for tablets
+  }
+
+  @media (max-width: 768px) {
+    min-height: 2.5rem; // Adjust for mobile
+  }
+}
+
+.navbar-logo {
+  @extend .navbar-item;
+  display: flex;
+  align-items: center; // Ensure vertical alignment
+  padding: 0; // Remove extra padding
+
+  img {
+    max-height: 4rem; // Increase logo size
+    width: auto; // Maintain aspect ratio
+  }
+}
+
+.content-column {
+  @extend .column;
+  background-color: $content-background-color;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.aside-column {
+  @extend .content-column;
+  background-color: $aside-background-color;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
