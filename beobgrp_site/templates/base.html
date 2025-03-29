@@ -1,7 +1,8 @@
-{% load static sass_tags wagtailcore_tags navigation_tags wagtailuserbar %}
+{% load static wagtailcore_tags navigation_tags wagtailuserbar %}
+{% load compress %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="theme-dark">
     <head>
         <title>{{ page.title }}</title>
         <meta charset="utf-8" />
@@ -16,11 +17,14 @@
         {% endif %}
 
         {# Global stylesheets #}
-        <link rel="stylesheet" type="text/css" href="{% sass_src 'css/beobgrp_site.scss' %}">
-
+        {% compress css %}
+        <link rel="stylesheet" type="text/x-scss" href="{% static 'css/beobgrp_site.scss' %}"/>
         {% block extra_css %}
         {# Override this in templates to add extra stylesheets #}
         {% endblock %}
+        {% endcompress %}
+
+
     </head>
 
     <body class="{% block body_class %}{% endblock %}">
@@ -28,30 +32,52 @@
 
         <header>
             {% get_site_root as site_root %}
-            {%  include "includes/site_menu.html" with menu_id="desktop-nav" %} <!-- Desktop Menu -->
-
-            <!-- Mobile Menu Button -->
-            <input type="checkbox" id="menu-toggle" class="menu-toggle">
-            <label for="menu-toggle" class="menu-icon">&#9776;</label>
-
-            <!-- Mobile Navigation -->
-            {% include "includes/site_menu.html" with menu_id="mobile-nav" %}
-        </header>
-
-        <div class="container">
-            <!-- Sidebar -->
-            <aside class="sidebar">
-                {% block sidebar %}{% endblock %}
-            </aside>
-
-            <!-- Main Content -->
-            <main id="main-content">
-                <div id="content">
-                    {% block content %}{% endblock %}
+        
+            <nav class="navbar" role="navigation" aria-label="main navigation">
+                <div class="container">
+                    <div class="navbar-brand">
+                        <a class="navbar-logo" href="{% pageurl site_root %}">
+                            <img class="image" src="{% static 'images/logo-beobachtergruppe.jpg' %}" alt="Logo">
+                        </a>
+            
+                        <!-- Bulma's navbar-burger toggle -->
+                        <a role="button" class="navbar-burger is-info" aria-label="menu" aria-expanded="false" data-target="navMenu">
+                            <span aria-hidden="true"></span>
+                            <span aria-hidden="true"></span>
+                            <span aria-hidden="true"></span>
+                            <span aria-hidden="true"></span>
+                        </a>
+                    </div>
+            
+                    <!-- Navbar menu (hidden on mobile by default) -->
+                    <div id="navMenu" class="navbar-menu">
+                        <div class="navbar-start">
+                            <a class="navbar-item" href="{% pageurl site_root %}">Home</a>
+                            {% for menuitem in site_root.get_children.live.in_menu %}
+                                <a class="navbar-item" href="{% pageurl menuitem %}">{{ menuitem.title }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
-            </main>
-        </div>
+            </nav>
+        </header>
+                
+        {# Main Layout #}
+        <div class="container mt-3">
+            <div class="columns">
+                <aside class="aside-column is-one-fifth">
+                    {% block sidebar %}{% endblock %}
+                </aside>
 
+                <main id="main-content" class="content-column">
+                    <section class="section">
+                        <div id="content">
+                            {% block content %}{% endblock %}
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </div>
 
 
         {# Global javascript #}

@@ -2,7 +2,7 @@
 # docker run -v /path/to/local/db.sqlite3:/app/db.sqlite3 -p 8000:8000 your_image_name
 
 # Use an official Python runtime based on Debian 10 "buster" as a parent image.
-FROM python:3.12.8-bookworm AS builder
+FROM python:3.12.9-bookworm AS builder
 
 # Get the database password from the build argument
 ENV WAGTAIL_DB_PASSWORD=${WAGTAIL_DB_PASSWORD}
@@ -42,7 +42,8 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
     libwebp-dev \
     pkg-config \
     python3-dev \
-    lsb-release
+    lsb-release \
+    npm
 
 # Install Postgres 16 from a dedicated repository
 COPY dpdg.list /etc/apt/sources.list.d/
@@ -59,6 +60,8 @@ RUN apt-get update && apt-get install -y locales \
 ENV LANG=de_DE.UTF-8
 ENV LANGUAGE=de_DE:de
 ENV LC_ALL=de_DE.UTF-8
+
+RUN npm install --global sass
 
 RUN pip install --upgrade pip
 
@@ -77,6 +80,10 @@ RUN chown -R wagtail:wagtail /app
 
 # The persistent media directory must also be writeable by the "wagtail" user.
 RUN mkdir -p /media 
+
+# Install bulma
+RUN npm init -y && \
+    npm install bulma
 
 # Copy the source code of the project into the container.
 COPY --chown=wagtail:wagtail . .

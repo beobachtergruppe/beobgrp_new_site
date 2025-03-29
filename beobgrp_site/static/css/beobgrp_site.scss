@@ -1,199 +1,100 @@
-// main base colors for site
-$main-background: black;
-$main-foreground: white;
-$button-background: darken(darkblue, 12%);
-$button-foreground: white;
-$lower-left-background: darkblue;
-$lower-right-background: black;
-$event-color: darken(blue, 20%);
+// Custom Variables
+$primary: gold;
+$link: darken(yellow, 10%);
+$text-strong: white;
+$text: white;
+$background: black;
+
+// other colors
+$content-background-color: #08286c;
+$aside-background-color: #0c358e;
+
+// Navbar
+$navbar-background-color: #333;
+$navbar-item-color: white;
+
+// Buttons
+$button-color: white;
+$button-background-color: darken(darkblue, 12%);
 
 $background-opacity: 0.7;
 
-h1, .block-h1 {
+@use "bulma/sass" with (
+  $background: black,
+);
+
+// html, body {
+//   background: linear-gradient(rgba(0, 0, 0, $background-opacity), rgba(0, 0, 0, $background-opacity)),
+//     url('/static/images/Background_Oststernwarte_1600.jpg') no-repeat center fixed;
+//   background-size: cover;
+//   color: $text;
+// }
+
+.block-h1 {
+  @extend .title;
+  @extend .is-1;
   color: gold;
-  margin-bottom: 0.25em;
-  font-weight: bolder;
-  font-size: 2rem;
 }
 
-h2, .block-h2 {
+.block-h2 {
+  @extend .title;
+  @extend .is-2;
   color: gold;
-  margin-bottom: 0.25em;
-  font-weight: bold;
-  font-size: 1.75rem;
 }
 
-h3, .block-h3 {
+.block-h3 {
+  @extend .title;
+  @extend .is-3;
   color: gold;
-  margin-bottom: 0.125em;
-  font-size: 1.5rem;
 }
 
-h4, .block-h4 {
+.block-h4 {
+  @extend .title;
+  @extend .is-4;
   color: gold;
-  margin-bottom: 0.125em;
-  font-size: 1.25rem;
 }
 
-b {
-  color: gold
+.block-h5 {
+  @extend .title;
+  @extend .is-5;
+  color: gold;
 }
 
-a {
-  color: darken(yellow, 10%);
-}
 
-@mixin default-colors {
-  background-color: $main-background;
-  color: $main-foreground;
-}
+.navbar {
+  min-height: 5rem; // Increase navbar height for larger logo
 
-// style for all buttons
-@mixin button-style {
-  background-color: $button-background;
-  color: $button-foreground;
-  font-size: 1em
-}
+  @media (max-width: 1024px) {
+    min-height: 3rem; // Adjust for tablets
+  }
 
-@mixin border-style {
-  padding-top: 0.5%;
-  padding-right: 0.5%;
-  padding-bottom: 0.5%;
-  padding-left: 0.5%;
-}
-
-@mixin button-style-active {
-  background-color: lighten($button-background, 20%);
-  color: lighten($button-foreground, 20%);
-  font-size: 1em
-}
-
-main {
-  height: 100vh;
-  background: linear-gradient(rgba(0, 0, 0, $background-opacity), rgba(0, 0, 0, $background-opacity)),
-  url('/static/images/Background_Oststernwarte_1600.jpg');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-size: cover;
-  @include border-style;
-
-  * {
-    background: transparent;
+  @media (max-width: 768px) {
+    min-height: 2.5rem; // Adjust for mobile
   }
 }
 
-/* Reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
-  line-height: 1.2em;
-  @include default-colors;
-  @include border-style
-}
-
-/* Header */
-header {
+.navbar-logo {
+  @extend .navbar-item;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1em;
-  background-color: #333;
-  color: #fff;
-  @include border-style;
-  background-image: url('/static/images/banner.jpg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover
-}
+  align-items: center; // Ensure vertical alignment
+  padding: 0; // Remove extra padding
 
-#desktop-nav {
-  background: transparent;
-}
-
-#desktop-nav ul {
-  list-style: none;
-  display: flex;
-  gap: 1em;
-  background: transparent;
-}
-
-#desktop-nav ul li a {
-  color: #fff;
-  text-decoration: none
-}
-
-/* Mobile Menu */
-.menu-toggle {
-  display: none;
-}
-
-.menu-icon {
-  display: none;
-  font-size: 1.5em;
-  color: #fff;
-  cursor: pointer;
-}
-
-/* Hide Mobile Navigation by Default */
-#mobile-nav {
-  display: none;
-  position: absolute;
-  top: 60px;
-  right: 0;
-  width: 100%;
-  background-color: #333;
-  text-align: center;
-}
-
-#mobile-nav ul {
-  list-style: none;
-  padding: 1em;
-}
-
-#mobile-nav ul li a {
-  display: block;
-  color: #fff;
-  padding: 0.5em;
-  text-decoration: none;
-}
-
-.menu-item {
-  text-decoration: none; /* Remove underline */
-  color: white;
-  padding: 0.5em 1em;
-  border: 1px solid #555;
-  border-radius: 4px;
-  transition: background-color 0.3s; /* Smooth hover effect */
-  @include button-style
-}
-
-/* Hover effect for buttons */
-.menu-item:hover {
-  @include button-style-active;
-  background-color: #3e8f3e;
-}
-
-/* Active state for the last clicked button */
-.menu-item.active {
-  @include button-style-active
-}
-
-/* When checkbox is checked, show the mobile menu */
-.menu-toggle:checked + .menu-icon + #mobile-nav {
-  display: block;
-}
-
-/* Responsive Styles */
-@media (max-width: 768px) {
-  #desktop-nav {
-    display: none;
-  }
-
-  .menu-icon {
-    display: block;
+  img {
+    max-height: 4rem; // Increase logo size
+    width: auto; // Maintain aspect ratio
   }
 }
 
+.content-column {
+  @extend .column;
+  background-color: $content-background-color;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.aside-column {
+  @extend .content-column;
+  background-color: $aside-background-color;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}

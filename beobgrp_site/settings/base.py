@@ -20,13 +20,34 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
+# Logging
+
+LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['console'],
+                'level': 'INFO',  # Or 'INFO', 'WARNING', etc.
+            },
+            'compressor': { #for debugging compressor
+                'handlers': ['console'],
+                'level': 'DEBUG',
+            }
+        },
+    }
 
 # Application definition
 
 INSTALLED_APPS = [
+    "beobgrp_site",
     "home",
     "search",
-    "sass_processor",
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
     "wagtail.embeds",
@@ -46,8 +67,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "beobgrp_site",
-    "dbbackup"
+    "dbbackup",
+    "compressor"
 ]
 
 MIDDLEWARE = [
@@ -122,11 +143,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = "de-de"
-
 TIME_ZONE = "UTC"
-
 USE_I18N = True
-
 USE_TZ = True
 
 
@@ -136,11 +154,7 @@ USE_TZ = True
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-    'sass_processor.finders.CssFinder'
-]
-
-STATICFILES_DIRS = [
-    os.path.join(PROJECT_DIR, "static"),
+    'compressor.finders.CompressorFinder'
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
@@ -164,9 +178,6 @@ STORAGES = {
     }
 }
 
-# Required for bootstrap SASS
-SASS_PRECISION = 8
-
 # Wagtail settings
 
 WAGTAIL_SITE_NAME = "beobgrp_site"
@@ -186,3 +197,11 @@ WAGTAILADMIN_BASE_URL = "https://www.beobachtergruppe.de"
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_STORAGE_OPTIONS = {'location': os.environ.get("DJANGO_BACKUP_DIR","../beobgrp_site_backup")}
 
+SASS_LOAD_PATH = os.environ.get("SASS_LOAD_PATH", os.path.join(BASE_DIR,'node_modules'))
+
+COMPRESS_PRECOMPILERS = (
+    ('text/x-scss', f'sass -q --load-path {SASS_LOAD_PATH} '+'{infile}'),
+)
+
+COMPRESS_ENABLED = True
+COMPRESS_VERBOSE = True

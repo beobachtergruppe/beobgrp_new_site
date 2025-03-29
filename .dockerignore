@@ -46,3 +46,8 @@ Dockerfile
 
 # Ignore temporary files
 tmp*
+
+# Ignore CSS files in the following directories
+/beobgrp_site/**/*.css*
+/home/**/*.css*
+/node_modules/

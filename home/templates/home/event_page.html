@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% load static sass_tags wagtailcore_tags %}
+{% load static wagtailcore_tags %}
+{% load compress %}
 
 {% block body_class %}template-eventpage{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" type="text/css" href="{% sass_src 'css/event_info.scss' %}">
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'css/event_info.scss' %}"/>
 {% endblock extra_css %}
 
 {% event_checkbox_style test }

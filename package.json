@@ -1,0 +1,23 @@
+{
+  "name": "beobgrp_new_site",
+  "version": "1.0.0",
+  "description": "This project contains the new website of https://www.beobachtergruppe.de",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beobachtergruppe/beobgrp_new_site.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/beobachtergruppe/beobgrp_new_site/issues"
+  },
+  "homepage": "https://github.com/beobachtergruppe/beobgrp_new_site#readme",
+  "dependencies": {
+    "bulma": "^1.0.3"
+  }
+}
