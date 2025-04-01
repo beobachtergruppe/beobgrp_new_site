@@ -1,4 +1,3 @@
-import logging
 from typing import Tuple
 
 from wagtail.admin.panels.field_panel import FieldPanel
@@ -14,6 +13,7 @@ gen_body_content: list[Tuple[str, FieldBlock]] = [
     ("paragraph", RichTextBlock()),
     ("image", ImageChooserBlock()),
 ]
+
 
 class HomePage(Page):
     body = StreamField(gen_body_content, default=[])
