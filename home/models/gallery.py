@@ -15,10 +15,20 @@ class PhotoPage(Page):
 
     content_panels = Page.content_panels + [
         FieldPanel("photo",heading="Foto"),
-        FieldPanel("title",heading="Titel"),
         FieldPanel("description",heading="Beschreibung"),
         FieldPanel("author",heading="Autor"),
         FieldPanel("date",heading="Datum"),
-        FieldPanel("time",heading="Uhrzeit"),
+        FieldPanel("time",heading="Uhrzeit",default=None),
         FieldPanel("location",heading="Ort")
     ]
+
+class GalleryPage(Page):
+    description = RichTextField(max_length=800,default="")
+    cover_image = ImageField()
+
+    content_panels = Page.content_panels + [
+        FieldPanel("description",heading="Beschreibung"),
+        FieldPanel("cover_image",heading="Titelbild")
+    ]
+
+    subpage_types = [PhotoPage]
