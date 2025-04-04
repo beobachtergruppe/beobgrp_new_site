@@ -7,18 +7,18 @@ from wagtail.fields import RichTextField
 
 class PhotoPage(Page):
     photo = ImageField()
-    description = RichTextField(max_length=800)
+    description = RichTextField(max_length=800,default="", blank=True)
     author = CharField(max_length=120)
     date = DateField()
-    time = TimeField(default=None)
-    location = CharField(max_length=255)
+    time = TimeField(blank=True)
+    location = CharField(max_length=255,default="",blank=True)
 
     content_panels = Page.content_panels + [
         FieldPanel("photo",heading="Foto"),
         FieldPanel("description",heading="Beschreibung"),
         FieldPanel("author",heading="Autor"),
         FieldPanel("date",heading="Datum"),
-        FieldPanel("time",heading="Uhrzeit",default=None),
+        FieldPanel("time",heading="Uhrzeit"),
         FieldPanel("location",heading="Ort")
     ]
 
