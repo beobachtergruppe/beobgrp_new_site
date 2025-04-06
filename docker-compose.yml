@@ -4,7 +4,7 @@ volumes:
 
 services:
   wagtail:
-    image: beobgrp_site:0.2.0
+    image: beobgrp_site:0.3.0
     build: .
     environment:
       WAGTAIL_DB_PASSWORD: ${WAGTAIL_DB_PASSWORD}

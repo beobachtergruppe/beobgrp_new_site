@@ -181,5 +181,5 @@ class EventPage(Page):
     body = StreamField(blocks_for_event_body, default=[])
 
     content_panels = Page.content_panels + [FieldPanel("body", heading="Inhalt")]
-
-    child_page_types = [SingleEvent]
+    
+    subpage_types = ["home.SingleEvent","home.EventPage"]

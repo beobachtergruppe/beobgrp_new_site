@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Tuple
 
 from wagtail.admin.panels.field_panel import FieldPanel
@@ -19,3 +20,5 @@ class HomePage(Page):
     body = StreamField(gen_body_content, default=[])
 
     content_panels = Page.content_panels + [FieldPanel("body", heading="Inhalt")]
+
+    subpage_types = ["home.HomePage", "home.EventPage", "home.GalleryIndexPage"]
