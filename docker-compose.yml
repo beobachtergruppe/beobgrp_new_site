@@ -8,6 +8,7 @@ services:
     build: .
     environment:
       WAGTAIL_DB_PASSWORD: ${WAGTAIL_DB_PASSWORD}
+      PGPASSWORD: ${WAGTAIL_DB_PASSWORD}
       SITE_INIT_MODE: ${SITE_INIT_MODE:-"none"}
     volumes:
       - ${DJANGO_BACKUP_DIR}:/site_backup
