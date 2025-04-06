@@ -47,9 +47,10 @@ sudo -u postgres psql -c "CREATE USER wagtail WITH PASSWORD '$WAGTAIL_DB_PASSWOR
 ```
 * Create the database beobgrp_site and allow access for user 'wagtail':
 ```
-sudo -u postgres createb beobgrp_site
+sudo -u postgres createdb beobgrp_site
 sudo -u postgres psql -c "ALTER DATABASE beobgrp_site OWNER TO wagtail;"
 ```
+
 * Run the database migration to create the database:
 ```
 ./manage.py migrate
