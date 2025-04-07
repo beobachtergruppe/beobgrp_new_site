@@ -14,13 +14,11 @@
     <hr/>
     <div class="columns is-multiline">
         {% for photo_page in photos %}
-            <div class="column is-desktop-3 is-tablet-6 is-mobile-12">
+            <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
                 <a href="{% pageurl photo_page %}">
                     <div class="card">
                         <div class="card-image">
-                            <figure class="image">
-                                {% image photo_page.photo width-200 class="gallery-thumbnail" %}
-                            </figure>
+                            {% image photo_page.photo original class="is-fullwidth" %}
                         </div>
                         <div class="card-content">
                             <p>{{ photo_page.title }}</p>

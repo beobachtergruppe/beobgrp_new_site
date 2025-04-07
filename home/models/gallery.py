@@ -1,3 +1,4 @@
+from typing import cast
 from django.db import models
 from django.db.models.fields import DateField, CharField, TimeField
 from wagtail.models import Page
@@ -48,7 +49,7 @@ class GalleryPage(Page):
 
     def get_context(self, request):
         context = super().get_context(request)
-        context["photos"] = self.get_children().live()  # .order_by('-date')
+        context["photos"] = PhotoPage.objects.child_of(self).live().order_by("-date")
         return context
 
 
@@ -63,5 +64,5 @@ class GalleryIndexPage(Page):
 
     def get_context(self, request):
         context = super().get_context(request)
-        context["galleries"] = self.get_children().live()
+        context["galleries"] = GalleryPage.objects.child_of(self).live()
         return context
