@@ -6,7 +6,6 @@ FROM python:3.12.9-bookworm AS builder
 
 # Get the database password from the build argument
 ENV WAGTAIL_DB_PASSWORD=${WAGTAIL_DB_PASSWORD}
-ENV PGPASSWORD=${WAGTAIL_DB_PASSWORD}
 
 # Get the site init mode from an environment variable
 # The value may be 'migrate' or 'restore'
