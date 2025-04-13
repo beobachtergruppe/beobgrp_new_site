@@ -16,7 +16,7 @@
             {{ page.description|richtext }}
             <p>Autor: {{ page.author }}</p>
             <p>Ort: {{ page.location }}</p>
-            <p>Datum: {{ page.date }} {{ page.time }}</p>
+            <p>Datum: {{ page.date }} {{ page.time|default_if_none:"" }}</p>
         </figcaption>
     </figure>   
 
