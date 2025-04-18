@@ -9,12 +9,20 @@
 
 {% block content %}
 
-<div class="row is-flex is-align-items-center is-justify-content-space-between">
-    <img class="block-h2 icon-inline" src="{% static 'icons/left.svg' %}" alt="Left Arrow">
-    <h2>{{ page.title }}</h2>
-    <img class="block-h2 icon-inline" src="{% static 'icons/right.svg' %}" alt="Right Arrow">
-  </div>
-<figure class="image">
+    <div class="row is-flex is-align-items-center is-justify-content-space-between">
+        {% if previous %}
+            <a href="{% pageurl previous %}">
+                <img class="block-h2 icon-inline" src="{% static 'icons/left.svg' %}" alt="Left Arrow"/>
+            </a>
+        {% endif %}
+        <h2>{{ page.title }}</h2>
+        {% if next %}
+            <a href="{% pageurl next %}">
+                <img class="block-h2 icon-inline" src="{% static 'icons/right.svg' %}" alt="Right Arrow"/>
+            </a>
+        {% endif %}
+    </div>
+    <figure class="image">
         {% image page.photo original class="is-fluid" %}
         <figcaption>
             {{ page.description|richtext }}
@@ -25,3 +33,4 @@
     </figure>   
 
 {% endblock content %}
+

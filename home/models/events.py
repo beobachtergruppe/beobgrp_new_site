@@ -182,4 +182,4 @@ class EventPage(Page):
 
     content_panels = Page.content_panels + [FieldPanel("body", heading="Inhalt")]
     
-    subpage_types = ["home.SingleEvent","home.EventPage", "home.PhotoGalleryPage"]
+    subpage_types = ["home.SingleEvent","home.EventPage", "home.GalleryPage"]

@@ -29,6 +29,22 @@ class PhotoPage(Page):
         FieldPanel("location", heading="Ort"),
     ]
 
+    def get_context(self, request):
+        context = super().get_context(request)
+        siblings: list[PhotoPage] = list(PhotoPage.objects.child_of(self.get_parent()).live().order_by("-date"))
+        self_index = siblings.index(self)
+        if len(siblings) > 1:
+            context["previous"] = (
+                siblings[self_index - 1] if self_index > 0 else siblings[-1]
+            )
+            context["next"] = (
+                siblings[self_index + 1] if self_index < len(siblings) - 1 else siblings[0]
+            )
+        else:
+            context["previous"] = None
+            context["next"] = None
+        return context
+
 
 class GalleryPage(Page):
     description = RichTextField(max_length=800, default="")
