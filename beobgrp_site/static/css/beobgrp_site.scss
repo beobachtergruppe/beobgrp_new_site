@@ -30,33 +30,33 @@ $background-opacity: 0.7;
 //   color: $text;
 // }
 
-.block-h1 {
-  @extend .title;
-  @extend .is-1;
-  color: gold;
-}
-
-.block-h2 {
+.block-h1, h1 {
   @extend .title;
   @extend .is-2;
   color: gold;
 }
 
-.block-h3 {
+.block-h2, h2 {
   @extend .title;
   @extend .is-3;
   color: gold;
 }
 
-.block-h4 {
+.block-h3, h3 {
   @extend .title;
   @extend .is-4;
   color: gold;
 }
 
-.block-h5 {
+.block-h4, h4 {
   @extend .title;
   @extend .is-5;
+  color: gold;
+}
+
+.block-h5, h5 {
+  @extend .title;
+  @extend .is-6;
   color: gold;
 }
 
@@ -97,4 +97,12 @@ $background-opacity: 0.7;
   background-color: $aside-background-color;
   padding: 0.5rem;
   border-radius: 0.5rem;
+}
+
+.icon-inline {
+  height: 1em;
+  display: block;
+  object-fit: contain;
+  max-height: 100%;
+  filter: brightness(0) invert(1);
 }

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags wagtailimages_tags %}
+
+{% block body_class %}template-homepage{% endblock %}
+
+{% block extra_css %}
+
+{% endblock extra_css %}
+
+{% block content %}
+
+    <div class="row is-flex is-align-items-center is-justify-content-space-between">
+        {% if previous %}
+            <a href="{% pageurl previous %}">
+                <img class="block-h2 icon-inline" src="{% static 'icons/left.svg' %}" alt="Left Arrow"/>
+            </a>
+        {% endif %}
+        <h2>{{ page.title }}</h2>
+        {% if next %}
+            <a href="{% pageurl next %}">
+                <img class="block-h2 icon-inline" src="{% static 'icons/right.svg' %}" alt="Right Arrow"/>
+            </a>
+        {% endif %}
+    </div>
+    <figure class="image">
+        {% image page.photo original class="is-fluid" %}
+        <figcaption>
+            {{ page.description|richtext }}
+            <p>Autor: {{ page.author }}</p>
+            <p>Ort: {{ page.location }}</p>
+            <p>Datum: {{ page.date }} {{ page.time|default_if_none:"" }}</p>
+        </figcaption>
+    </figure>   
+
+{% endblock content %}
+

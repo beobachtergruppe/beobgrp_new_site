@@ -1,41 +1,35 @@
-from datetime import date, datetime, timedelta
-from functools import cached_property
-import hashlib
-import logging
-from copy import deepcopy
-import textwrap
-from typing import Tuple
+from time import localtime
+from beobgrp_site.utils.email import create_email_link
 
-from django.db.models import TextChoices
-from django.db.models.fields import DateTimeField, CharField, BooleanField
+from django.db.models.fields import BooleanField, CharField, DateTimeField
 from django.db.models.fields.files import ImageField
 from django.utils.text import slugify
+from wagtail.admin.panels.field_panel import FieldPanel
+from wagtail.fields import RichTextField
+from wagtail.models import Page
+
+
+import hashlib
+import textwrap
+from datetime import date, timedelta
+from functools import cached_property
+
+import logging
+from copy import deepcopy
+
+from django.db.models import TextChoices
 from django.utils.timezone import localtime, now
 from wagtail.admin.forms.pages import WagtailAdminPageForm
 from wagtail.admin.panels.field_panel import FieldPanel
-from wagtail.blocks.field_block import RichTextBlock, CharBlock, ChoiceBlock, FieldBlock
+from wagtail.blocks.field_block import ChoiceBlock
 from wagtail.blocks.struct_block import StructBlock
-from wagtail.fields import StreamField, RichTextField
-from wagtail.images.blocks import ImageChooserBlock
+from wagtail.fields import StreamField
 from wagtail.models import Page
 
-from beobgrp_site.utils.email import create_email_link
+
+from home.models.base import gen_body_content
 
 logger = logging.getLogger(__name__)
-
-gen_body_content: list[Tuple[str, FieldBlock]] = [
-    ("h1", CharBlock(form_classname="h1", label="Kopfzeile 1")),
-    ("h2", CharBlock(form_classname="h2", label="Kopfzeile 2")),
-    ("h3", CharBlock(form_classname="h3", label="Kopfzeile 3")),
-    ("paragraph", RichTextBlock()),
-    ("image", ImageChooserBlock()),
-]
-
-
-class HomePage(Page):
-    body = StreamField(gen_body_content, default=[])
-
-    content_panels = Page.content_panels + [FieldPanel("body", heading="Inhalt")]
 
 
 class EventTypes(TextChoices):
@@ -56,6 +50,13 @@ class SingleEventForm(WagtailAdminPageForm):
 
         cleaned_data = super().clean()
         return cleaned_data
+
+
+def _get_default_event_title(start_time, event_title):
+    if start_time and event_title:
+        formatted_start_time = localtime(start_time).strftime("%Y-%m-%d %H:%M")
+        return f"{formatted_start_time} - {event_title}"
+    return "Default Title"
 
 
 class SingleEvent(Page):
@@ -83,7 +84,7 @@ class SingleEvent(Page):
         FieldPanel("location", heading="Ort"),
         FieldPanel("referent", heading="Referent"),
         FieldPanel("abstract", heading="Zusammenfassung"),
-        FieldPanel("image", heading="Foto")
+        FieldPanel("image", heading="Foto"),
     ]
 
     # Override the save method to auto-generate title and slug
@@ -114,7 +115,8 @@ class SingleEvent(Page):
         return create_email_link(
             email_address="reservierung@beobachtergruppe.de",
             subject=f"Anmeldung für den Vortrag am {self.start_time:%d.%m.%y} ({self.event_title})",
-            body=textwrap.dedent(f"""
+            body=textwrap.dedent(
+                f"""
                   Liebe Beobachtergruppe,
                   
                   bitte um Anmeldung zum folgenden Vortrag:
@@ -129,17 +131,11 @@ class SingleEvent(Page):
                   
                   Mit freundlichen Grüßen
                   ...
-            """)
+            """
+            ),
         )
 
     base_form_class = SingleEventForm
-
-
-def _get_default_event_title(start_time, event_title):
-    if start_time and event_title:
-        formatted_start_time = localtime(start_time).strftime("%Y-%m-%d %H:%M")
-        return f"{formatted_start_time} - {event_title}"
-    return "Default Title"
 
 
 class EventListBlock(StructBlock):
@@ -185,5 +181,5 @@ class EventPage(Page):
     body = StreamField(blocks_for_event_body, default=[])
 
     content_panels = Page.content_panels + [FieldPanel("body", heading="Inhalt")]
-
-    child_page_types = [SingleEvent]
+    
+    subpage_types = ["home.SingleEvent","home.EventPage", "home.GalleryPage"]
