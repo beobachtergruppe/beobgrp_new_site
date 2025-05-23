@@ -3,13 +3,17 @@
         <ul>
             {% for event in events %}
                 <style>
+                    /* Hide the checkbox itself visually */
                     .card .card-body .toggle-checkbox-{{ event.web_id }} {
                         display: none;
                     }
-                    .card .card-body .toggle-checkbox-{{ event.web_id }}:checked + .btn-info + .card-abstract {
+                    /* When the checkbox is checked, and its immediate sibling (.btn-info) is present,
+                       then any subsequent sibling (.card-abstract) will be displayed. */
+                    .card .card-body .toggle-checkbox-{{ event.web_id }}:checked + .btn-info ~ .card-abstract {
                         display: block;
                     }
-                </style>                        
+                    
+                </style>  
                 <div class="card">
                     <div class="card-header">Vortrag im Museum</div>
                     <div class="card-body">
