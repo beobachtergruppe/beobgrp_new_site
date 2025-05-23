@@ -1,25 +1,35 @@
-<div class="event-list">
+{% load wagtailimages_tags %}
+
+<div class="event-list columns is-multiline">
     {% if events %}
-        <ul>
             {% for event in events %}
                 <style>
                     /* Hide the checkbox itself visually */
-                    .card .card-body .toggle-checkbox-{{ event.web_id }} {
+                    .card .card-content .toggle-checkbox-{{ event.web_id }} {
                         display: none;
                     }
                     /* When the checkbox is checked, and its immediate sibling (.btn-info) is present,
                        then any subsequent sibling (.card-abstract) will be displayed. */
-                    .card .card-body .toggle-checkbox-{{ event.web_id }}:checked + .btn-info ~ .card-abstract {
+                    .card .card-content .toggle-checkbox-{{ event.web_id }}:checked + .btn-info ~ .card-abstract {
                         display: block;
                     }
                     
                 </style>  
-                <div class="card">
+                <div class="card column is-half-tablet is-full-mobile">
                     <div class="card-header">Vortrag im Museum</div>
-                    <div class="card-body">
-                        <p class="card-title">{{ event.start_time|date:"l" }}, den
-                            {{ event.start_time|date:"d.m, H:i" }} Uhr</p>
-                        <p class="card-subtitle"><b>{{ event.event_title }}</b><br>{{ event.referent }}</p>
+                    <div class="card-content">
+                        <div class="columns is-multiline">                
+                            <div class="column is-full-mobile is-two-thirds-tablet">
+                                <p class="card-title">{{ event.start_time|date:"D" }} 
+                                    {{ event.start_time|date:"d.m, H:i" }} Uhr</p>
+                                <p class="card-subtitle"><b>{{ event.event_title }}</b><br>{{ event.referent }}</p>
+                            </div>                          
+                            {% if event.image %}
+                                <div class="column is-full-mobile is-one-third-tablet is-image-col">
+                                       {% image event.image original class="is-fullwidth card-image-wrapper" %}
+                                </div>
+                            {% endif %}
+                        </div>                        
                         <input type="checkbox" id="toggle-info-{{ event.web_id }}" class="toggle-checkbox-{{ event.web_id }}">
                         <label for="toggle-info-{{ event.web_id }}" class="btn btn-info">Info</label>
                         {% if event.needs_reservation %}
@@ -37,7 +47,6 @@
                     </div>
                 </div>
             {% endfor %}
-        </ul>
     {% else %}
         <p>Keine Veranstaltungen geplant</p>
     {% endif %}
