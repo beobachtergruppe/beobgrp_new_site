@@ -3,6 +3,8 @@ from beobgrp_site.utils.email import create_email_link
 
 from django.db.models.fields import BooleanField, CharField, DateTimeField
 from django.db.models.fields.files import ImageField
+from django.db import models
+
 from django.utils.text import slugify
 from wagtail.admin.panels.field_panel import FieldPanel
 from wagtail.fields import RichTextField
@@ -66,7 +68,13 @@ class SingleEvent(Page):
     location = CharField(max_length=120, default="Deutsches Museum")
     referent = CharField(max_length=120, default="")
     abstract = RichTextField(max_length=800, default="")
-    image = ImageField(blank=True)
+    image = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
     cancelled = BooleanField(default=False)
     booked_out = BooleanField(default=False)
     needs_reservation = BooleanField(default=True)

@@ -22,8 +22,7 @@ case "$SITE_INIT_MODE" in
     ;;
   restore)
     psql -h postgres -U wagtail -d beobgrp_site -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
-    python manage.py migrate --noinput
-    python manage.py dbrestore --noinput
+    python manage.py dbrestore --noinput --pg-options="--if-exists"
     python manage.py mediarestore --noinput
     python manage.py migrate --noinput
     ;;
