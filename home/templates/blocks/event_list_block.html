@@ -15,17 +15,17 @@
                     }
                     
                 </style>  
-                <div class="card column is-half-tablet is-full-mobile">
+                <div class="card columm is-full-mobile">
                     <div class="card-header">Vortrag im Museum</div>
                     <div class="card-content">
                         <div class="columns is-multiline">                
-                            <div class="column is-full-mobile is-two-thirds-tablet">
+                            <div class="column is-three-quarter-mobile is-two-thirds-tablet is-half-desktop is-text-col">
                                 <p class="card-title">{{ event.start_time|date:"D" }} 
                                     {{ event.start_time|date:"d.m, H:i" }} Uhr</p>
                                 <p class="card-subtitle"><b>{{ event.event_title }}</b><br>{{ event.referent }}</p>
                             </div>                          
                             {% if event.image %}
-                                <div class="column is-full-mobile is-one-third-tablet is-image-col">
+                                <div class="column is-one-quarter-mobile is-one-third-tablet is-half-desktop is-image-col">
                                        {% image event.image original class="is-fullwidth card-image-wrapper" %}
                                 </div>
                             {% endif %}

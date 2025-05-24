@@ -33,30 +33,35 @@ $background-opacity: 0.7;
 .block-h1, h1 {
   @extend .title;
   @extend .is-2;
+  margin-top: 0.3em;
   color: gold;
 }
 
 .block-h2, h2 {
   @extend .title;
   @extend .is-3;
+  margin-top: 0.2em;
   color: gold;
 }
 
 .block-h3, h3 {
   @extend .title;
   @extend .is-4;
+  margin-top: 0.1em;
   color: gold;
 }
 
 .block-h4, h4 {
   @extend .title;
   @extend .is-5;
+  margin-top: 0.1em;
   color: gold;
 }
 
 .block-h5, h5 {
   @extend .title;
   @extend .is-6;
+  margin-top: 0.2em;
   color: gold;
 }
 
@@ -83,6 +88,15 @@ $background-opacity: 0.7;
     max-height: 4rem; // Increase logo size
     width: auto; // Maintain aspect ratio
   }
+}
+
+.columns {
+  margin: 0 auto;
+}
+
+p {
+  margin-top: 0.3rem;
+  margin-bottom: 0.3rem;
 }
 
 .content-column {
