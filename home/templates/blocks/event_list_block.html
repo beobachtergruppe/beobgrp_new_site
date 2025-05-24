@@ -1,7 +1,8 @@
 {% load wagtailimages_tags %}
 
-<div class="event-list columns is-multiline">
+<div class="event-list columns is-multiline is-desktop">
     {% if events %}
+                
             {% for event in events %}
                 <style>
                     /* Hide the checkbox itself visually */
@@ -15,34 +16,36 @@
                     }
                     
                 </style>  
-                <div class="card columm is-full-mobile">
-                    <div class="card-header">Vortrag im Museum</div>
-                    <div class="card-content">
-                        <div class="columns is-multiline">                
-                            <div class="column is-three-quarter-mobile is-two-thirds-tablet is-half-desktop is-text-col">
-                                <p class="card-title">{{ event.start_time|date:"D" }} 
-                                    {{ event.start_time|date:"d.m, H:i" }} Uhr</p>
-                                <p class="card-subtitle"><b>{{ event.event_title }}</b><br>{{ event.referent }}</p>
-                            </div>                          
-                            {% if event.image %}
-                                <div class="column is-one-quarter-mobile is-one-third-tablet is-half-desktop is-image-col">
-                                       {% image event.image original class="is-fullwidth card-image-wrapper" %}
-                                </div>
-                            {% endif %}
-                        </div>                        
-                        <input type="checkbox" id="toggle-info-{{ event.web_id }}" class="toggle-checkbox-{{ event.web_id }}">
-                        <label for="toggle-info-{{ event.web_id }}" class="btn btn-info">Info</label>
-                        {% if event.needs_reservation %}
-                            {% if event.is_reservable %}
-                                <a href="{{ event.reservation_mailto_link }}" class="btn btn-reservation">Reservierung</a>
+                <div class="column is-full is-half-fullhd">
+                    <div class="card">
+                        <div class="card-header">Vortrag im Museum</div>
+                        <div class="card-content">
+                            <div class="columns is-multiline">                
+                                <div class="column is-two-third is-text-col">
+                                    <p class="card-title">{{ event.start_time|date:"D" }} 
+                                        {{ event.start_time|date:"d.m, H:i" }} Uhr</p>
+                                    <p class="card-subtitle"><b>{{ event.event_title }}</b><br>{{ event.referent }}</p>
+                                </div>                          
+                                {% if event.image %}
+                                    <div class="column is-one-third is-image-col">
+                                        {% image event.image original class="is-fullwidth card-image-wrapper" %}
+                                    </div>
+                                {% endif %}
+                            </div>                        
+                            <input type="checkbox" id="toggle-info-{{ event.web_id }}" class="toggle-checkbox-{{ event.web_id }}">
+                            <label for="toggle-info-{{ event.web_id }}" class="btn btn-info">Info</label>
+                            {% if event.needs_reservation %}
+                                {% if event.is_reservable %}
+                                    <a href="{{ event.reservation_mailto_link }}" class="btn btn-reservation">Reservierung</a>
+                                {% else %}
+                                    Reservierbar ab dem {{ event.first_reservation_date|date:"d.m" }}
+                                {% endif %}
                             {% else %}
-                                Reservierbar ab dem {{ event.first_reservation_date|date:"d.m" }}
+                                Keine Reservierung erforderlich
                             {% endif %}
-                        {% else %}
-                            Keine Reservierung erforderlich
-                        {% endif %}
-                        <div class="card-abstract">
-                            <p>{{ event.abstract|striptags }}</p>
+                            <div class="card-abstract">
+                                <p>{{ event.abstract|striptags }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -32,14 +32,26 @@ $crd-btn-hover-lighten: 10%;
 }
 
 
+/* Optional: Add some padding to the column containing the card */
+.event-card-container {
+  padding: 0.25rem;
+  /* Standard Bulma column padding */
+}
+
+// /* You might want to adjust internal padding of your text/image columns if needed */
+// /* For example, remove default column padding if `is-gapless` is not enough */
+// .is-text-col, .is-image-col {
+//   /* padding: 0.75rem; /* Or adjust padding as needed */
+// }
+
 .card {
   background-color: $crd-primary-color;
   color: $crd-text-color;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  width: 90%;
-  max-width: 500px; // Limit the card's width on large viewports
+  width: 95%;
+  max-width: 750px; // Limit the card's width on large viewports
 
   .card-header {
     background-color: $crd-secondary-color;
@@ -92,5 +104,7 @@ $crd-btn-hover-lighten: 10%;
       /* Ensures the whole image is visible, no cropping */
       /* max-height: 200px; /* Optional: if you want to cap the image height */
     }
+
+
   }
 }
