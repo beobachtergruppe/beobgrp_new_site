@@ -13,15 +13,26 @@ $aside-background-color: #0c358e;
 $navbar-background-color: #333;
 $navbar-item-color: white;
 
+// *** IMPORTANT: Define your breakpoints
+// This is the *desktop* breakpoint where the burger menu kicks in.
+// You'll need to find the optimal point where your menu items start to overflow
+// even with slight font reductions.
+$navbar-burger-breakpoint: 1024px; // Bulma's default desktop breakpoint, adjust as needed
+
+// Define smaller breakpoints *before* the burger appears, where you'll shrink font size
+$medium-desktop-breakpoint: 1250px; // Example: Menu starts to get tight here
+$small-desktop-breakpoint: 1200px; // Example: Need to shrink more here
+
 // Buttons
 $button-color: white;
 $button-background-color: darken(darkblue, 12%);
 
 $background-opacity: 0.7;
 
-@use "bulma/sass" with (
-  $background: black,
-);
+@use "bulma/sass" with ($background: black,
+  $navbar-background-color: $navbar-background-color,
+  $navbar-item-color: $navbar-item-color,
+  $navbar-breakpoint: $navbar-burger-breakpoint);
 
 // html, body {
 //   background: linear-gradient(rgba(0, 0, 0, $background-opacity), rgba(0, 0, 0, $background-opacity)),
@@ -30,35 +41,40 @@ $background-opacity: 0.7;
 //   color: $text;
 // }
 
-.block-h1, h1 {
+.block-h1,
+h1 {
   @extend .title;
   @extend .is-2;
   margin-top: 0.3em;
   color: gold;
 }
 
-.block-h2, h2 {
+.block-h2,
+h2 {
   @extend .title;
   @extend .is-3;
   margin-top: 0.2em;
   color: gold;
 }
 
-.block-h3, h3 {
+.block-h3,
+h3 {
   @extend .title;
   @extend .is-4;
   margin-top: 0.1em;
   color: gold;
 }
 
-.block-h4, h4 {
+.block-h4,
+h4 {
   @extend .title;
   @extend .is-5;
   margin-top: 0.1em;
   color: gold;
 }
 
-.block-h5, h5 {
+.block-h5,
+h5 {
   @extend .title;
   @extend .is-6;
   margin-top: 0.2em;
@@ -69,14 +85,68 @@ $background-opacity: 0.7;
 .navbar {
   min-height: 5rem; // Increase navbar height for larger logo
 
-  @media (max-width: 1024px) {
+  @media screen and (max-width: $navbar-burger-breakpoint) {
     min-height: 3rem; // Adjust for tablets
   }
 
-  @media (max-width: 768px) {
-    min-height: 2.5rem; // Adjust for mobile
+  @media screen and (max-width: 768px) {
+    min-height: 2.5rem;
+  }
+
+  >.container {
+    padding-left: 0 !important; // Remove Bulma's default container padding
+    padding-right: 0 !important;
+    max-width: none !important; // Allow the container to take full width
+    display: flex; // Ensure it's a flex container
+    width: 100%; // Ensure it uses full width
+    align-items: stretch; // Make sure children stretch height
+    justify-content: flex-start; // Align items to the start (left)
+  }
+
+  // Ensure the navbar-brand and navbar-menu align correctly within the container
+  .navbar-brand {
+      // Bulma's .navbar-brand usually handles this well, but let's be explicit
+      // It should be at the start of the flex container
+      margin-right: auto; // This pushes the burger to the right on mobile
+      display: flex; // Make sure it's a flex container too
+      align-items: center; // Vertically align items
+      // Add a small internal padding to the brand for breathing room if logo is flush to edge
+      padding-left: 1rem;
+      padding-right: 1rem; // Add to both sides to balance the burger placement
+  }
+
+  .navbar-menu {
+      // On desktop, this should take up the remaining space and align left.
+      // Bulma usually uses flex-grow: 1 or similar for this.
+      // Ensure no auto margins are pushing it right.
+      flex-grow: 1;
+      flex-shrink: 0; // Prevent shrinking when menu is long
+      justify-content: flex-start; // Ensure items within navbar-start align left
+      padding-left: 0; // Ensure no default padding is inherited that pushes it right
+      padding-right: 0; // Same for right
+  }
+
+  .navbar-start {
+      // Ensure the items inside .navbar-start are also aligned left
+      justify-content: flex-start;
+      margin-left: 0; // Ensure no auto margin from Bulma's defaults
+  }
+
+
+  // On mobile, Bulma's .container padding is usually less,
+  // but this ensures consistency across all sizes.
+  @media screen and (max-width: 768px) {
+
+    // You might want to remove padding for very small screens if the logo
+    // is pushing too far in.
+    .navbar-brand,
+    .navbar-menu {
+      padding-left: 0.5rem; // Slightly less padding on mobile
+      padding-right: 0.5rem;
+    }
   }
 }
+
 
 .navbar-logo {
   @extend .navbar-item;
@@ -89,6 +159,58 @@ $background-opacity: 0.7;
     width: auto; // Maintain aspect ratio
   }
 }
+
+// This ensures the burger is hidden on desktop and visible on mobile
+.navbar-burger {
+  display: none; // Hidden by default
+
+  @media screen and (max-width: $navbar-burger-breakpoint) {
+    // At desktop breakpoint and below
+    display: block; // Show the burger
+  }
+}
+
+
+// This ensures the navbar menu is horizontal on desktop and vertical/hidden on mobile
+.navbar-menu {
+  // Bulma by default handles this with `is-active` class.
+  // Ensure it collapses correctly on mobile.
+  // If you're encountering issues here, double-check Bulma's internal styles.
+  // The `.is-active` class, when applied to `navbar-menu`, makes it a block display.
+
+  @media screen and (max-width: $navbar-burger-breakpoint) {
+
+    // When the burger is active, this menu will become `display: flex` or `display: block`
+    // depending on Bulma's internal styling.
+    // By default, Bulma makes it display none on mobile and tablet.
+    // You might need to explicitly hide it if it's showing.
+    &:not(.is-active) {
+      // When the menu is NOT active, hide it on mobile/tablet
+      display: none !important; // Use !important if Bulma's default is overriding
+    }
+  }
+}
+
+// Font size adjustments for .navbar-item 
+.navbar-item {
+  // Default font size for larger screens
+  font-size: 1.0rem; // Or whatever your desired default is (e.g., 16px)
+
+  // Media query for when the menu starts to get tight (before burger appears)
+  @media screen and (max-width: $medium-desktop-breakpoint) {
+    font-size: 0.85rem; // Reduce font size slightly
+    padding-left: 0.75rem; // Adjust padding if needed
+    padding-right: 0.75rem;
+  }
+
+  // Media query for when it gets even tighter (closer to burger breakpoint)
+  @media screen and (max-width: $small-desktop-breakpoint) {
+    font-size: 0.75rem; // Reduce font size more
+    padding-left: 0.5rem; // Adjust padding more aggressively
+    padding-right: 0.5rem;
+  }
+}
+
 
 .columns {
   margin: 0 auto;
