@@ -93,33 +93,31 @@ h5 {
     max-width: none !important; // Allow the container to take full width
     display: flex; // Ensure it's a flex container
     width: 100%; // Ensure it uses full width
-    align-items: stretch; // Make sure children stretch height
-    justify-content: flex-start; // Align items to the start (left)
+    align-items: center; // Vertically center items
+    justify-content: space-between; // Align items to the start (left)
+
+    @media screen and (max-width: $navbar-burger-breakpoint) {
+      flex-wrap: nowrap; // Important: prevents wrapping
+    }
+
   }
 
   // Ensure the navbar-brand and navbar-menu align correctly within the container
   .navbar-brand {
     // Bulma's .navbar-brand usually handles this well, but let's be explicit
     // It should be at the start of the flex container
-    margin-right: auto; // This pushes the burger to the right on mobile
     display: flex; // Make sure it's a flex container too
     align-items: center; // Vertically align items
     // Add a small internal padding to the brand for breathing room if logo is flush to edge
     padding-left: 1rem;
     padding-right: 1rem; // Add to both sides to balance the burger placement
+    margin-right: auto;
+  }
 
-    // The key here is to push the burger to the right on mobile screens.
-    // Bulma does this internally. If it's not working, one of these is the cause:
-    // 1. Your .navbar-burger definition is overriding it.
-    // 2. The flexbox on .navbar-brand needs an explicit push.
-    // By default, a flex container with children will just line them up.
-    // The margin-left: auto on .navbar-burger ensures it's pushed.
-    // Let's ensure the burger is the *only* thing that gets auto-margin.
-    .navbar-item:first-child {
-      // This targets the logo link
-      margin-right: auto; // This will push the *next* item (the burger) to the right
-    }
-
+  .navbar-burger {
+    // Ensure the burger icon is aligned to the right
+    margin-left: auto; // This will push the burger to the right end of the navbar-brand
+    margin-right: 0; // Remove any right margin that might push it left
   }
 
   .navbar-menu {
@@ -132,6 +130,16 @@ h5 {
     padding-left: 0; // Ensure no default padding is inherited that pushes it right
     padding-right: 0; // Same for right
 
+    // Ensure the menu items are aligned to the left on desktop (and horizonally stacked)
+    @media screen and (min-width: ($navbar-burger-breakpoint + 1px)) {
+      display: flex !important;
+      flex-direction: row;
+      justify-content: flex-start; // ⬅️ ensures menu items align left
+      padding-left: 1rem; // ⬅️ add left padding to match the logo
+      padding-right: 0; // ⬅️ remove any unintended right padding
+      width: 100%; // ensure it spans the full width to allow left alignment
+    }
+
     // This is crucial for mobile stacking:
     @media screen and (max-width: $navbar-burger-breakpoint) {
       &.is-active {
@@ -139,21 +147,23 @@ h5 {
         width: 100%; // Crucial: ensure it takes full available width
         display: flex;
         flex-direction: column; // Stack items vertically
-        align-items: flex-end !important; // THIS ALIGNS THE ITEMS TO THE RIGHT
+        justify-content: flex-end !important; // THIS ALIGNS THE ITEMS TO THE RIGHT
         padding-right: 1rem; // Add internal padding to the right for the menu items
         padding-left: 0; // Remove any left padding that would push it in
       }
     }
   }
 
-  .navbar-burger {
-    // This is the burger icon that appears on mobile
-    // Bulma's default is display: none on desktop, display: block on mobile.
-    // We need to ensure it aligns correctly within the navbar-brand.
-    margin-left: auto; // This pushes the burger to the right within navbar-brand
-    // Ensure it has no padding or margins that would offset it from the right edge
-    padding: 0;
-    margin: 0;
+  .navbar-inner-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+
+    // @media screen and (max-width: $navbar-burger-breakpoint) {
+    //   flex-direction: column;
+    //   align-items: flex-start;
+    // }
   }
 
 
@@ -225,28 +235,19 @@ h5 {
       display: none !important;
     }
 
-    // When active, Bulma usually sets display: flex and flex-direction: column
-    // The main .navbar container should allow it to stack *below* the brand.
-    // If it's appearing right of the logo, it means the parent flex container
-    // (the .navbar or .container within it) is still acting like a row.
   }
 }
 
 
-// === ADDITIONAL FIX FOR MOBILE STACKING OF NAVBAR-MENU ===
-// The issue is likely that the `.navbar` itself, or its immediate child `.container`,
-// is remaining `display: flex; flex-direction: row;` on mobile,
-// preventing `navbar-menu` from dropping below `navbar-brand`.
 .navbar {
   @media screen and (max-width: $navbar-burger-breakpoint) {
-    // Change the main navbar to a column layout on mobile
     flex-direction: column !important;
-    align-items: flex-start !important; // Align contents to the left
+    align-items: stretch !important;
 
-    // The container inside it also needs to adapt.
     >.container {
-      flex-direction: column !important;
-      align-items: flex-start !important;
+      flex-direction: row !important; // ✅ KEEP ROW DIRECTION
+      align-items: center !important; // ✅ Center vertically
+      justify-content: space-between !important; // ✅ Spread logo & burger
     }
   }
 }

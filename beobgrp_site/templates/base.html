@@ -35,21 +35,21 @@
             {% get_site_root as site_root %}
         
             <nav class="navbar" role="navigation" aria-label="main navigation">
-                <div class="container">
+                <div class="navbar-inner-wrapper container">
                     <div class="navbar-brand">
                         <a class="navbar-logo" href="{% pageurl site_root %}">
                             <img class="image" src="{% static 'images/logo-beobachtergruppe.jpg' %}" alt="Logo">
                         </a>
-            
-                        <!-- Bulma's navbar-burger toggle -->
-                        <a role="button" class="navbar-burger is-info" aria-label="menu" aria-expanded="false" data-target="navMenu">
-                            <span aria-hidden="true"></span>
-                            <span aria-hidden="true"></span>
-                            <span aria-hidden="true"></span>
-                            <span aria-hidden="true"></span>
-                        </a>
                     </div>
-            
+
+                    <!-- Bulma's navbar-burger toggle -->
+                    <a role="button" class="navbar-burger is-info" aria-label="menu" aria-expanded="false" data-target="navMenu">
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                    </a>
+
                     <!-- Navbar menu (hidden on mobile by default) -->
                     <div id="navMenu" class="navbar-menu">
                         <div class="navbar-start">
@@ -58,7 +58,9 @@
                                 <a class="navbar-item" href="{% pageurl menuitem %}">{{ menuitem.title }}</a>
                             {% endfor %}
                         </div>
-                    </div>
+                    </div>                
+
+ 
                 </div>
             </nav>
         </header>
