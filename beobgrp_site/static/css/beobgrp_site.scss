@@ -78,6 +78,9 @@ h5 {
 
 .navbar {
   min-height: 5rem; // Increase navbar height for larger logo
+  max-width: 100;
+  padding-left: 0;
+  padding-right: 0;
 
   @media screen and (max-width: $navbar-burger-breakpoint) {
     min-height: 3rem; // Adjust for tablets
@@ -87,21 +90,6 @@ h5 {
     min-height: 2.5rem;
   }
 
-  >.container {
-    padding-left: 0 !important; // Remove Bulma's default container padding
-    padding-right: 0 !important;
-    max-width: none !important; // Allow the container to take full width
-    display: flex; // Ensure it's a flex container
-    width: 100%; // Ensure it uses full width
-    align-items: center; // Vertically center items
-    justify-content: space-between; // Align items to the start (left)
-
-    @media screen and (max-width: $navbar-burger-breakpoint) {
-      flex-wrap: nowrap; // Important: prevents wrapping
-    }
-
-  }
-
   // Ensure the navbar-brand and navbar-menu align correctly within the container
   .navbar-brand {
     // Bulma's .navbar-brand usually handles this well, but let's be explicit
@@ -109,14 +97,14 @@ h5 {
     display: flex; // Make sure it's a flex container too
     align-items: center; // Vertically align items
     // Add a small internal padding to the brand for breathing room if logo is flush to edge
-    padding-left: 1rem;
-    padding-right: 1rem; // Add to both sides to balance the burger placement
+    padding-left: 0;
+    padding-right: 0.25rem; // Add to both sides to balance the burger placement
     margin-right: auto;
   }
 
   .navbar-burger {
     // Ensure the burger icon is aligned to the right
-    margin-left: auto; // This will push the burger to the right end of the navbar-brand
+    align-self: flex-end; // right-align inside vertical flex container
     margin-right: 0; // Remove any right margin that might push it left
   }
 
@@ -143,13 +131,10 @@ h5 {
     // This is crucial for mobile stacking:
     @media screen and (max-width: $navbar-burger-breakpoint) {
       &.is-active {
-        // When the mobile menu is active/expanded
-        width: 100%; // Crucial: ensure it takes full available width
-        display: flex;
-        flex-direction: column; // Stack items vertically
-        justify-content: flex-end !important; // THIS ALIGNS THE ITEMS TO THE RIGHT
-        padding-right: 1rem; // Add internal padding to the right for the menu items
-        padding-left: 0; // Remove any left padding that would push it in
+        display: flex !important;
+        flex-direction: column;
+        width: 100%;
+        padding: 1rem;
       }
     }
   }
@@ -160,10 +145,10 @@ h5 {
     justify-content: space-between;
     width: 100%;
 
-    // @media screen and (max-width: $navbar-burger-breakpoint) {
-    //   flex-direction: column;
-    //   align-items: flex-start;
-    // }
+    @media screen and (max-width: $navbar-burger-breakpoint) {
+      flex-direction: column;
+      align-items: stretch; // Ensures children can expand to full width
+    }
   }
 
 
