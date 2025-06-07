@@ -1,11 +1,9 @@
 from __future__ import annotations
 from typing import Tuple
 
-from wagtail.admin.panels.field_panel import FieldPanel
 from wagtail.blocks.field_block import RichTextBlock, CharBlock, FieldBlock
-from wagtail.fields import StreamField
 from wagtail.images.blocks import ImageChooserBlock
-from wagtail.models import Page
+
 
 gen_body_content: list[Tuple[str, FieldBlock]] = [
     ("h1", CharBlock(form_classname="h1", label="Kopfzeile 1")),
@@ -16,9 +14,3 @@ gen_body_content: list[Tuple[str, FieldBlock]] = [
 ]
 
 
-class HomePage(Page):
-    body = StreamField(gen_body_content, default=[])
-
-    content_panels = Page.content_panels + [FieldPanel("body", heading="Inhalt")]
-
-    subpage_types = ["home.HomePage", "home.EventPage", "home.GalleryIndexPage"]
