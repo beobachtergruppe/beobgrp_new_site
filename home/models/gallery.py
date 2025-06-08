@@ -5,8 +5,10 @@ from wagtail.models import Page
 from wagtail.admin.panels.field_panel import FieldPanel
 from wagtail.fields import RichTextField
 
+from home.models.common import CommonContextMixin
 
-class PhotoPage(Page):
+
+class PhotoPage(CommonContextMixin, Page):
     photo = models.ForeignKey(
         "wagtailimages.Image",
         null=True,
@@ -46,7 +48,7 @@ class PhotoPage(Page):
         return context
 
 
-class GalleryPage(Page):
+class GalleryPage(CommonContextMixin, Page):
     description = RichTextField(max_length=800, default="")
     cover_image = models.ForeignKey(
         "wagtailimages.Image",
@@ -69,7 +71,7 @@ class GalleryPage(Page):
         return context
 
 
-class GalleryIndexPage(Page):
+class GalleryIndexPage(CommonContextMixin, Page):
     description = RichTextField(max_length=800, default="")
 
     content_panels = Page.content_panels + [
