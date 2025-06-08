@@ -18,23 +18,30 @@
                 </style>  
                 <div class="column is-full is-half-fullhd">
                     <div class="card">
-                        <div class="card-header">Vortrag im Museum</div>
+                        <div class="card-header columns {{ event.warning_class }}">
+                            {% if event.status %}
+                                <span class="column is-text-col">{{ event.status|upper }}! </span>
+                            {% endif %}
+                            <span class="column is-text-col">{{ event.event_type }}</span>
+                        </div>
                         <div class="card-content">
                             <div class="columns is-multiline">                
-                                <div class="column is-two-third is-text-col">
+                                <div class="column is-half is-text-col {{ event.status|yesno:"strikethrough," }}">
                                     <p class="card-title">{{ event.start_time|date:"D" }} 
                                         {{ event.start_time|date:"d.m, H:i" }} Uhr</p>
                                     <p class="card-subtitle"><b>{{ event.event_title }}</b><br>{{ event.referent }}</p>
                                 </div>                          
                                 {% if event.image %}
-                                    <div class="column is-one-third is-image-col">
+                                    <div class="column is-half is-image-col">
                                         {% image event.image original class="is-fullwidth card-image-wrapper" %}
                                     </div>
                                 {% endif %}
                             </div>                        
                             <input type="checkbox" id="toggle-info-{{ event.web_id }}" class="toggle-checkbox-{{ event.web_id }}">
                             <label for="toggle-info-{{ event.web_id }}" class="btn btn-info">Info</label>
-                            {% if event.needs_reservation %}
+                            {% if event.status %}
+                                <b>{{ event.status|upper }}!</b>
+                            {% elif event.needs_reservation %}
                                 {% if event.is_reservable %}
                                     <a href="{{ event.reservation_mailto_link }}" class="btn btn-reservation">Reservierung</a>
                                 {% else %}

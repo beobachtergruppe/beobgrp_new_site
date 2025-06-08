@@ -119,6 +119,21 @@ class SingleEvent(Page):
         return date.today() >= self.first_reservation_date and is_open
 
     @cached_property
+    def warning_class(self) -> str:
+        if self.cancelled or self.booked_out:
+            return "not-available"
+        return ""
+    
+    @cached_property
+    def status(self) -> str:
+        if self.cancelled:
+            return "abgesagt"
+        elif self.booked_out:
+            return "ausgebucht"
+        else:
+            return ""
+
+    @cached_property
     def reservation_mailto_link(self) -> str:
         return create_email_link(
             email_address="reservierung@beobachtergruppe.de",

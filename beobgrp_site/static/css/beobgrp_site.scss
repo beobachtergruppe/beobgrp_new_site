@@ -83,6 +83,16 @@ h5 {
   margin-bottom: 0.5rem; // Add some space between event boxes
 }
 
+.not-available {
+  @extend .has-background-danger;
+  font-weight: bold;
+}
+
+.strikethrough {
+  text-decoration: line-through;
+}
+
+
 .navbar {
   min-height: 5rem; // Increase navbar height for larger logo
   max-width: 100;
