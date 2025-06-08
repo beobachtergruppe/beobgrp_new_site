@@ -1,0 +1,6 @@
+<div class="eventbox">
+    <p>
+        {{ event.event_type }}: <b><a href="{{ event.get_parent.get_url }}">{{ event.event_title }}</a></b> am
+        <b>{{ event.start_time|date:"D" }} {{ event.start_time|date:"d.m, H:i" }} Uhr</b>
+    </p>
+</div>

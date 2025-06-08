@@ -29,7 +29,7 @@ from wagtail.fields import StreamField
 from wagtail.models import Page
 
 
-from home.models.base import gen_body_content
+from home.models.common import CommonContextMixin, gen_body_content
 
 logger = logging.getLogger(__name__)
 
@@ -185,7 +185,7 @@ blocks_for_event_body = deepcopy(gen_body_content)
 blocks_for_event_body.append(("event_list", EventListBlock()))  # type: ignore
 
 
-class EventPage(Page):
+class EventPage(CommonContextMixin,Page):
     body = StreamField(blocks_for_event_body, default=[])
 
     content_panels = Page.content_panels + [FieldPanel("body", heading="Inhalt")]

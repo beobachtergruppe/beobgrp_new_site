@@ -13,70 +13,174 @@ $aside-background-color: #0c358e;
 $navbar-background-color: #333;
 $navbar-item-color: white;
 
+// *** IMPORTANT: Define your breakpoints
+// This is the *desktop* breakpoint where the burger menu kicks in.
+// You'll need to find the optimal point where your menu items start to overflow
+// even with slight font reductions.
+$navbar-burger-breakpoint: 1024px; // Bulma's default desktop breakpoint, adjust as needed
+
+// Define smaller breakpoints *before* the burger appears, where you'll shrink font size
+$medium-desktop-breakpoint: 1250px; // Example: Menu starts to get tight here
+$small-desktop-breakpoint: 1200px; // Example: Need to shrink more here
+
 // Buttons
 $button-color: white;
 $button-background-color: darken(darkblue, 12%);
 
 $background-opacity: 0.7;
 
-@use "bulma/sass" with (
-  $background: black,
-);
+@use "bulma/sass" with ($background: black,
+  $navbar-background-color: $navbar-background-color,
+  $navbar-item-color: $navbar-item-color,
+  $navbar-breakpoint: $navbar-burger-breakpoint);
 
-// html, body {
-//   background: linear-gradient(rgba(0, 0, 0, $background-opacity), rgba(0, 0, 0, $background-opacity)),
-//     url('/static/images/Background_Oststernwarte_1600.jpg') no-repeat center fixed;
-//   background-size: cover;
-//   color: $text;
-// }
 
-.block-h1, h1 {
+.block-h1,
+h1 {
   @extend .title;
   @extend .is-2;
   margin-top: 0.3em;
   color: gold;
 }
 
-.block-h2, h2 {
+.block-h2,
+h2 {
   @extend .title;
   @extend .is-3;
   margin-top: 0.2em;
   color: gold;
 }
 
-.block-h3, h3 {
+.block-h3,
+h3 {
   @extend .title;
   @extend .is-4;
   margin-top: 0.1em;
   color: gold;
 }
 
-.block-h4, h4 {
+.block-h4,
+h4 {
   @extend .title;
   @extend .is-5;
   margin-top: 0.1em;
   color: gold;
 }
 
-.block-h5, h5 {
+.block-h5,
+h5 {
   @extend .title;
   @extend .is-6;
   margin-top: 0.2em;
   color: gold;
 }
 
+.eventbox {
+  @extend .box;
+  background-color: $content-background-color;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem; // Add some space between event boxes
+}
 
 .navbar {
   min-height: 5rem; // Increase navbar height for larger logo
+  max-width: 100;
+  padding-left: 0;
+  padding-right: 0;
 
-  @media (max-width: 1024px) {
+  @media screen and (max-width: $navbar-burger-breakpoint) {
     min-height: 3rem; // Adjust for tablets
   }
 
-  @media (max-width: 768px) {
-    min-height: 2.5rem; // Adjust for mobile
+  @media screen and (max-width: 768px) {
+    min-height: 2.5rem;
+  }
+
+  // Ensure the navbar-brand and navbar-menu align correctly within the container
+  .navbar-brand {
+    // Bulma's .navbar-brand usually handles this well, but let's be explicit
+    // It should be at the start of the flex container
+    display: flex; // Make sure it's a flex container too
+    align-items: center; // Vertically align items
+    // Add a small internal padding to the brand for breathing room if logo is flush to edge
+    padding-left: 0;
+    padding-right: 0.25rem; // Add to both sides to balance the burger placement
+    margin-right: auto;
+  }
+
+  .navbar-burger {
+    // Ensure the burger icon is aligned to the right
+    align-self: flex-end; // right-align inside vertical flex container
+    margin-right: 0; // Remove any right margin that might push it left
+  }
+
+  .navbar-menu {
+    // On desktop, this should take up the remaining space and align left.
+    // Bulma usually uses flex-grow: 1 or similar for this.
+    // Ensure no auto margins are pushing it right.
+    flex-grow: 1;
+    flex-shrink: 0; // Prevent shrinking when menu is long
+    justify-content: flex-start; // Ensure items within navbar-start align left
+    padding-left: 0; // Ensure no default padding is inherited that pushes it right
+    padding-right: 0; // Same for right
+
+    // Ensure the menu items are aligned to the left on desktop (and horizonally stacked)
+    @media screen and (min-width: ($navbar-burger-breakpoint + 1px)) {
+      display: flex !important;
+      flex-direction: row;
+      justify-content: flex-start; // ⬅️ ensures menu items align left
+      padding-left: 1rem; // ⬅️ add left padding to match the logo
+      padding-right: 0; // ⬅️ remove any unintended right padding
+      width: 100%; // ensure it spans the full width to allow left alignment
+    }
+
+    // This is crucial for mobile stacking:
+    @media screen and (max-width: $navbar-burger-breakpoint) {
+      &.is-active {
+        display: flex !important;
+        flex-direction: column;
+        justify-content: flex-end;
+        width: 100%;
+        padding: 1rem;
+      }
+    }
+  }
+
+  .navbar-inner-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+
+    @media screen and (max-width: $navbar-burger-breakpoint) {
+      flex-direction: column;
+      align-items: stretch; // Ensures children can expand to full width
+    }
+  }
+
+
+  .navbar-start {
+    // Ensure the items inside .navbar-start are also aligned left
+    justify-content: flex-start;
+    margin-left: 0; // Ensure no auto margin from Bulma's defaults
+  }
+
+
+  // On mobile, Bulma's .container padding is usually less,
+  // but this ensures consistency across all sizes.
+  @media screen and (max-width: 768px) {
+
+    // You might want to remove padding for very small screens if the logo
+    // is pushing too far in.
+    .navbar-brand,
+    .navbar-menu {
+      padding-left: 0.5rem; // Slightly less padding on mobile
+      padding-right: 0.5rem;
+    }
   }
 }
+
 
 .navbar-logo {
   @extend .navbar-item;
@@ -90,6 +194,80 @@ $background-opacity: 0.7;
   }
 }
 
+// This ensures the burger is hidden on desktop and visible on mobile
+.navbar-burger {
+
+  @media screen and (min-width: ($navbar-burger-breakpoint + 1px)) {
+    // Above burger breakpoint
+    display: none !important; // Hide burger explicitly on desktop
+  }
+
+  @media screen and (max-width: $navbar-burger-breakpoint) {
+    display: block !important; // Show burger explicitly on mobile/tablet
+  }
+}
+
+
+
+// This ensures the navbar menu is horizontal on desktop and vertical/hidden on mobile
+.navbar-menu {
+
+  // On desktop, this is horizontal
+  @media screen and (min-width: ($navbar-burger-breakpoint + 1px)) {
+    display: flex !important; // Ensure horizontal display on desktop
+    flex-grow: 1; // Take up remaining space
+    justify-content: flex-start; // Align items left
+    flex-direction: row; // Explicitly row on desktop
+  }
+
+  // On mobile/tablet, it should collapse vertically and be hidden until active
+  @media screen and (max-width: $navbar-burger-breakpoint) {
+
+    // When not active, hide it
+    &:not(.is-active) {
+      display: none !important;
+    }
+
+  }
+}
+
+
+.navbar {
+  @media screen and (max-width: $navbar-burger-breakpoint) {
+    flex-direction: column !important;
+    align-items: stretch !important;
+
+    >.container {
+      flex-direction: row !important; // ✅ KEEP ROW DIRECTION
+      align-items: center !important; // ✅ Center vertically
+      justify-content: space-between !important; // ✅ Spread logo & burger
+    }
+  }
+}
+
+
+
+// Font size adjustments for .navbar-item 
+.navbar-item {
+  // Default font size for larger screens
+  font-size: 1.0rem; // Or whatever your desired default is (e.g., 16px)
+
+  // Media query for when the menu starts to get tight (before burger appears)
+  @media screen and (max-width: $medium-desktop-breakpoint) {
+    font-size: 0.85rem; // Reduce font size slightly
+    padding-left: 0.75rem; // Adjust padding if needed
+    padding-right: 0.75rem;
+  }
+
+  // Media query for when it gets even tighter (closer to burger breakpoint)
+  @media screen and (max-width: $small-desktop-breakpoint) {
+    font-size: 0.75rem; // Reduce font size more
+    padding-left: 0.5rem; // Adjust padding more aggressively
+    padding-right: 0.5rem;
+  }
+}
+
+
 .columns {
   margin: 0 auto;
 }
@@ -97,6 +275,16 @@ $background-opacity: 0.7;
 p {
   margin-top: 0.3rem;
   margin-bottom: 0.3rem;
+}
+
+a {
+  color: $link;
+  font-style: bold;
+
+  &:hover {
+    color: lighten($link, 10%);
+    text-decoration: underline;
+  }
 }
 
 .content-column {
