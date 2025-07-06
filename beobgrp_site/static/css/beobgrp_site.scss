@@ -1,8 +1,8 @@
 // Custom Variables
-$primary: gold;
-$link: darken(yellow, 10%);
+$primary: rgb(236, 230, 200);
+$link: rgb(243, 243, 80);
 $text-strong: white;
-$text: white;
+$text: rgb(222, 248, 248);
 $background: black;
 
 // other colors
@@ -34,13 +34,31 @@ $background-opacity: 0.7;
   $navbar-item-color: $navbar-item-color,
   $navbar-breakpoint: $navbar-burger-breakpoint);
 
+html, body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+p {
+  margin-top: 0.3rem;
+  margin-bottom: 0.3rem;
+}
+
+a {
+  color: $link;
+  font-style: bold;
+
+  &:hover {
+    color: lighten($link, 10%);
+    text-decoration: underline;
+  }
+}
 
 .block-h1,
 h1 {
   @extend .title;
   @extend .is-2;
   margin-top: 0.3em;
-  color: gold;
+  color: $primary;
 }
 
 .block-h2,
@@ -48,7 +66,7 @@ h2 {
   @extend .title;
   @extend .is-3;
   margin-top: 0.2em;
-  color: gold;
+  color: $primary;
 }
 
 .block-h3,
@@ -56,7 +74,7 @@ h3 {
   @extend .title;
   @extend .is-4;
   margin-top: 0.1em;
-  color: gold;
+  color: $primary;
 }
 
 .block-h4,
@@ -64,7 +82,7 @@ h4 {
   @extend .title;
   @extend .is-5;
   margin-top: 0.1em;
-  color: gold;
+  color: $primary;
 }
 
 .block-h5,
@@ -72,7 +90,7 @@ h5 {
   @extend .title;
   @extend .is-6;
   margin-top: 0.2em;
-  color: gold;
+  color: $primary;
 }
 
 .eventbox {
@@ -282,20 +300,6 @@ h5 {
   margin: 0 auto;
 }
 
-p {
-  margin-top: 0.3rem;
-  margin-bottom: 0.3rem;
-}
-
-a {
-  color: $link;
-  font-style: bold;
-
-  &:hover {
-    color: lighten($link, 10%);
-    text-decoration: underline;
-  }
-}
 
 .content-column {
   @extend .column;
