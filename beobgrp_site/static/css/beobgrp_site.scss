@@ -1,6 +1,6 @@
 // Custom Variables
-$primary: rgb(236, 230, 200);
-$link: rgb(243, 243, 80);
+$primary: rgb(242, 231, 172);
+$link: rgb(122, 201, 169);
 $text-strong: white;
 $text: rgb(222, 248, 248);
 $background: black;
@@ -53,44 +53,58 @@ a {
   }
 }
 
+.block-paragraph {
+  background-color: $content-background-color;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 0.5rem; 
+}
+
+.block-image {
+  background-color: $content-background-color;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 0.5rem
+}
+
+.title {
+  background-color: $content-background-color;
+  color: $primary
+}
+
 .block-h1,
 h1 {
   @extend .title;
   @extend .is-2;
-  margin-top: 0.3em;
-  color: $primary;
+  margin-top: 0.3em
 }
 
 .block-h2,
 h2 {
   @extend .title;
   @extend .is-3;
-  margin-top: 0.2em;
-  color: $primary;
+  margin-top: 0.2em
 }
 
 .block-h3,
 h3 {
   @extend .title;
   @extend .is-4;
-  margin-top: 0.1em;
-  color: $primary;
+  margin-top: 0.1em
 }
 
 .block-h4,
 h4 {
   @extend .title;
   @extend .is-5;
-  margin-top: 0.1em;
-  color: $primary;
+  margin-top: 0.1em
 }
 
 .block-h5,
 h5 {
   @extend .title;
   @extend .is-6;
-  margin-top: 0.2em;
-  color: $primary;
+  margin-top: 0.2em
 }
 
 .eventbox {
@@ -295,15 +309,22 @@ h5 {
   }
 }
 
-
 .columns {
+  gap: 0.5rem; // Adds space between columns
   margin: 0 auto;
+}
+
+.column,
+.content-column,
+.aside-column {
+  border-radius: 1rem; // Ensures rounded corners for all columns
+  overflow: hidden; // Prevents content from overflowing rounded corners
 }
 
 
 .content-column {
   @extend .column;
-  background-color: $content-background-color;
+  background-color: $background;
   padding: 0.5rem;
   border-radius: 0.5rem;
 }
