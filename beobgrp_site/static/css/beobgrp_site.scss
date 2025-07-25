@@ -6,8 +6,9 @@ $text: rgb(222, 248, 248);
 $background: black;
 
 // other colors
-$content-background-color: #08286c;
+$content-background-color: #0d3ca2;
 $aside-background-color: #0c358e;
+$header-background-color: #4490ac;
 
 // Navbar
 $navbar-background-color: #333;
@@ -53,58 +54,103 @@ a {
   }
 }
 
+@mixin generic-block {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+  border-radius: 0.5rem !important
+}
+
+
 .block-paragraph {
+  @include generic-block;
   background-color: $content-background-color;
-  margin-top: 0;
-  margin-bottom: 0;
-  padding: 0.5rem; 
 }
 
 .block-image {
+  @include generic-block;
   background-color: $content-background-color;
-  margin-top: 0;
-  margin-bottom: 0;
-  padding: 0.5rem
 }
 
 .title {
-  background-color: $content-background-color;
-  color: $primary
+  @include generic-block;
+  background-color: $header-background-color;
+  color: $primary;
 }
 
-.block-h1,
-h1 {
+// Create a mixin for overriding margins and paddings
+@mixin block-heading-spacing {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+  border-radius: 0.5rem !important;
+}
+
+// Example for block-h1
+.block-h1 {
   @extend .title;
   @extend .is-2;
-  margin-top: 0.3em
+  @include block-heading-spacing;
+  margin-top: 0.3em !important; // Custom top margin if needed
 }
 
-.block-h2,
-h2 {
+// Apply to other block-* headings as well
+.block-h2 {
   @extend .title;
   @extend .is-3;
-  margin-top: 0.2em
+  @include block-heading-spacing;
+  margin-top: 0.2em !important;
 }
 
-.block-h3,
-h3 {
+.block-h3 {
   @extend .title;
   @extend .is-4;
-  margin-top: 0.1em
+  @include block-heading-spacing;
+  margin-top: 0.1em !important;
 }
 
-.block-h4,
-h4 {
+.block-h4 {
   @extend .title;
   @extend .is-5;
-  margin-top: 0.1em
+  @include block-heading-spacing;
+  margin-top: 0.1em !important;
 }
 
-.block-h5,
-h5 {
+.block-h5 {
   @extend .title;
   @extend .is-6;
-  margin-top: 0.2em
+  @include block-heading-spacing;
+  margin-top: 0.2em !important;
+}
+
+.block-h2 {
+  @extend .title;
+  @extend .is-3;
+  margin-top: 0.2em;
+}
+
+.block-h3 {
+  @extend .title;
+  @extend .is-4;
+  margin-top: 0.1em;
+}
+
+.block-h4 {
+  @extend .title;
+  @extend .is-5;
+  margin-top: 0.1em;
+}
+
+.block-h5 {
+  @extend .title;
+  @extend .is-6;
+  margin-top: 0.2em;
 }
 
 .eventbox {
