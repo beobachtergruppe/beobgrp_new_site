@@ -69,25 +69,31 @@ a {
 .block-paragraph {
   @include block-heading-spacing;
   background-color: $content-background-color;
+  overflow: hidden;
+  display: flow-root
 }
 
 .block-image {
   @include block-heading-spacing;
   background-color: $content-background-color;
+  overflow: hidden;
+  display: flow-root
 }
 
 .title {
   background-color: $header-background-color;
-  color: $primary;
+  color: $primary
 }
 
+$title-bottom-padding: 0.2em;
 
 // Example for block-h1
 .block-h1 {
   @extend .title;
   @extend .is-2;
   @include block-heading-spacing;
-  margin-top: 0.3em !important; // Custom top margin if needed
+  padding-bottom: $title-bottom-padding !important;
+  margin-top: 2rem !important; // Custom top margin if needed
 }
 
 // Apply to other block-* headings as well
@@ -95,28 +101,32 @@ a {
   @extend .title;
   @extend .is-3;
   @include block-heading-spacing;
-  margin-top: 0.2em !important;
+  padding-bottom: $title-bottom-padding !important;
+  margin-top: 2rem !important;
 }
 
 .block-h3 {
   @extend .title;
   @extend .is-4;
   @include block-heading-spacing;
-  margin-top: 0.1em !important;
+  padding-bottom: $title-bottom-padding !important;
+  margin-top: 1rem !important;
 }
 
 .block-h4 {
   @extend .title;
   @extend .is-5;
   @include block-heading-spacing;
-  margin-top: 0.1em !important;
+  padding-bottom: $title-bottom-padding !important;
+  margin-top: 1rem !important;
 }
 
 .block-h5 {
   @extend .title;
   @extend .is-6;
   @include block-heading-spacing;
-  margin-top: 0.2em !important;
+  padding-bottom: $title-bottom-padding !important;
+  margin-top: 0.5rem !important;
 }
 
 
