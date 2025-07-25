@@ -54,32 +54,6 @@ a {
   }
 }
 
-@mixin generic-block {
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  padding-left: 0.5rem !important;
-  padding-right: 0.5rem !important;
-  border-radius: 0.5rem !important
-}
-
-
-.block-paragraph {
-  @include generic-block;
-  background-color: $content-background-color;
-}
-
-.block-image {
-  @include generic-block;
-  background-color: $content-background-color;
-}
-
-.title {
-  @include generic-block;
-  background-color: $header-background-color;
-  color: $primary;
-}
 
 // Create a mixin for overriding margins and paddings
 @mixin block-heading-spacing {
@@ -89,8 +63,24 @@ a {
   padding-bottom: 0 !important;
   padding-left: 0.5rem !important;
   padding-right: 0.5rem !important;
-  border-radius: 0.5rem !important;
+  border-radius: 0.5rem !important
 }
+
+.block-paragraph {
+  @include block-heading-spacing;
+  background-color: $content-background-color;
+}
+
+.block-image {
+  @include block-heading-spacing;
+  background-color: $content-background-color;
+}
+
+.title {
+  background-color: $header-background-color;
+  color: $primary;
+}
+
 
 // Example for block-h1
 .block-h1 {
@@ -129,29 +119,6 @@ a {
   margin-top: 0.2em !important;
 }
 
-.block-h2 {
-  @extend .title;
-  @extend .is-3;
-  margin-top: 0.2em;
-}
-
-.block-h3 {
-  @extend .title;
-  @extend .is-4;
-  margin-top: 0.1em;
-}
-
-.block-h4 {
-  @extend .title;
-  @extend .is-5;
-  margin-top: 0.1em;
-}
-
-.block-h5 {
-  @extend .title;
-  @extend .is-6;
-  margin-top: 0.2em;
-}
 
 .eventbox {
   @extend .box;
