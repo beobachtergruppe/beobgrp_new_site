@@ -91,7 +91,7 @@ $title-bottom-padding: 0.2em;
 // Example for block-h1
 .block-h1 {
   @extend .title;
-  @extend .is-2;
+  @extend .is-3;
   @include block-heading-spacing;
   padding-bottom: $title-bottom-padding !important;
   margin-top: 2rem !important; // Custom top margin if needed
@@ -100,7 +100,7 @@ $title-bottom-padding: 0.2em;
 // Apply to other block-* headings as well
 .block-h2 {
   @extend .title;
-  @extend .is-3;
+  @extend .is-4;
   @include block-heading-spacing;
   padding-bottom: $title-bottom-padding !important;
   margin-top: 2rem !important;
@@ -108,7 +108,7 @@ $title-bottom-padding: 0.2em;
 
 .block-h3 {
   @extend .title;
-  @extend .is-4;
+  @extend .is-5;
   @include block-heading-spacing;
   padding-bottom: $title-bottom-padding !important;
   margin-top: 1rem !important;
@@ -116,7 +116,8 @@ $title-bottom-padding: 0.2em;
 
 .block-h4 {
   @extend .title;
-  @extend .is-5;
+  @extend .is-6;
+  font-style: bold;
   @include block-heading-spacing;
   padding-bottom: $title-bottom-padding !important;
   margin-top: 1rem !important;
