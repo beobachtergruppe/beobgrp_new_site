@@ -1,13 +1,14 @@
 // Custom Variables
-$primary: gold;
-$link: darken(yellow, 10%);
+$primary: rgb(242, 231, 172);
+$link: rgb(122, 201, 169);
 $text-strong: white;
-$text: white;
+$text: rgb(222, 248, 248);
 $background: black;
 
 // other colors
-$content-background-color: #08286c;
+$content-background-color: #0d3ca2;
 $aside-background-color: #0c358e;
+$header-background-color: #145a74;
 
 // Navbar
 $navbar-background-color: #333;
@@ -34,46 +35,102 @@ $background-opacity: 0.7;
   $navbar-item-color: $navbar-item-color,
   $navbar-breakpoint: $navbar-burger-breakpoint);
 
-
-.block-h1,
-h1 {
-  @extend .title;
-  @extend .is-2;
-  margin-top: 0.3em;
-  color: gold;
+html, body {
+  font-family: Arial, Helvetica, sans-serif;
+  hyphens: auto;
 }
 
-.block-h2,
-h2 {
+p {
+  margin-top: 0.3rem;
+  margin-bottom: 0.3rem;
+}
+
+a {
+  color: $link;
+  font-style: bold;
+
+  &:hover {
+    color: lighten($link, 10%);
+    text-decoration: underline;
+  }
+}
+
+
+// Create a mixin for overriding margins and paddings
+@mixin block-heading-spacing {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+  border-radius: 0.5rem !important
+}
+
+.block-paragraph {
+  @include block-heading-spacing;
+  background-color: $content-background-color;
+  overflow: hidden;
+  display: flow-root
+}
+
+.block-image {
+  @include block-heading-spacing;
+  background-color: $content-background-color;
+  overflow: hidden;
+  display: flow-root
+}
+
+.title {
+  background-color: $header-background-color;
+  color: $primary
+}
+
+$title-bottom-padding: 0.2em;
+
+// Example for block-h1
+.block-h1 {
   @extend .title;
   @extend .is-3;
-  margin-top: 0.2em;
-  color: gold;
+  @include block-heading-spacing;
+  padding-bottom: $title-bottom-padding !important;
+  margin-top: 2rem !important; // Custom top margin if needed
 }
 
-.block-h3,
-h3 {
+// Apply to other block-* headings as well
+.block-h2 {
   @extend .title;
   @extend .is-4;
-  margin-top: 0.1em;
-  color: gold;
+  @include block-heading-spacing;
+  padding-bottom: $title-bottom-padding !important;
+  margin-top: 2rem !important;
 }
 
-.block-h4,
-h4 {
+.block-h3 {
   @extend .title;
   @extend .is-5;
-  margin-top: 0.1em;
-  color: gold;
+  @include block-heading-spacing;
+  padding-bottom: $title-bottom-padding !important;
+  margin-top: 1rem !important;
 }
 
-.block-h5,
-h5 {
+.block-h4 {
   @extend .title;
   @extend .is-6;
-  margin-top: 0.2em;
-  color: gold;
+  font-style: bold;
+  @include block-heading-spacing;
+  padding-bottom: $title-bottom-padding !important;
+  margin-top: 1rem !important;
 }
+
+.block-h5 {
+  @extend .title;
+  @extend .is-6;
+  @include block-heading-spacing;
+  padding-bottom: $title-bottom-padding !important;
+  margin-top: 0.5rem !important;
+}
+
 
 .eventbox {
   @extend .box;
@@ -277,29 +334,22 @@ h5 {
   }
 }
 
-
 .columns {
+  gap: 0.5rem; // Adds space between columns
   margin: 0 auto;
 }
 
-p {
-  margin-top: 0.3rem;
-  margin-bottom: 0.3rem;
+.column,
+.content-column,
+.aside-column {
+  border-radius: 1rem; // Ensures rounded corners for all columns
+  overflow: hidden; // Prevents content from overflowing rounded corners
 }
 
-a {
-  color: $link;
-  font-style: bold;
-
-  &:hover {
-    color: lighten($link, 10%);
-    text-decoration: underline;
-  }
-}
 
 .content-column {
   @extend .column;
-  background-color: $content-background-color;
+  background-color: $background;
   padding: 0.5rem;
   border-radius: 0.5rem;
 }

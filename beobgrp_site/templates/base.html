@@ -17,7 +17,7 @@
             {% block extra_css %}{# Override this in templates to add extra stylesheets #}{% endblock %}
         {% endcompress %}
     </head>
-    <body class="{% block body_class %}{% endblock %}">
+    <body lang="de" class="{% block body_class %}{% endblock %}">
         {% wagtailuserbar %}
         <header>
             {% get_site_root as site_root %}
