@@ -64,7 +64,7 @@ def _get_default_event_title(start_time, event_title):
 class SingleEvent(Page):
     start_time = DateTimeField()
     event_type = CharField(choices=EventTypes.choices)
-    event_title = CharField(max_length=100, default="")
+    event_title = CharField(max_length=140, default="")
     location = CharField(max_length=120, default="Deutsches Museum")
     referent = CharField(max_length=120, default="")
     abstract = RichTextField(max_length=800, default="")
