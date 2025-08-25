@@ -47,7 +47,7 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
 
 # Install Postgres 16 from a dedicated repository
 COPY dpdg.list /etc/apt/sources.list.d/
-RUN apt install curl ca-certificates && \
+RUN apt install -y curl ca-certificates && \
     install -d /usr/share/postgresql-common/pgdg && \
     curl -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc --fail https://www.postgresql.org/media/keys/ACCC4CF8.asc && \
     apt update && \

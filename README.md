@@ -14,6 +14,37 @@ Make sure that your development tools are installed:
 * git utilities
 * vscode IDE
 
+#### Database development setup
+
+In order to have password free access you need to do the following:
+* Only allow local access:
+
+```shell
+sudo nano /etc/postgresql/16/main/postgresql.conf
+```
+Outcomment this line:
+```
+listen_addresses = 'localhost'
+```
+
+* Convert authentication without password for localhost only in the pg_hba.conf file:
+```shell
+sudo nano /etc/postgresql/16/main/pg_hba.conf
+```
+Change/add the line:
+```
+local   all             postgres                                trust
+```
+
+* Restart Postgres
+
+```shell
+sudo systemctl restart postgresql
+```
+
+Now you should be able to locally access the database as the postgres user without password.
+
+#### Clone repository
 
 To install the development environment you first need to clone 
 the git repository (for that you need to have your public SSH key setup in Githib):
@@ -21,6 +52,8 @@ the git repository (for that you need to have your public SSH key setup in Githi
 ```shell
 git clone git@github.com:beobachtergruppe/beobgrp_site.git
 ```
+
+#### Configure Python environment for project
 
 Then go into the newly created project `beobgrp_site` and do the following:
 
@@ -36,6 +69,7 @@ pip install --upgrade pip
 ```
 pip install -r requirements.txt
 ```
+
 * Set the database password
 ```
 export WAGTAIL_DB_PASSWORD="some_password" 
