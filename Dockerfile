@@ -20,6 +20,9 @@ ENV DJANGO_BACKUP_DIR=/site_backup
 # Set the media directory to the mounted volume
 ENV DJANGO_MEDIA_DIR=/media
 
+# Tell Django to use production settings (currently precompiled SASS)
+ENV PRODUCTION_VERSION=true
+
 # Add user that will be used in the container.
 RUN useradd wagtail
 
@@ -86,6 +89,9 @@ RUN npm init -y && \
 
 # Copy the source code of the project into the container.
 COPY --chown=wagtail:wagtail . .
+
+# Compress the SASS templates
+RUN ./manage.py compress
 
 # Run startup script with the provided arguments.
 ENTRYPOINT ./docker_start_server.sh
