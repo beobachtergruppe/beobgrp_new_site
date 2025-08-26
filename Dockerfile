@@ -61,8 +61,6 @@ ENV LANG=de_DE.UTF-8
 ENV LANGUAGE=de_DE:de
 ENV LC_ALL=de_DE.UTF-8
 
-RUN npm install --global sass
-
 RUN pip install --upgrade pip
 
 # Install the application server.
@@ -81,9 +79,10 @@ RUN chown -R wagtail:wagtail /app
 # The persistent media directory must also be writeable by the "wagtail" user.
 RUN mkdir -p /media 
 
-# Install bulma
+# Install bulma & sass
 RUN npm init -y && \
-    npm install bulma
+    npm install --global sass && \
+    npm install bulma 
 
 # Copy the source code of the project into the container.
 COPY --chown=wagtail:wagtail . .
