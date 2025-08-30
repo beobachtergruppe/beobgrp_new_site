@@ -6,8 +6,9 @@ $text: rgb(222, 248, 248);
 $background: black;
 
 // other colors
+$content-column-background-color: #06245c;
 $content-background-color: #0d3ca2;
-$aside-background-color: #0c358e;
+$aside-background-color: #1f2e4d;
 $header-background-color: #145a74;
 
 // Navbar
@@ -88,7 +89,6 @@ a {
 
 $title-bottom-padding: 0.2em;
 
-// Example for block-h1
 .block-h1 {
   @extend .title;
   @extend .is-3;
@@ -97,7 +97,6 @@ $title-bottom-padding: 0.2em;
   margin-top: 2rem !important; // Custom top margin if needed
 }
 
-// Apply to other block-* headings as well
 .block-h2 {
   @extend .title;
   @extend .is-4;
@@ -348,7 +347,7 @@ $title-bottom-padding: 0.2em;
 
 .content-column {
   @extend .column;
-  background-color: $background;
+  background-color: $content-column-background-color;
   padding: 0.5rem;
   border-radius: 0.5rem;
 }

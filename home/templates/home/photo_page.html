@@ -12,13 +12,13 @@
     <div class="row is-flex is-align-items-center is-justify-content-space-between">
         {% if previous %}
             <a href="{% pageurl previous %}">
-                <img class="block-h2 icon-inline" src="{% static 'icons/left.svg' %}" alt="Left Arrow"/>
+                <img class="icon-inline" src="{% static 'icons/left.svg' %}" alt="Left Arrow"/>
             </a>
         {% endif %}
         <h2>{{ page.title }}</h2>
         {% if next %}
             <a href="{% pageurl next %}">
-                <img class="block-h2 icon-inline" src="{% static 'icons/right.svg' %}" alt="Right Arrow"/>
+                <img class="icon-inline" src="{% static 'icons/right.svg' %}" alt="Right Arrow"/>
             </a>
         {% endif %}
     </div>
