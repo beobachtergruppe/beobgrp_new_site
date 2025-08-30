@@ -20,6 +20,9 @@ ENV DJANGO_BACKUP_DIR=/site_backup
 # Set the media directory to the mounted volume
 ENV DJANGO_MEDIA_DIR=/media
 
+# Tell Django to use production settings (currently precompiled SASS)
+ENV PRODUCTION_VERSION=true
+
 # Add user that will be used in the container.
 RUN useradd wagtail
 
@@ -47,7 +50,7 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
 
 # Install Postgres 16 from a dedicated repository
 COPY dpdg.list /etc/apt/sources.list.d/
-RUN apt install curl ca-certificates && \
+RUN apt install -y curl ca-certificates && \
     install -d /usr/share/postgresql-common/pgdg && \
     curl -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc --fail https://www.postgresql.org/media/keys/ACCC4CF8.asc && \
     apt update && \
@@ -60,8 +63,6 @@ RUN apt-get update && apt-get install -y locales \
 ENV LANG=de_DE.UTF-8
 ENV LANGUAGE=de_DE:de
 ENV LC_ALL=de_DE.UTF-8
-
-RUN npm install --global sass
 
 RUN pip install --upgrade pip
 
@@ -81,12 +82,16 @@ RUN chown -R wagtail:wagtail /app
 # The persistent media directory must also be writeable by the "wagtail" user.
 RUN mkdir -p /media 
 
-# Install bulma
+# Install bulma & sass
 RUN npm init -y && \
-    npm install bulma
+    npm install --global sass && \
+    npm install bulma@1.0.4
 
 # Copy the source code of the project into the container.
 COPY --chown=wagtail:wagtail . .
+
+# Compress the SASS templates
+RUN ./manage.py compress
 
 # Run startup script with the provided arguments.
 ENTRYPOINT ./docker_start_server.sh

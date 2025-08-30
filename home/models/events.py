@@ -2,7 +2,6 @@ from time import localtime
 from beobgrp_site.utils.email import create_email_link
 
 from django.db.models.fields import BooleanField, CharField, DateTimeField
-from django.db.models.fields.files import ImageField
 from django.db import models
 
 from django.utils.text import slugify
@@ -23,7 +22,7 @@ from django.db.models import TextChoices
 from django.utils.timezone import localtime, now
 from wagtail.admin.forms.pages import WagtailAdminPageForm
 from wagtail.admin.panels.field_panel import FieldPanel
-from wagtail.blocks.field_block import ChoiceBlock
+from wagtail.blocks.field_block import MultipleChoiceBlock
 from wagtail.blocks.struct_block import StructBlock
 from wagtail.fields import StreamField
 from wagtail.models import Page
@@ -64,7 +63,7 @@ def _get_default_event_title(start_time, event_title):
 class SingleEvent(Page):
     start_time = DateTimeField()
     event_type = CharField(choices=EventTypes.choices)
-    event_title = CharField(max_length=100, default="")
+    event_title = CharField(max_length=140, default="")
     location = CharField(max_length=120, default="Deutsches Museum")
     referent = CharField(max_length=120, default="")
     abstract = RichTextField(max_length=800, default="")
@@ -162,9 +161,9 @@ class SingleEvent(Page):
 
 
 class EventListBlock(StructBlock):
-    event_type = ChoiceBlock(
+    event_type = MultipleChoiceBlock(
         choices=EventTypes.choices,
-        required=True,
+        required=False,
         label="Art der Veranstaltung",
         help_text="Liste von Veranstaltungen",
     )
@@ -177,15 +176,16 @@ class EventListBlock(StructBlock):
             parent_page = parent_context["page"]
 
             # Query child pages of the parent that are of type SingleEvent
-            events = (
-                SingleEvent.objects.child_of(parent_page)
-                .live()
-                .filter(
-                    event_type=value["event_type"],  # Match the event type
-                    start_time__gte=now(),  # Match events at or after the current time
-                )
-                .order_by("start_time")
-            )  # Order by start time
+            event_types = value.get("event_type")
+            if isinstance(event_types, str):
+                event_types = [event_types]
+                
+            events_qs = SingleEvent.objects.child_of(parent_page).live().filter(
+                start_time__gte=now()
+            )
+            if event_types:
+                events_qs = events_qs.filter(event_type__in=event_types)
+            events = events_qs.order_by("start_time")
 
             # Add events to the context
             context["events"] = events

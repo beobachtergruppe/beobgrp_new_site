@@ -1,14 +1,16 @@
-// Custom Variables
-$primary: rgb(242, 231, 172);
+
+// Set your brand colors
 $link: rgb(122, 201, 169);
 $text-strong: white;
 $text: rgb(222, 248, 248);
 $background: black;
 
 // other colors
+$content-column-background-color: #06245c;
 $content-background-color: #0d3ca2;
-$aside-background-color: #0c358e;
+$aside-background-color: #1f2e4d;
 $header-background-color: #145a74;
+$header-color: #f8e769;
 
 // Navbar
 $navbar-background-color: #333;
@@ -83,12 +85,11 @@ a {
 
 .title {
   background-color: $header-background-color;
-  color: $primary
+  color: $header-color
 }
 
 $title-bottom-padding: 0.2em;
 
-// Example for block-h1
 .block-h1 {
   @extend .title;
   @extend .is-3;
@@ -97,7 +98,6 @@ $title-bottom-padding: 0.2em;
   margin-top: 2rem !important; // Custom top margin if needed
 }
 
-// Apply to other block-* headings as well
 .block-h2 {
   @extend .title;
   @extend .is-4;
@@ -346,10 +346,9 @@ $title-bottom-padding: 0.2em;
   overflow: hidden; // Prevents content from overflowing rounded corners
 }
 
-
 .content-column {
   @extend .column;
-  background-color: $background;
+  background-color: $content-column-background-color;
   padding: 0.5rem;
   border-radius: 0.5rem;
 }
@@ -361,6 +360,11 @@ $title-bottom-padding: 0.2em;
   border-radius: 0.5rem;
 }
 
+.container.is-fluid {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
 .icon-inline {
   height: 1em;
   display: block;
@@ -368,3 +372,24 @@ $title-bottom-padding: 0.2em;
   max-height: 100%;
   filter: brightness(0) invert(1);
 }
+
+// --- FIX FOR BULMA 1.0 COLUMNS WITH GAP ---
+// This calculates the column width to account for the gap you've set.
+.columns.is-multiline {
+  // On desktop and wider
+  @media screen and (min-width: 1024px) {
+    .column.is-half-desktop {
+      flex: none;
+      width: calc(50% - (0.5rem / 2));
+    }
+    .column.is-one-third-desktop {
+      flex: none;
+      width: calc(33.3333% - (0.5rem * 2 / 3));
+    }
+    .column.is-one-quarter-desktop {
+      flex: none;
+      width: calc(25% - (0.5rem * 3 / 4));
+    }
+  }
+}
+

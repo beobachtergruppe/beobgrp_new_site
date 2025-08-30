@@ -18,6 +18,6 @@
   },
   "homepage": "https://github.com/beobachtergruppe/beobgrp_new_site#readme",
   "dependencies": {
-    "bulma": "^1.0.3"
+    "bulma": "^1.0.4"
   }
 }

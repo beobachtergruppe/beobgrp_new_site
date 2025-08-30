@@ -1,22 +1,26 @@
 {% load wagtailimages_tags %}
 
-<div class="event-list columns is-multiline is-desktop">
-    {% if events %}
-                
+<style>
+    /* Hide all abstracts by default */
+    .card-abstract {
+        display: none;
+    }
+    /* Hide the checkbox itself visually */
+    .toggle-checkbox {
+        display: none;
+    }
+</style>
+
+<div class="event-list columns is-multiline">
+    {% if events %}                
             {% for event in events %}
-                <style>
-                    /* Hide the checkbox itself visually */
-                    .card .card-content .toggle-checkbox-{{ event.web_id }} {
-                        display: none;
-                    }
-                    /* When the checkbox is checked, and its immediate sibling (.btn-info) is present,
-                       then any subsequent sibling (.card-abstract) will be displayed. */
-                    .card .card-content .toggle-checkbox-{{ event.web_id }}:checked + .btn-info ~ .card-abstract {
-                        display: block;
-                    }
-                    
-                </style>  
-                <div class="column is-full is-half-fullhd">
+                <div class="column is-half-desktop is-full-mobile is-full-tablet event-column">
+                    <style>
+                        /* Show the abstract with the matching class when the checkbox is checked, regardless of order */
+                        #toggle-info-{{ event.web_id }}:checked ~ .card-abstract-{{ event.web_id }} {
+                            display: block;
+                        }
+                    </style>
                     <div class="card">
                         <div class="card-header columns {{ event.warning_class }}">
                             {% if event.status %}
@@ -25,8 +29,8 @@
                             <span class="column is-text-col">{{ event.event_type }}</span>
                         </div>
                         <div class="card-content">
-                            <div class="columns is-multiline">                
-                                <div class="column is-half is-text-col {{ event.status|yesno:"strikethrough," }}">
+                            <div class="columns">                
+                                <div class="column is-half is-text-col {{ event.cancelled|yesno:"strikethrough," }}">
                                     <p class="card-title">{{ event.start_time|date:"D" }} 
                                         {{ event.start_time|date:"d.m, H:i" }} Uhr</p>
                                     <p class="card-subtitle"><b>{{ event.event_title }}</b><br>{{ event.referent }}</p>
@@ -37,26 +41,29 @@
                                     </div>
                                 {% endif %}
                             </div>                        
-                            <input type="checkbox" id="toggle-info-{{ event.web_id }}" class="toggle-checkbox-{{ event.web_id }}">
-                            <label for="toggle-info-{{ event.web_id }}" class="btn btn-info">Info</label>
-                            {% if event.status %}
-                                <b>{{ event.status|upper }}!</b>
-                            {% elif event.needs_reservation %}
-                                {% if event.is_reservable %}
-                                    <a href="{{ event.reservation_mailto_link }}" class="btn btn-reservation">Reservierung</a>
-                                {% else %}
-                                    Reservierbar ab dem {{ event.first_reservation_date|date:"d.m" }}
-                                {% endif %}
-                            {% else %}
-                                Keine Reservierung erforderlich
-                            {% endif %}
-                            <div class="card-abstract">
+                            <input type="checkbox" id="toggle-info-{{ event.web_id }}" class="toggle-checkbox">
+                            <div class="card-abstract card-abstract-{{ event.web_id }}">
                                 <p>{{ event.abstract|striptags }}</p>
+                            </div>
+                            <div class="event-action-row" style="display: flex; gap: 0.5em; align-items: center; margin-bottom: 1em;">
+                                <label for="toggle-info-{{ event.web_id }}" class="btn btn-info">Info</label>
+                                {% if event.status %}
+                                    <b>{{ event.status|upper }}!</b>
+                                {% elif event.needs_reservation %}
+                                    {% if event.is_reservable %}
+                                        <a href="{{ event.reservation_mailto_link }}" class="btn btn-reservation">Reservierung</a>
+                                    {% else %}
+                                        <span class="reservation-hint">Reservierbar ab dem {{ event.first_reservation_date|date:"d.m" }}</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="reservation-hint">Keine Reservierung erforderlich</span>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                 </div>
             {% endfor %}
+
     {% else %}
         <p>Keine Veranstaltungen geplant</p>
     {% endif %}
