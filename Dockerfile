@@ -85,7 +85,7 @@ RUN mkdir -p /media
 # Install bulma & sass
 RUN npm init -y && \
     npm install --global sass && \
-    npm install bulma 
+    npm install bulma@1.0.4
 
 # Copy the source code of the project into the container.
 COPY --chown=wagtail:wagtail . .

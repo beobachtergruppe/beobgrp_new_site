@@ -1,26 +1,26 @@
 {% load wagtailimages_tags %}
 
-<div class="event-list columns is-multiline is-desktop">
-    {% if events %}
-                
-            <style>
-                /* Hide all abstracts by default */
-                .card-abstract {
-                    display: none;
-                }
-                /* Hide the checkbox itself visually */
-                .toggle-checkbox {
-                    display: none;
-                }
-            </style>
+<style>
+    /* Hide all abstracts by default */
+    .card-abstract {
+        display: none;
+    }
+    /* Hide the checkbox itself visually */
+    .toggle-checkbox {
+        display: none;
+    }
+</style>
+
+<div class="event-list columns is-multiline">
+    {% if events %}                
             {% for event in events %}
-                <style>
-                    /* Show the abstract with the matching class when the checkbox is checked, regardless of order */
-                    #toggle-info-{{ event.web_id }}:checked ~ .card-abstract-{{ event.web_id }} {
-                        display: block;
-                    }
-                </style>
-                <div class="column is-multiline is-full">
+                <div class="column is-half-desktop is-full-mobile is-full-tablet event-column">
+                    <style>
+                        /* Show the abstract with the matching class when the checkbox is checked, regardless of order */
+                        #toggle-info-{{ event.web_id }}:checked ~ .card-abstract-{{ event.web_id }} {
+                            display: block;
+                        }
+                    </style>
                     <div class="card">
                         <div class="card-header columns {{ event.warning_class }}">
                             {% if event.status %}

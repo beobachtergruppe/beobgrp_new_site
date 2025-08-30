@@ -346,7 +346,6 @@ $title-bottom-padding: 0.2em;
   overflow: hidden; // Prevents content from overflowing rounded corners
 }
 
-
 .content-column {
   @extend .column;
   background-color: $background;
@@ -368,3 +367,4 @@ $title-bottom-padding: 0.2em;
   max-height: 100%;
   filter: brightness(0) invert(1);
 }
+
