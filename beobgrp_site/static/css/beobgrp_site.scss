@@ -1,5 +1,5 @@
-// Custom Variables
-$primary: rgb(242, 231, 172);
+
+// Set your brand colors
 $link: rgb(122, 201, 169);
 $text-strong: white;
 $text: rgb(222, 248, 248);
@@ -10,6 +10,7 @@ $content-column-background-color: #06245c;
 $content-background-color: #0d3ca2;
 $aside-background-color: #1f2e4d;
 $header-background-color: #145a74;
+$header-color: #f8e769;
 
 // Navbar
 $navbar-background-color: #333;
@@ -84,7 +85,7 @@ a {
 
 .title {
   background-color: $header-background-color;
-  color: $primary
+  color: $header-color
 }
 
 $title-bottom-padding: 0.2em;
@@ -357,6 +358,11 @@ $title-bottom-padding: 0.2em;
   background-color: $aside-background-color;
   padding: 0.5rem;
   border-radius: 0.5rem;
+}
+
+.container.is-fluid {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 }
 
 .icon-inline {
