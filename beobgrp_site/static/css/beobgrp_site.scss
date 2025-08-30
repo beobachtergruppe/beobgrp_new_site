@@ -368,3 +368,23 @@ $title-bottom-padding: 0.2em;
   filter: brightness(0) invert(1);
 }
 
+// --- FIX FOR BULMA 1.0 COLUMNS WITH GAP ---
+// This calculates the column width to account for the gap you've set.
+.columns.is-multiline {
+  // On desktop and wider
+  @media screen and (min-width: 1024px) {
+    .column.is-half-desktop {
+      flex: none;
+      width: calc(50% - (0.5rem / 2));
+    }
+    .column.is-one-third-desktop {
+      flex: none;
+      width: calc(33.3333% - (0.5rem * 2 / 3));
+    }
+    .column.is-one-quarter-desktop {
+      flex: none;
+      width: calc(25% - (0.5rem * 3 / 4));
+    }
+  }
+}
+
