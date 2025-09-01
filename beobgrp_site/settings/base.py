@@ -205,3 +205,4 @@ COMPRESS_PRECOMPILERS = (
 
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = os.environ.get("PRODUCTION_VERSION","false").lower() == "true"
+COMPRESS_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"

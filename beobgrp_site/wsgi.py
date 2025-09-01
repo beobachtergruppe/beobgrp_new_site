@@ -11,6 +11,10 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "beobgrp_site.settings.dev")
+# Check for the PRODUCTION_VERSION environment variable
+if os.environ.get("PRODUCTION_VERSION", "false").lower() == "true":
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "beobgrp_site.settings.production")
+else:
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "beobgrp_site.settings.dev")
 
 application = get_wsgi_application()
