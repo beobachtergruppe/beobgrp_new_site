@@ -10,12 +10,9 @@ fi
 # change user and group id of mounted volume to match the docker user
 chown -R wagtail:wagtail /media
 
-# change user to wagtail
-su wagtail
-
-# commands to configure and start the server
-
-
+# Run database migrations and start Gunicorn as the wagtail user
+exec gosu wagtail bash -c '
+set -xe
 case "$SITE_INIT_MODE" in
   migrate)
     python manage.py migrate --noinput
@@ -36,6 +33,7 @@ esac
 
 python manage.py clearsessions
 gunicorn beobgrp_site.wsgi:application
+'
 
 
 
