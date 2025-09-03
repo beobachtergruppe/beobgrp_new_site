@@ -20,8 +20,12 @@ ENV DJANGO_BACKUP_DIR=/site_backup
 # Set the media directory to the mounted volume
 ENV DJANGO_MEDIA_DIR=/media
 
+
 # Tell Django to use production settings
 ENV PRODUCTION_VERSION=true
+
+# Set static root for Django to match container path
+ENV DJANGO_STATIC_ROOT=/app/static
 
 # Add user that will be used in the container.
 RUN useradd wagtail
@@ -84,10 +88,9 @@ RUN npm init -y && \
 COPY --chown=wagtail:wagtail . .
 
 # Collect static files
-# RUN ./manage.py collectstatic --noinput
+RUN ./manage.py collectstatic --noinput
 
 # Compress the SASS templates
-# RUN ./manage.py collectstatic --noinput
 RUN ./manage.py compress
 
 # Clean up build-time dependencies and caches
