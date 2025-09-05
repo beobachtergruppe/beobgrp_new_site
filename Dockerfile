@@ -87,11 +87,11 @@ RUN npm init -y && \
 # Copy the source code of the project into the container.
 COPY --chown=wagtail:wagtail . .
 
-# Collect static files
-RUN ./manage.py collectstatic --noinput
-
 # Compress the SASS templates
 RUN ./manage.py compress
+
+# Collect static files
+RUN ./manage.py collectstatic --noinput 
 
 # Clean up build-time dependencies and caches
 RUN apt-get purge -y --auto-remove \

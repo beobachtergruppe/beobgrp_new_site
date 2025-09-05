@@ -10,12 +10,16 @@
         {# Force all links in the live preview panel to be opened in a new tab #}
         {% if request.in_preview_panel %}<base target="_blank">{% endif %}
         {# Global stylesheets #}
-        {% compress css %}
-            <link rel="stylesheet"
-                  type="text/x-scss"
-                  href="{% static 'css/beobgrp_site.scss' %}" />
-            {% block extra_css %}{# Override this in templates to add extra stylesheets #}{% endblock %}
-        {% endcompress %}
+        {% if debug %}
+            {% compress css %}
+                <link rel="stylesheet" type="text/x-scss" href="{% static 'css/beobgrp_site.scss' %}" />
+            {% endcompress %}
+        {% else %}
+            {% compress css %}
+                <link rel="stylesheet" type="text/x-scss" href="/static/css/beobgrp_site.scss" />
+            {% endcompress %}
+        {% endif %}
+        {% block extra_css %}{# Override this in templates to add extra stylesheets #}{% endblock %}
     </head>
     <body lang="de" class="content {% block body_class %}{% endblock %}">
         {% wagtailuserbar %}
