@@ -75,13 +75,14 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "django.middleware.security.SecurityMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
 ]
 
@@ -166,20 +167,25 @@ STATIC_URL = "/static/"
 MEDIA_ROOT = os.environ.get("DJANGO_MEDIA_DIR",os.path.join(BASE_DIR, "media"))
 MEDIA_URL = "/media/"
 
-# Default storage settings, with the staticfiles storage updated.
-# See https://docs.djangoproject.com/en/5.0/ref/settings/#std-setting-STORAGES
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    # ManifestStaticFilesStorage is recommended in production, to prevent
-    # outdated JavaScript / CSS assets being served from cache
-    # (e.g. after a Wagtail upgrade).
-    # See https://docs.djangoproject.com/en/5.0/ref/contrib/staticfiles/#manifeststaticfilesstorage
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
-    }
-}
+# Use Whitenoise CompressedManifestStaticFilesStorage in production, default in development
+if not DEBUG:
+    STATICFILES_STORAGE = os.environ.get(
+        "DJANGO_STATICFILES_STORAGE",
+        "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    )
+    COMPRESS_STORAGE = os.environ.get(
+        "DJANGO_COMPRESS_STORAGE",
+        "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    )
+else:
+    STATICFILES_STORAGE = os.environ.get(
+        "DJANGO_STATICFILES_STORAGE",
+        "django.contrib.staticfiles.storage.StaticFilesStorage"
+    )
+    COMPRESS_STORAGE = os.environ.get(
+        "DJANGO_COMPRESS_STORAGE",
+        "django.contrib.staticfiles.storage.StaticFilesStorage"
+    )
 
 # Wagtail settings
 
@@ -208,4 +214,3 @@ COMPRESS_PRECOMPILERS = (
 
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = os.environ.get("PRODUCTION_VERSION","false").lower() == "true"
-COMPRESS_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"

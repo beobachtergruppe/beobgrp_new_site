@@ -6,15 +6,9 @@
 
 
 {% block extra_css %}
-  {% if debug %}
-    {% compress css %}
-      <link rel="stylesheet" type="text/x-scss" href="{% static 'css/event_info.scss' %}"/>
-    {% endcompress %}
-  {% else %}
-    {% compress css %}
-      <link rel="stylesheet" type="text/x-scss" href="/static/css/event_info.scss"/>
-    {% endcompress %}
-  {% endif %}
+  {% compress css %}
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'css/event_info.scss' %}"/>
+  {% endcompress %}
 {% endblock extra_css %}
 
 {% event_checkbox_style test }
@@ -24,3 +18,5 @@
   {% include_block page.body %}
 
 {% endblock content %}
+
+

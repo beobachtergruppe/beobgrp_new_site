@@ -4,3 +4,4 @@ psycopg2-binary>=2.9.9
 django-compressor==4.5.1
 django-dbbackup==4.3.0
 pillow_heif==0.21.0
+whitenoise==6.9.0

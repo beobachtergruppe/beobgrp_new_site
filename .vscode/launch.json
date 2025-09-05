@@ -15,7 +15,7 @@
             "autoStartBrowser": false,
             "program": "${workspaceFolder}/manage.py",
             "env": {
-                "PRODUCTION_VERSION": "true"
+                "PRODUCTION_VERSION": "false"
             }
         }
     ]

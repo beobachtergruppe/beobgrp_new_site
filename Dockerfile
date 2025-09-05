@@ -87,11 +87,16 @@ RUN npm init -y && \
 # Copy the source code of the project into the container.
 COPY --chown=wagtail:wagtail . .
 
-# Compress the SASS templates
+
+# Use plain storage for compress step
+ENV DJANGO_STATICFILES_STORAGE=django.contrib.staticfiles.storage.StaticFilesStorage
+ENV DJANGO_COMPRESS_STORAGE=django.contrib.staticfiles.storage.StaticFilesStorage
 RUN ./manage.py compress
 
-# Collect static files
-RUN ./manage.py collectstatic --noinput 
+# Use manifest storage for collectstatic and runtime
+ENV DJANGO_STATICFILES_STORAGE=django.contrib.staticfiles.storage.ManifestStaticFilesStorage
+ENV DJANGO_COMPRESS_STORAGE=django.contrib.staticfiles.storage.ManifestStaticFilesStorage
+RUN ./manage.py collectstatic --noinput
 
 # Clean up build-time dependencies and caches
 RUN apt-get purge -y --auto-remove \
