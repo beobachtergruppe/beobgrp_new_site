@@ -164,28 +164,19 @@ STATICFILES_FINDERS = [
 STATIC_ROOT = os.environ.get("DJANGO_STATIC_ROOT", os.path.join(BASE_DIR, "static"))
 STATIC_URL = "/static/"
 
-MEDIA_ROOT = os.environ.get("DJANGO_MEDIA_DIR",os.path.join(BASE_DIR, "media"))
+MEDIA_ROOT = os.environ.get("DJANGO_MEDIA_DIR", os.path.join(BASE_DIR, "media"))
 MEDIA_URL = "/media/"
 
-# Use Whitenoise CompressedManifestStaticFilesStorage in production, default in development
+# Static files storage - use Whitenoise in production, default in debug
 if not DEBUG:
-    STATICFILES_STORAGE = os.environ.get(
-        "DJANGO_STATICFILES_STORAGE",
-        "whitenoise.storage.CompressedManifestStaticFilesStorage"
-    )
-    COMPRESS_STORAGE = os.environ.get(
-        "DJANGO_COMPRESS_STORAGE",
-        "whitenoise.storage.CompressedManifestStaticFilesStorage"
-    )
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    # django-compressor will use the same storage as staticfiles
 else:
-    STATICFILES_STORAGE = os.environ.get(
-        "DJANGO_STATICFILES_STORAGE",
-        "django.contrib.staticfiles.storage.StaticFilesStorage"
-    )
-    COMPRESS_STORAGE = os.environ.get(
-        "DJANGO_COMPRESS_STORAGE",
-        "django.contrib.staticfiles.storage.StaticFilesStorage"
-    )
+    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+
+# Configure Whitenoise 
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_AUTOREFRESH = DEBUG
 
 # Wagtail settings
 

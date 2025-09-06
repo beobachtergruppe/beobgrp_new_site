@@ -87,29 +87,23 @@ RUN npm init -y && \
 # Copy the source code of the project into the container.
 COPY --chown=wagtail:wagtail . .
 
-
-# Use plain storage for compress step
-ENV DJANGO_STATICFILES_STORAGE=django.contrib.staticfiles.storage.StaticFilesStorage
-ENV DJANGO_COMPRESS_STORAGE=django.contrib.staticfiles.storage.StaticFilesStorage
+# Compress CSS/JS first (uses default StaticFilesStorage in debug mode automatically)
+# Then collect static files (uses Whitenoise CompressedManifestStaticFilesStorage in production)
 RUN ./manage.py compress
-
-# Use manifest storage for collectstatic and runtime
-ENV DJANGO_STATICFILES_STORAGE=django.contrib.staticfiles.storage.ManifestStaticFilesStorage
-ENV DJANGO_COMPRESS_STORAGE=django.contrib.staticfiles.storage.ManifestStaticFilesStorage
 RUN ./manage.py collectstatic --noinput
 
 # Clean up build-time dependencies and caches
-RUN apt-get purge -y --auto-remove \
-    build-essential \
-    libpq-dev \
-    libjpeg62-turbo-dev \
-    zlib1g-dev \
-    libwebp-dev \
-    pkg-config \
-    python3-dev \
-    npm && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# RUN apt-get purge -y --auto-remove \
+#     build-essential \
+#     libpq-dev \
+#     libjpeg62-turbo-dev \
+#     zlib1g-dev \
+#     libwebp-dev \
+#     pkg-config \
+#     python3-dev \
+#     npm && \
+#     apt-get clean && \
+#     rm -rf /var/lib/apt/lists/*
 
 # Remove npm packages and cache
 RUN rm -rf /usr/local/lib/node_modules /root/.npm
