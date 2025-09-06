@@ -11,11 +11,9 @@
         {% if request.in_preview_panel %}<base target="_blank">{% endif %}
         {# Global stylesheets #}
         {% compress css %}
-            <link rel="stylesheet"
-                  type="text/x-scss"
-                  href="{% static 'css/beobgrp_site.scss' %}" />
-            {% block extra_css %}{# Override this in templates to add extra stylesheets #}{% endblock %}
+            <link rel="stylesheet" type="text/x-scss" href="{% static 'css/beobgrp_site.scss' %}" />
         {% endcompress %}
+        {% block extra_css %}{# Override this in templates to add extra stylesheets #}{% endblock %}
     </head>
     <body lang="de" class="content {% block body_class %}{% endblock %}">
         {% wagtailuserbar %}

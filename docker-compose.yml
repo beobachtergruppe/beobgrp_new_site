@@ -4,12 +4,14 @@ volumes:
 
 services:
   wagtail:
-    image: beobgrp_site:0.5.1
+    image: beobgrp_site:1.0.0
     build: .
     environment:
       WAGTAIL_DB_PASSWORD: ${WAGTAIL_DB_PASSWORD}
       PGPASSWORD: ${WAGTAIL_DB_PASSWORD}
       SITE_INIT_MODE: ${SITE_INIT_MODE:-"none"}
+      SECRET_KEY: ${SECRET_KEY}
+      DJANGO_SECURE_SSL_REDIRECT: ${DJANGO_SECURE_SSL_REDIRECT:-"false"}
     volumes:
       - ${DJANGO_BACKUP_DIR}:/site_backup
       - internal_wagtail:/media
