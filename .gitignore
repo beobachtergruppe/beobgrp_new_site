@@ -142,3 +142,4 @@ tmp/
 
 package-lock.json
 *.session.sql
+apache_config/001-beobachtergruppe.conf

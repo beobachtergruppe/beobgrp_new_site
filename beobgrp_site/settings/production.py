@@ -26,6 +26,7 @@ ALLOWED_HOSTS = [
 # Add the production domain to CSRF_TRUSTED_ORIGINS
 CSRF_TRUSTED_ORIGINS = [
     f"https://{allowed_host}",
+    "https://www.beobachtergruppe.de",  # Include the www version for compatibility
 ]
 
 # In production, these should all be True. For local testing over HTTP, they can be disabled.
