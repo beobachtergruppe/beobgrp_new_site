@@ -393,3 +393,129 @@ $title-bottom-padding: 0.2em;
   }
 }
 
+// Image with Caption Block Styles
+.block-image-with-caption {
+  @include block-heading-spacing;
+  background-color: $content-background-color;
+  overflow: hidden;
+  display: flow-root;
+  margin: 1.5rem 0;
+
+  .image-responsive {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 0.375rem; // Bulma's default border radius
+  }
+
+  .image-caption {
+    padding: 0.5rem;
+    font-style: italic;
+    color: $text;
+    font-size: 0.9em;
+    line-height: 1.4;
+    
+    // Use a slightly muted version of the text color
+    opacity: 0.9;
+  }
+
+  // Top caption positioning
+  .caption-top {
+    text-align: center;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba($text, 0.2);
+  }
+
+  // Bottom caption positioning
+  .caption-bottom {
+    text-align: center;
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba($text, 0.2);
+  }
+
+  // Side captions using Bulma's flex utilities
+  .image-container.is-flex {
+    @extend .is-flex;
+    @extend .is-align-items-center;
+    gap: 1.5rem;
+
+    .caption-left {
+      flex: 0 0 200px;
+      text-align: right;
+      padding-right: 1rem;
+      border-right: 1px solid rgba($text, 0.2);
+    }
+
+    .caption-right {
+      flex: 0 0 200px;
+      text-align: left;
+      padding-left: 1rem;
+      border-left: 1px solid rgba($text, 0.2);
+    }
+
+    .image-wrapper {
+      flex: 1;
+      text-align: center;
+    }
+  }
+
+  // Responsive adjustments using Bulma breakpoints
+  @media screen and (max-width: 768px) {
+    .image-container.is-flex {
+      flex-direction: column;
+      gap: 1rem;
+      
+      .caption-left,
+      .caption-right {
+        flex: none;
+        text-align: center;
+        padding: 0.5rem 0;
+        border: none;
+        border-top: 1px solid rgba($text, 0.2);
+        border-bottom: 1px solid rgba($text, 0.2);
+      }
+      
+      // Reorder for mobile: left caption goes to top, right caption to bottom
+      .caption-left {
+        order: 1;
+      }
+      
+      .image-wrapper {
+        order: 2;
+      }
+      
+      .caption-right {
+        order: 3;
+      }
+    }
+  }
+
+  // Link styling that matches your existing link colors
+  .image-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+
+    &:hover {
+      .image-responsive {
+        opacity: 0.9;
+        transition: opacity 0.3s ease;
+        transform: scale(1.02);
+        transition: all 0.3s ease;
+      }
+      
+      .image-caption {
+        color: $link;
+        transition: color 0.3s ease;
+      }
+    }
+
+    // Remove the default link styling when used as image wrapper
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+

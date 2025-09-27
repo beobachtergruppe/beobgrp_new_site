@@ -1,8 +1,39 @@
 from __future__ import annotations
 from typing import Tuple
 
-from wagtail.blocks.field_block import RichTextBlock, CharBlock, FieldBlock
+from wagtail.blocks.field_block import RichTextBlock, CharBlock, FieldBlock, URLBlock, ChoiceBlock
+from wagtail.blocks.struct_block import StructBlock
 from wagtail.images.blocks import ImageChooserBlock
+
+
+class ImageWithCaptionBlock(StructBlock):
+    image = ImageChooserBlock(label="Bild")
+    caption = CharBlock(
+        required=False, 
+        max_length=255, 
+        label="Bildunterschrift",
+        help_text="Optional text to display with the image"
+    )
+    caption_position = ChoiceBlock(
+        choices=[
+            ('top', 'Oben'),
+            ('bottom', 'Unten'),
+            ('left', 'Links'),
+            ('right', 'Rechts'),
+        ],
+        default='bottom',
+        label="Position der Bildunterschrift"
+    )
+    link = URLBlock(
+        required=False,
+        label="Optional Link",
+        help_text="Optional URL to link the image to (external links only)"
+    )
+
+    class Meta:
+        icon = "image"
+        label = "Bild mit Bildunterschrift"
+        template = "blocks/image_with_caption.html"
 
 
 gen_body_content: list[Tuple[str, FieldBlock]] = [
@@ -11,6 +42,7 @@ gen_body_content: list[Tuple[str, FieldBlock]] = [
     ("h3", CharBlock(form_classname="h3", label="Kopfzeile 3")),
     ("paragraph", RichTextBlock()),
     ("image", ImageChooserBlock()),
+    ("image_with_caption", ImageWithCaptionBlock()),
 ]
 
 
