@@ -1,9 +1,13 @@
 from __future__ import annotations
-from typing import Tuple
+from typing import TYPE_CHECKING, Tuple
 
+from wagtail.blocks import Block
 from wagtail.blocks.field_block import RichTextBlock, CharBlock, FieldBlock, URLBlock, ChoiceBlock
 from wagtail.blocks.struct_block import StructBlock
 from wagtail.images.blocks import ImageChooserBlock
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
 
 
 class ImageWithCaptionBlock(StructBlock):
@@ -30,13 +34,13 @@ class ImageWithCaptionBlock(StructBlock):
         help_text="Optional URL to link the image to (external links only)"
     )
 
-    class Meta:
+    class Meta: # type: ignore[misc]
         icon = "image"
         label = "Bild mit Bildunterschrift"
         template = "blocks/image_with_caption.html"
 
 
-gen_body_content: list[Tuple[str, FieldBlock]] = [
+gen_body_content: list[Tuple[str, Block]] = [
     ("h1", CharBlock(form_classname="h1", label="Kopfzeile 1")),
     ("h2", CharBlock(form_classname="h2", label="Kopfzeile 2")),
     ("h3", CharBlock(form_classname="h3", label="Kopfzeile 3")),
@@ -49,6 +53,7 @@ gen_body_content: list[Tuple[str, FieldBlock]] = [
 class CommonContextMixin:
     """
     Mixin for pages that can have events.
+    This mixin should be used with Wagtail Page classes.
     """
 
     def _get_upcoming_events(self):
@@ -56,13 +61,13 @@ class CommonContextMixin:
         from django.utils.timezone import now
 
         return (
-            SingleEvent.objects.live()
+            SingleEvent.objects.live()  # type: ignore[attr-defined]
             .public()
             .filter(start_time__gte=now())  # Match events at or after the current time
             .order_by("start_time")[:2]
         )
     
-    def get_context(self, request, *args, **kwargs):
-        context = super().get_context(request, *args, **kwargs)
+    def get_context(self, request: "HttpRequest", *args, **kwargs):
+        context = super().get_context(request, *args, **kwargs)  # type: ignore[misc]
         context["upcoming_events"] = self._get_upcoming_events()
         return context
