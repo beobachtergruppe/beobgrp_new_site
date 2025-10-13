@@ -11,27 +11,41 @@
         </div>
     {% endif %}
     
-    <div class="image-container{% if value.caption_position == 'left' or value.caption_position == 'right' %} is-flex{% endif %}">
-        {% if value.caption_position == 'left' and value.caption %}
-            <div class="image-caption caption-left">
-                {{ value.caption }}
-            </div>
-        {% endif %}
-        
-        <div class="image-wrapper">
-            {% if value.image %}
-                {% image value.image fill-800x600 as img %}
-                <img src="{{ img.url }}" alt="{{ value.caption|default:img.alt }}" 
-                     width="{{ img.width }}" height="{{ img.height }}" class="image-responsive" />
+    {% if value.caption_position == 'left' or value.caption_position == 'right' %}
+        <div class="columns is-mobile is-gapless">
+            {% if value.caption_position == 'left' and value.caption %}
+                <div class="column is-two-thirds">
+                    <div class="image-caption caption-left">
+                        {{ value.caption }}
+                    </div>
+                </div>
+                <div class="column is-one-third">
+                    {% if value.image %}
+                        {% image value.image width-400 alt=value.caption|default:value.image.title class="image-responsive" %}
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="column is-one-third">
+                    {% if value.image %}
+                        {% image value.image width-400 alt=value.caption|default:value.image.title class="image-responsive" %}
+                    {% endif %}
+                </div>
+                {% if value.caption_position == 'right' and value.caption %}
+                    <div class="column is-two-thirds">
+                        <div class="image-caption caption-right">
+                            {{ value.caption }}
+                        </div>
+                    </div>
+                {% endif %}
             {% endif %}
         </div>
-        
-        {% if value.caption_position == 'right' and value.caption %}
-            <div class="image-caption caption-right">
-                {{ value.caption }}
-            </div>
-        {% endif %}
-    </div>
+    {% else %}
+        <div class="image-wrapper">
+            {% if value.image %}
+                {% image value.image width-800 alt=value.caption|default:value.image.title class="image-responsive" %}
+            {% endif %}
+        </div>
+    {% endif %}
     
     {% if value.caption_position == 'bottom' and value.caption %}
         <div class="image-caption caption-bottom">
