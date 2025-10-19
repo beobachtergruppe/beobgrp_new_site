@@ -489,7 +489,7 @@ $title-bottom-padding: 0.2em;
       transition: color 0.3s ease;
       
       // Ensure rich text content within captions also gets link styling
-      p, strong, em, span, li, ul, ol {
+      p, strong, em, span, li, ul, ol, h1, h2, h3, h4, h5, h6 {
         color: $link;
       }
     }
@@ -506,7 +506,7 @@ $title-bottom-padding: 0.2em;
         color: lighten($link, 10%);
         
         // Hover effect for rich text content
-        p, strong, em, span, li, ul, ol {
+        p, strong, em, span, li, ul, ol, h1, h2, h3, h4, h5, h6 {
           color: lighten($link, 10%);
         }
       }
