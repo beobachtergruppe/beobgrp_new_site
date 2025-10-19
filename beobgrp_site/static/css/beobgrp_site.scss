@@ -406,7 +406,8 @@ $title-bottom-padding: 0.2em;
   background-color: $content-background-color;
   overflow: hidden;
   display: flow-root;
-  margin: 1.5rem 0;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
 
   .image-responsive {
     max-width: 100%;
@@ -482,6 +483,17 @@ $title-bottom-padding: 0.2em;
     color: inherit;
     display: block;
 
+    // Style captions as links when they're part of a clickable block
+    .image-caption {
+      color: $link;
+      transition: color 0.3s ease;
+      
+      // Ensure rich text content within captions also gets link styling
+      p, strong, em, span, li, ul, ol {
+        color: $link;
+      }
+    }
+
     &:hover {
       .image-responsive {
         opacity: 0.9;
@@ -491,8 +503,12 @@ $title-bottom-padding: 0.2em;
       }
       
       .image-caption {
-        color: $link;
-        transition: color 0.3s ease;
+        color: lighten($link, 10%);
+        
+        // Hover effect for rich text content
+        p, strong, em, span, li, ul, ol {
+          color: lighten($link, 10%);
+        }
       }
     }
 
