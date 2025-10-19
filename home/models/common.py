@@ -5,9 +5,39 @@ from wagtail.blocks import Block
 from wagtail.blocks.field_block import RichTextBlock, CharBlock, FieldBlock, URLBlock, ChoiceBlock
 from wagtail.blocks.struct_block import StructBlock
 from wagtail.images.blocks import ImageChooserBlock
+from wagtail.blocks import PageChooserBlock
 
 if TYPE_CHECKING:
     from django.http import HttpRequest
+
+
+class LinkBlock(StructBlock):
+    """
+    A flexible link block that supports both internal and external links.
+    """
+    link_type = ChoiceBlock(
+        choices=[
+            ('none', 'Kein Link'),
+            ('internal', 'Interne Seite'),
+            ('external', 'Externe URL'),
+        ],
+        default='none',
+        label="Link-Typ"
+    )
+    internal_page = PageChooserBlock(
+        required=False,
+        label="Interne Seite",
+        help_text="Wählen Sie eine Seite aus dieser Website"
+    )
+    external_url = URLBlock(
+        required=False,
+        label="Externe URL",
+        help_text="Geben Sie eine vollständige URL ein (z.B. https://example.com)"
+    )
+    
+    class Meta: # type: ignore[misc]
+        icon = "link"
+        label = "Link"
 
 
 class ImageWithCaptionBlock(StructBlock):
@@ -28,10 +58,9 @@ class ImageWithCaptionBlock(StructBlock):
         default='bottom',
         label="Position der Bildunterschrift"
     )
-    link = URLBlock(
-        required=False,
+    link = LinkBlock(
         label="Optional Link",
-        help_text="Optional URL to link the image to (external links only)"
+        help_text="Optionaler Link für das Bild (interne Seite oder externe URL)"
     )
 
     class Meta: # type: ignore[misc]

@@ -1,8 +1,12 @@
 {% load wagtailimages_tags %}
 
 <div class="block-image-with-caption image-caption-{{ value.caption_position }}">
-    {% if value.link %}
-        <a href="{{ value.link }}" target="_blank" rel="noopener" class="image-link">
+    {% if value.link.link_type != 'none' %}
+        {% if value.link.link_type == 'internal' and value.link.internal_page %}
+            <a href="{{ value.link.internal_page.url }}" class="image-link">
+        {% elif value.link.link_type == 'external' and value.link.external_url %}
+            <a href="{{ value.link.external_url }}" target="_blank" rel="noopener" class="image-link">
+        {% endif %}
     {% endif %}
     
     {% if value.caption_position == 'top' and value.caption %}
@@ -53,7 +57,7 @@
         </div>
     {% endif %}
     
-    {% if value.link %}
+    {% if value.link.link_type != 'none' %}
         </a>
     {% endif %}
 </div>
