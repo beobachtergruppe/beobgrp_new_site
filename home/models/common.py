@@ -42,11 +42,10 @@ class LinkBlock(StructBlock):
 
 class ImageWithCaptionBlock(StructBlock):
     image = ImageChooserBlock(label="Bild")
-    caption = CharBlock(
-        required=False, 
-        max_length=255, 
+    caption = RichTextBlock(
+        required=False,
         label="Bildunterschrift",
-        help_text="Optional text to display with the image"
+        help_text="Optional formatted text to display with the image"
     )
     caption_position = ChoiceBlock(
         choices=[

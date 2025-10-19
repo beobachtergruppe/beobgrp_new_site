@@ -83,6 +83,13 @@ a {
   display: flow-root
 }
 
+.block-image-with-caption {
+  @include block-heading-spacing;
+  background-color: $content-background-color;
+  overflow: hidden;
+  display: flow-root
+}
+
 .title {
   background-color: $header-background-color;
   color: $header-color
@@ -410,16 +417,12 @@ $title-bottom-padding: 0.2em;
 
   .image-caption {
     padding: 1rem;
-    font-style: italic;
     color: $text;
-    font-size: 0.9em;
+    font-size: 1em;
     line-height: 1.4;
     display: flex;
     align-items: center;
     min-height: 100%;
-    
-    // Use a slightly muted version of the text color
-    opacity: 0.9;
   }
 
   // Top caption positioning
