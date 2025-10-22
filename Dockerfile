@@ -93,17 +93,17 @@ RUN ./manage.py compress
 RUN ./manage.py collectstatic --noinput
 
 # Clean up build-time dependencies and caches
-# RUN apt-get purge -y --auto-remove \
-#     build-essential \
-#     libpq-dev \
-#     libjpeg62-turbo-dev \
-#     zlib1g-dev \
-#     libwebp-dev \
-#     pkg-config \
-#     python3-dev \
-#     npm && \
-#     apt-get clean && \
-#     rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get purge -y --auto-remove \
+    build-essential \
+    libpq-dev \
+    libjpeg62-turbo-dev \
+    zlib1g-dev \
+    libwebp-dev \
+    pkg-config \
+    python3-dev \
+    npm && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Remove npm packages and cache
 RUN rm -rf /usr/local/lib/node_modules /root/.npm

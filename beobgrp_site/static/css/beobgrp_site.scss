@@ -83,6 +83,13 @@ a {
   display: flow-root
 }
 
+.block-image-with-caption {
+  @include block-heading-spacing;
+  background-color: $content-background-color;
+  overflow: hidden;
+  display: flow-root
+}
+
 .title {
   background-color: $header-background-color;
   color: $header-color
@@ -389,6 +396,125 @@ $title-bottom-padding: 0.2em;
     .column.is-one-quarter-desktop {
       flex: none;
       width: calc(25% - (0.5rem * 3 / 4));
+    }
+  }
+}
+
+// Image with Caption Block Styles
+.block-image-with-caption {
+  @include block-heading-spacing;
+  background-color: $content-background-color;
+  overflow: hidden;
+  display: flow-root;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+
+  .image-responsive {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 0.375rem; // Bulma's default border radius
+  }
+
+  .image-caption {
+    padding: 1rem;
+    color: $text;
+    font-size: 1em;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    min-height: 100%;
+  }
+
+  // Top caption positioning
+  .caption-top {
+    text-align: center;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba($text, 0.2);
+    display: block;
+    min-height: auto;
+  }
+
+  // Bottom caption positioning
+  .caption-bottom {
+    text-align: center;
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba($text, 0.2);
+    display: block;
+    min-height: auto;
+  }
+
+  // Side captions using Bulma columns (2/3 caption, 1/3 image)
+  .caption-left {
+    text-align: right;
+    padding-right: 1rem;
+    border-right: 1px solid rgba($text, 0.2);
+  }
+
+  .caption-right {
+    text-align: left;
+    padding-left: 1rem;
+    border-left: 1px solid rgba($text, 0.2);
+  }
+
+  // Ensure images in columns scale properly
+  .columns.is-gapless .column {
+    padding: 0;
+    
+    // Images should fill their container completely
+    .is-fullwidth {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+  }
+
+  // Simple wrapper for non-columned images (top/bottom captions)
+  .image-wrapper {
+    text-align: center;
+  }
+
+  // Link styling that matches your existing link colors
+  .image-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+
+    // Style captions as links when they're part of a clickable block
+    .image-caption {
+      color: $link;
+      transition: color 0.3s ease;
+      
+      // Ensure rich text content within captions also gets link styling
+      p, strong, em, span, li, ul, ol, h1, h2, h3, h4, h5, h6 {
+        color: $link;
+      }
+    }
+
+    &:hover {
+      .image-responsive {
+        opacity: 0.9;
+        transition: opacity 0.3s ease;
+        transform: scale(1.02);
+        transition: all 0.3s ease;
+      }
+      
+      .image-caption {
+        color: lighten($link, 10%);
+        
+        // Hover effect for rich text content
+        p, strong, em, span, li, ul, ol, h1, h2, h3, h4, h5, h6 {
+          color: lighten($link, 10%);
+        }
+      }
+    }
+
+    // Remove the default link styling when used as image wrapper
+    &:hover {
+      text-decoration: none;
     }
   }
 }

@@ -1,0 +1,64 @@
+{% load wagtailimages_tags %}
+{% load wagtailcore_tags %}
+
+<div class="block-image-with-caption image-caption-{{ value.caption_position }}">
+    {% comment %} Only render link if both link_type AND the corresponding URL exist {% endcomment %}
+    {% if value.link.link_type == 'internal' and value.link.internal_page %}
+        <a href="{{ value.link.internal_page.url }}" class="image-link">
+    {% elif value.link.link_type == 'external' and value.link.external_url %}
+        <a href="{{ value.link.external_url }}" target="_blank" rel="noopener" class="image-link">
+    {% endif %}
+    
+    {% if value.caption_position == 'top' and value.caption %}
+        <div class="image-caption caption-top">
+            {% include_block value.caption %}
+        </div>
+    {% endif %}
+    
+    {% if value.caption_position == 'left' or value.caption_position == 'right' %}
+        <div class="columns is-mobile is-gapless">
+            {% if value.caption_position == 'left' and value.caption %}
+                <div class="column is-two-thirds-mobile is-three-quarters-tablet is-seven-eighths-desktop">
+                    <div class="image-caption caption-left">
+                        {% include_block value.caption %}
+                    </div>
+                </div>
+                <div class="column is-one-third-mobile is-one-quarter-tablet is-one-eighth-desktop">
+                    {% if value.image %}
+                        {% image value.image original alt=value.image.title class="is-fullwidth" %}
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="column is-one-third-mobile is-one-quarter-tablet is-one-eighth-desktop">
+                    {% if value.image %}
+                        {% image value.image original alt=value.image.title class="is-fullwidth" %}
+                    {% endif %}
+                </div>
+                {% if value.caption_position == 'right' and value.caption %}
+                    <div class="column is-two-thirds-mobile is-three-quarters-tablet is-seven-eighths-desktop">
+                        <div class="image-caption caption-right">
+                            {% include_block value.caption %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="image-wrapper">
+            {% if value.image %}
+                {% image value.image original alt=value.image.title class="is-fullwidth" %}
+            {% endif %}
+        </div>
+    {% endif %}
+    
+    {% if value.caption_position == 'bottom' and value.caption %}
+        <div class="image-caption caption-bottom">
+            {% include_block value.caption %}
+        </div>
+    {% endif %}
+    
+    {% comment %} Only close link if it was actually opened (same conditions as opening) {% endcomment %}
+    {% if value.link.link_type == 'internal' and value.link.internal_page or value.link.link_type == 'external' and value.link.external_url %}
+        </a>
+    {% endif %}
+</div>
