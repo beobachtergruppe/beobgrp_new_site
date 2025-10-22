@@ -3,7 +3,8 @@ from typing import TYPE_CHECKING, Tuple
 
 from wagtail.blocks import Block
 from wagtail.blocks.field_block import RichTextBlock, CharBlock, FieldBlock, URLBlock, ChoiceBlock
-from wagtail.blocks.struct_block import StructBlock
+from wagtail.blocks.struct_block import StructBlock, StructBlockValidationError
+from django.core.exceptions import ValidationError
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.blocks import PageChooserBlock
 
@@ -34,6 +35,34 @@ class LinkBlock(StructBlock):
         label="Externe URL",
         help_text="Geben Sie eine vollständige URL ein (z.B. https://example.com)"
     )
+    
+    def clean(self, value):
+        """
+        Validate that when link_type is not 'none', the corresponding URL is provided.
+        """
+        errors = {}
+
+        if isinstance(value, dict):
+            link_type = value.get('link_type')
+            internal_page = value.get('internal_page')
+            external_url = value.get('external_url')
+
+            # If link_type is 'internal', internal_page must be provided
+            if link_type == 'internal' and not internal_page:
+                errors['internal_page'] = ValidationError('Bitte wählen Sie eine Seite aus, wenn Sie "Interne Seite" als Link-Typ ausgewählt haben.')
+
+            # If link_type is 'external', external_url must be provided
+            if link_type == 'external' and not external_url:
+                errors['external_url'] = ValidationError('Bitte geben Sie eine URL ein, wenn Sie "Externe URL" als Link-Typ ausgewählt haben.')
+
+            # If link_type is None and a link is provided
+            if link_type is None and (internal_page or external_url):
+                errors['link_type'] = ValidationError('Bitte wählen Sie einen Link-Typ aus, wenn Sie einen Link angeben.')
+
+        if errors:
+            raise StructBlockValidationError(errors)
+
+        return super().clean(value)
     
     class Meta: # type: ignore[misc]
         icon = "link"

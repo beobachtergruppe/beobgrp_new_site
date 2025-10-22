@@ -2,12 +2,11 @@
 {% load wagtailcore_tags %}
 
 <div class="block-image-with-caption image-caption-{{ value.caption_position }}">
-    {% if value.link.link_type != 'none' %}
-        {% if value.link.link_type == 'internal' and value.link.internal_page %}
-            <a href="{{ value.link.internal_page.url }}" class="image-link">
-        {% elif value.link.link_type == 'external' and value.link.external_url %}
-            <a href="{{ value.link.external_url }}" target="_blank" rel="noopener" class="image-link">
-        {% endif %}
+    {% comment %} Only render link if both link_type AND the corresponding URL exist {% endcomment %}
+    {% if value.link.link_type == 'internal' and value.link.internal_page %}
+        <a href="{{ value.link.internal_page.url }}" class="image-link">
+    {% elif value.link.link_type == 'external' and value.link.external_url %}
+        <a href="{{ value.link.external_url }}" target="_blank" rel="noopener" class="image-link">
     {% endif %}
     
     {% if value.caption_position == 'top' and value.caption %}
@@ -58,7 +57,8 @@
         </div>
     {% endif %}
     
-    {% if value.link.link_type != 'none' %}
+    {% comment %} Only close link if it was actually opened (same conditions as opening) {% endcomment %}
+    {% if value.link.link_type == 'internal' and value.link.internal_page or value.link.link_type == 'external' and value.link.external_url %}
         </a>
     {% endif %}
 </div>
