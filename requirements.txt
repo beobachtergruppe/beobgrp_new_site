@@ -1,7 +1,7 @@
-Django==5.1.6
-wagtail==6.4.1
+Django==5.2.7
+wagtail==7.0.3
 psycopg2-binary>=2.9.9
 django-compressor==4.5.1
-django-dbbackup==4.3.0
-pillow_heif==0.21.0
-whitenoise==6.9.0
+django-dbbackup==5.0.0
+pillow_heif==1.1.1
+whitenoise==6.11.0
