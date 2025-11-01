@@ -1,0 +1,5 @@
+# Type checking
+django-stubs
+djangorestframework-stubs
+types-requests
+mypy

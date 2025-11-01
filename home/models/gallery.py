@@ -9,18 +9,18 @@ from home.models.common import CommonContextMixin
 
 
 class PhotoPage(CommonContextMixin, Page):
-    photo = models.ForeignKey(
+    photo: models.ForeignKey = models.ForeignKey(
         "wagtailimages.Image",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
         related_name="+",
     )
-    description = RichTextField(max_length=800, default="", blank=True)
-    author = CharField(max_length=120, default="", blank=True)
-    date = DateField()
-    time = TimeField(blank=True, null=True)
-    location = CharField(max_length=255, default="", blank=True)
+    description: RichTextField = RichTextField(max_length=800, default="", blank=True)
+    author: CharField = CharField(max_length=120, default="", blank=True)
+    date: DateField = DateField()
+    time: TimeField = TimeField(blank=True, null=True)
+    location: CharField = CharField(max_length=255, default="", blank=True)
 
     content_panels = Page.content_panels + [
         FieldPanel("photo", heading="Foto"),
@@ -49,8 +49,8 @@ class PhotoPage(CommonContextMixin, Page):
 
 
 class GalleryPage(CommonContextMixin, Page):
-    description = RichTextField(max_length=800, default="")
-    cover_image = models.ForeignKey(
+    description: RichTextField = RichTextField(max_length=800, default="")
+    cover_image: models.ForeignKey = models.ForeignKey(
         "wagtailimages.Image",
         null=True,
         blank=True,

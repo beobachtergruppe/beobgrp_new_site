@@ -14,6 +14,7 @@ A good entrypoint for getting to know wagtail better is this page: [Wagtail gett
 - [Development Setup (Linux)](#development-setup-linux)
 - [Production Setup (Docker Compose)](#production-setup-docker-compose)
 - [Testing](#testing)
+- [Type Checking](#type-checking)
 - [Windows/WSL Notes](#windowswsl-notes)
 - [License](#license)
 
@@ -205,6 +206,54 @@ python manage.py test home.tests -v 2
 ```
 
 For detailed information about test coverage and troubleshooting, see [home/tests/README.md](home/tests/README.md).
+
+---
+
+## Type Checking
+
+This project uses **mypy** for static type checking to catch type errors before runtime and improve code quality.
+
+### Running Type Checks
+
+Check all files:
+```bash
+mypy .
+```
+
+Check specific directory:
+```bash
+mypy home/
+```
+
+### Configuration
+
+Type checking is configured in `mypy.ini`:
+- Uses `django-stubs` plugin for Django type support
+- Excludes migration files and virtual environment
+- Ignores missing type stubs for Wagtail (not yet fully typed)
+- Configured for Python 3.12
+
+### Type Annotations
+
+Model fields are annotated with their field types:
+```python
+class SingleEvent(Page):
+    start_time: DateTimeField = DateTimeField()
+    event_title: CharField = CharField(max_length=140, default="")
+```
+
+This helps IDEs provide better autocomplete and catches type errors early.
+
+### Running All Quality Checks
+
+You can run both tests and type checks with a single command:
+```bash
+./run_checks.sh
+```
+
+This will run:
+1. All 23 unit tests
+2. Type checking on the entire codebase
 
 ---
 
