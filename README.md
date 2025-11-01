@@ -213,6 +213,14 @@ For detailed information about test coverage and troubleshooting, see [home/test
 
 This project uses **mypy** for static type checking to catch type errors before runtime and improve code quality.
 
+### Setup
+
+Type checking dependencies are separate from runtime dependencies. Install them with:
+
+```bash
+pip install -r mypy-requirements.txt
+```
+
 ### Running Type Checks
 
 Check all files:
@@ -232,6 +240,8 @@ Type checking is configured in `mypy.ini`:
 - Excludes migration files and virtual environment
 - Ignores missing type stubs for Wagtail (not yet fully typed)
 - Configured for Python 3.12
+
+Dependencies for type checking are in `mypy-requirements.txt` (separate from runtime `requirements.txt`).
 
 ### Type Annotations
 
