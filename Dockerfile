@@ -2,7 +2,7 @@
 # docker run -v /path/to/local/db.sqlite3:/app/db.sqlite3 -p 8000:8000 your_image_name
 
 # Use an official Python runtime based on Debian bookworm as a parent image.
-FROM python:3.12.9-bookworm
+FROM python:3.12.12-bookworm
 
 # Get the database password from the build argument
 ENV WAGTAIL_DB_PASSWORD=${WAGTAIL_DB_PASSWORD}
@@ -87,10 +87,13 @@ RUN npm init -y && \
 # Copy the source code of the project into the container.
 COPY --chown=wagtail:wagtail . .
 
-# Compress CSS/JS first (uses default StaticFilesStorage in debug mode automatically)
-# Then collect static files (uses Whitenoise CompressedManifestStaticFilesStorage in production)
+# First collect static files WITHOUT compression (creates hashed names)
+# Use a temporary env var to disable compression during collectstatic
+RUN COMPRESS_ENABLED=False ./manage.py collectstatic --noinput
+
+# Now run compress - it will find the already-collected files with their hashed names
+# and create the offline manifest with the correct keys
 RUN ./manage.py compress
-RUN ./manage.py collectstatic --noinput
 
 # Clean up build-time dependencies and caches
 RUN apt-get update && apt-get purge -y --auto-remove \

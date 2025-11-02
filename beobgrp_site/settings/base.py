@@ -167,12 +167,22 @@ STATIC_URL = "/static/"
 MEDIA_ROOT = os.environ.get("DJANGO_MEDIA_DIR", os.path.join(BASE_DIR, "media"))
 MEDIA_URL = "/media/"
 
-# Static files storage - use Whitenoise in production, default in debug
-if not DEBUG:
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-    # django-compressor will use the same storage as staticfiles
-else:
-    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+# Storage configuration - Django 4.2+ STORAGES setting
+# Replaces old DEFAULT_FILE_STORAGE and STATICFILES_STORAGE settings
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+    "dbbackup": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "OPTIONS": {
+            "location": os.environ.get("DJANGO_BACKUP_DIR", "../beobgrp_site_backup")
+        }
+    }
+}
 
 # Configure Whitenoise 
 WHITENOISE_USE_FINDERS = True
@@ -193,9 +203,6 @@ WAGTAILSEARCH_BACKENDS = {
 # Base URL to use when referring to full URLs within the Wagtail admin backend -
 # e.g. in notification emails. Don't include '/admin' or a trailing slash
 WAGTAILADMIN_BASE_URL = "https://beobachtergruppe.de"
-
-DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
-DBBACKUP_STORAGE_OPTIONS = {'location': os.environ.get("DJANGO_BACKUP_DIR","../beobgrp_site_backup")}
 
 SASS_LOAD_PATH = os.environ.get("SASS_LOAD_PATH", os.path.join(BASE_DIR,'node_modules'))
 

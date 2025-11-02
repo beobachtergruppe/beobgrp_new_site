@@ -13,6 +13,8 @@ A good entrypoint for getting to know wagtail better is this page: [Wagtail gett
 ## Table of Contents
 - [Development Setup (Linux)](#development-setup-linux)
 - [Production Setup (Docker Compose)](#production-setup-docker-compose)
+- [Testing](#testing)
+- [Type Checking](#type-checking)
 - [Windows/WSL Notes](#windowswsl-notes)
 - [License](#license)
 
@@ -153,6 +155,115 @@ The server will be available at http://localhost:8000
 
 **For production (Docker):**
 - `server_backup.sh`: Execute backup inside Docker container and clean up old backups (>3 days)
+
+---
+
+## Testing
+
+This project includes **23 tests** covering all Wagtail page models and custom blocks. The tests:
+- Validate model structure and configuration
+- Protect against API changes in Wagtail and Django  
+- Run quickly (~50ms) using simplified test approach
+- Focus on critical functionality without complex integration testing
+
+### Prerequisites for Testing
+
+The PostgreSQL user needs the `CREATEDB` privilege to create test databases:
+
+```bash
+sudo -u postgres psql -c "ALTER USER wagtail CREATEDB;"
+```
+
+Or run the provided helper script:
+```bash
+./grant_test_db_permission.sh
+```
+
+**If tests hang**, drop the test database:
+```bash
+PGPASSWORD="$WAGTAIL_DB_PASSWORD" psql -h localhost -U wagtail -d postgres -c "DROP DATABASE IF EXISTS test_beobgrp_site;"
+```
+
+### Running Tests
+
+Run all tests (23 tests in ~50ms):
+```bash
+python manage.py test home.tests
+```
+
+Run specific test modules:
+```bash
+python manage.py test home.tests.test_setup
+python manage.py test home.tests.test_home_page
+python manage.py test home.tests.test_events_simple
+python manage.py test home.tests.test_gallery_simple
+python manage.py test home.tests.test_blocks_simple
+```
+
+Run with verbose output:
+```bash
+python manage.py test home.tests -v 2
+```
+
+For detailed information about test coverage and troubleshooting, see [home/tests/README.md](home/tests/README.md).
+
+---
+
+## Type Checking
+
+This project uses **mypy** for static type checking to catch type errors before runtime and improve code quality.
+
+### Setup
+
+Type checking dependencies are separate from runtime dependencies. Install them with:
+
+```bash
+pip install -r mypy-requirements.txt
+```
+
+### Running Type Checks
+
+Check all files:
+```bash
+mypy .
+```
+
+Check specific directory:
+```bash
+mypy home/
+```
+
+### Configuration
+
+Type checking is configured in `mypy.ini`:
+- Uses `django-stubs` plugin for Django type support
+- Excludes migration files and virtual environment
+- Ignores missing type stubs for Wagtail (not yet fully typed)
+- Configured for Python 3.12
+
+Dependencies for type checking are in `mypy-requirements.txt` (separate from runtime `requirements.txt`).
+
+### Type Annotations
+
+Model fields are annotated with their field types:
+```python
+class SingleEvent(Page):
+    start_time: DateTimeField = DateTimeField()
+    event_title: CharField = CharField(max_length=140, default="")
+```
+
+This helps IDEs provide better autocomplete and catches type errors early.
+
+### Running All Quality Checks
+
+You can run both tests and type checks with a single command:
+```bash
+./run_checks.sh
+```
+
+This will run:
+1. All 23 unit tests
+2. Type checking on the entire codebase
 
 ---
 

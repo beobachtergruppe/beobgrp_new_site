@@ -1,4 +1,3 @@
-from time import localtime
 from beobgrp_site.utils.email import create_email_link
 
 from django.db.models.fields import BooleanField, CharField, DateTimeField
@@ -61,22 +60,22 @@ def _get_default_event_title(start_time, event_title):
 
 
 class SingleEvent(Page):
-    start_time = DateTimeField()
-    event_type = CharField(choices=EventTypes.choices)
-    event_title = CharField(max_length=140, default="")
-    location = CharField(max_length=120, default="Deutsches Museum")
-    referent = CharField(max_length=120, default="")
-    abstract = RichTextField(max_length=800, default="")
-    image = models.ForeignKey(
+    start_time: DateTimeField = DateTimeField()
+    event_type: CharField = CharField(choices=EventTypes.choices)
+    event_title: CharField = CharField(max_length=140, default="")
+    location: CharField = CharField(max_length=120, default="Deutsches Museum")
+    referent: CharField = CharField(max_length=120, default="")
+    abstract: RichTextField = RichTextField(max_length=800, default="")
+    image: models.ForeignKey = models.ForeignKey(
         "wagtailimages.Image",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
         related_name="+",
     )
-    cancelled = BooleanField(default=False)
-    booked_out = BooleanField(default=False)
-    needs_reservation = BooleanField(default=True)
+    cancelled: BooleanField = BooleanField(default=False)
+    booked_out: BooleanField = BooleanField(default=False)
+    needs_reservation: BooleanField = BooleanField(default=True)
 
     def __post_init__(self):
         self.title.editable = False
