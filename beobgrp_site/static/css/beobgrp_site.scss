@@ -1,8 +1,8 @@
 
 // Set your brand colors
-$link: rgb(122, 201, 169);
+$link: rgb(218, 241, 244);
 $text-strong: white;
-$text: rgb(222, 248, 248);
+$text: rgb(245, 250, 251);
 $background: black;
 
 // other colors
@@ -10,7 +10,7 @@ $content-column-background-color: #06245c;
 $content-background-color: #0d3ca2;
 $aside-background-color: #1f2e4d;
 $header-background-color: #145a74;
-$header-color: #f8e769;
+$header-color: #ede9cb;
 
 // Navbar
 $navbar-background-color: #333;
@@ -50,6 +50,7 @@ p {
 a {
   color: $link;
   font-style: bold;
+  text-decoration: underline;
 
   &:hover {
     color: lighten($link, 10%);
@@ -148,7 +149,7 @@ $title-bottom-padding: 0.2em;
 }
 
 .not-available {
-  @extend .has-background-danger;
+  background-color: #960000;
   font-weight: bold;
 }
 
@@ -198,6 +199,10 @@ $title-bottom-padding: 0.2em;
     justify-content: flex-start; // Ensure items within navbar-start align left
     padding-left: 0; // Ensure no default padding is inherited that pushes it right
     padding-right: 0; // Same for right
+
+    a {
+      text-decoration: none;
+    }
 
     // Ensure the menu items are aligned to the left on desktop (and horizonally stacked)
     @media screen and (min-width: ($navbar-burger-breakpoint + 1px)) {
