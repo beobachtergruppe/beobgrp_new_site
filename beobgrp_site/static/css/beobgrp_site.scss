@@ -149,12 +149,13 @@ $title-bottom-padding: 0.2em;
 }
 
 .not-available {
-  background-color: #960000;
+  background-color: #960000 !important;
   font-weight: bold;
 }
 
 .strikethrough {
   text-decoration: line-through;
+  color: $text-strong;
 }
 
 
@@ -484,7 +485,7 @@ $title-bottom-padding: 0.2em;
 
   // Link styling that matches your existing link colors
   .image-link {
-    text-decoration: none;
+    text-decoration: underline;
     color: inherit;
     display: block;
 
@@ -517,9 +518,8 @@ $title-bottom-padding: 0.2em;
       }
     }
 
-    // Remove the default link styling when used as image wrapper
     &:hover {
-      text-decoration: none;
+      text-decoration: underline;
     }
   }
 }
