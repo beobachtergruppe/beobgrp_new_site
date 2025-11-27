@@ -38,7 +38,7 @@ class HeadingBlock(CharBlock):
         context['anchor_id'] = generate_anchor_id(value)
         return context
     
-    class Meta:
+    class Meta: # type: ignore
         template = 'blocks/heading_block.html'
 
 
