@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Tuple
+import re
 
 from wagtail.blocks import Block
 from wagtail.blocks.field_block import RichTextBlock, CharBlock, FieldBlock, URLBlock, ChoiceBlock
@@ -7,9 +8,38 @@ from wagtail.blocks.struct_block import StructBlock, StructBlockValidationError
 from django.core.exceptions import ValidationError
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.blocks import PageChooserBlock
+from django.utils.text import slugify
 
 if TYPE_CHECKING:
     from django.http import HttpRequest
+
+
+def generate_anchor_id(text: str) -> str:
+    """
+    Generate an anchor ID from text following the 'block-*' convention.
+    
+    Args:
+        text: The heading text to convert to an anchor ID
+        
+    Returns:
+        A slugified anchor ID with 'block-' prefix
+    """
+    slug = slugify(text)
+    return f"block-{slug}"
+
+
+class HeadingBlock(CharBlock):
+    """
+    Custom heading block that generates anchor IDs automatically.
+    """
+    
+    def get_context(self, value, parent_context=None):
+        context = super().get_context(value, parent_context)
+        context['anchor_id'] = generate_anchor_id(value)
+        return context
+    
+    class Meta: # type: ignore
+        template = 'blocks/heading_block.html'
 
 
 class LinkBlock(StructBlock):
@@ -98,10 +128,10 @@ class ImageWithCaptionBlock(StructBlock):
 
 
 gen_body_content: list[Tuple[str, Block]] = [
-    ("h1", CharBlock(form_classname="h1", label="Kopfzeile 1")),
-    ("h2", CharBlock(form_classname="h2", label="Kopfzeile 2")),
-    ("h3", CharBlock(form_classname="h3", label="Kopfzeile 3")),
-    ("paragraph", RichTextBlock()),
+    ("h1", HeadingBlock(form_classname="h1", label="Kopfzeile 1")),
+    ("h2", HeadingBlock(form_classname="h2", label="Kopfzeile 2")),
+    ("h3", HeadingBlock(form_classname="h3", label="Kopfzeile 3")),
+    ("paragraph", RichTextBlock(features=['anchor-identifier','h4', 'h5', 'bold', 'italic', 'link', 'ol', 'ul', 'document-link', 'image', 'embed'])),
     ("image", ImageChooserBlock()),
     ("image_with_caption", ImageWithCaptionBlock()),
 ]
@@ -123,6 +153,24 @@ class CommonContextMixin:
             .filter(start_time__gte=now())  # Match events at or after the current time
             .order_by("start_time")[:2]
         )
+    
+    def get_anchors(self) -> list[tuple[str, str]]:
+        """
+        Extract all anchors from this page's StreamField content.
+        Returns a list of tuples: (anchor_id, heading_text)
+        Only includes anchors matching the 'block-*' pattern from h1, h2, h3 blocks.
+        """
+        anchors = []
+        
+        # Check if the page has a 'body' StreamField
+        if hasattr(self, 'body'):
+            for block in self.body:  # type: ignore[attr-defined]
+                if block.block_type in ['h1', 'h2', 'h3']:
+                    heading_text = str(block.value)
+                    anchor_id = generate_anchor_id(heading_text)
+                    anchors.append((anchor_id, heading_text))
+        
+        return anchors
     
     def get_context(self, request: "HttpRequest", *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)  # type: ignore[misc]

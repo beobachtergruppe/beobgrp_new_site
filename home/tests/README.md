@@ -11,8 +11,9 @@ The tests use Django's standard `TestCase` for simplicity and reliability:
 - `test_events_simple.py` - Tests for EventPage and SingleEvent models (5 tests)
 - `test_gallery_simple.py` - Tests for Gallery models (6 tests)
 - `test_blocks_simple.py` - Tests for custom blocks (3 tests)
+- `test_anchors.py` - Tests for anchor link functionality (15 tests)
 
-**Total: 23 tests** covering all main Wagtail models and custom functionality.
+**Total: 38 tests** covering all main Wagtail models and custom functionality.
 
 **Note**: The simplified approach focuses on model instantiation, configuration, and basic functionality rather than full integration testing. This provides reliable, fast tests that protect against API changes.
 
@@ -82,7 +83,7 @@ The tests focus on:
 3. **Critical functionality** - Verify event types, required fields, block structures
 4. **API protection** - Detect breaking changes in Wagtail/Django APIs
 
-This approach prioritizes reliability and speed (~50ms execution time) over comprehensive integration testing.
+This approach prioritizes reliability and speed (~75ms execution time) over comprehensive integration testing.
 
 ### Test Coverage Details
 
@@ -105,6 +106,13 @@ This approach prioritizes reliability and speed (~50ms execution time) over comp
 **Custom Blocks (3 tests)**
 - LinkBlock field structure (link_type, internal_page, external_url)
 - ImageWithCaptionBlock field structure
+
+**Anchor Links (15 tests)**
+- Anchor ID generation from various text inputs
+- Special character handling (umlauts, punctuation, spaces)
+- Anchor extraction from pages with StreamField content
+- Support across different page types (HomePage, EventPage)
+- Edge cases (empty body, duplicate headings, no headings)
 
 **Setup (3 tests)**
 - Basic Wagtail infrastructure (Page, Site creation)

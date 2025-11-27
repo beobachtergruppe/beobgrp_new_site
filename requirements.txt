@@ -1,5 +1,6 @@
 Django==5.2.7
 wagtail==7.1.2
+wagtail-draftail-anchors==0.6.0
 psycopg2-binary>=2.9.9
 django-compressor==4.5.1
 django-dbbackup==5.0.0

@@ -58,6 +58,17 @@ a {
   }
 }
 
+// Anchor link styling - make anchors invisible but targetable
+span[id^="block-"] {
+  display: block;
+  position: relative;
+  
+  // Offset anchor position to account for fixed headers if any
+  &:target {
+    scroll-margin-top: 2rem; // Adjust this value based on your header height
+  }
+}
+
 
 // Create a mixin for overriding margins and paddings
 @mixin block-heading-spacing {
