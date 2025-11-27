@@ -160,10 +160,10 @@ The server will be available at http://localhost:8000
 
 ## Testing
 
-This project includes **23 tests** covering all Wagtail page models and custom blocks. The tests:
+This project includes **38 tests** covering all Wagtail page models and custom blocks. The tests:
 - Validate model structure and configuration
 - Protect against API changes in Wagtail and Django  
-- Run quickly (~50ms) using simplified test approach
+- Run quickly (~75ms) using simplified test approach
 - Focus on critical functionality without complex integration testing
 
 ### Prerequisites for Testing
@@ -186,7 +186,7 @@ PGPASSWORD="$WAGTAIL_DB_PASSWORD" psql -h localhost -U wagtail -d postgres -c "D
 
 ### Running Tests
 
-Run all tests (23 tests in ~50ms):
+Run all tests (38 tests in ~75ms):
 ```bash
 python manage.py test home.tests
 ```
