@@ -30,15 +30,14 @@ ENV DJANGO_STATIC_ROOT=/app/static
 # Add user that will be used in the container.
 RUN useradd wagtail
 
-# Port used by this container to serve HTTP.
-EXPOSE 8000
+# Ports used by this container to serve HTTP.
+# 8000 for production, 8001 for development
+EXPOSE 8000 8001
 
 # Set environment variables.
 # 1. Force Python stdout and stderr streams to be unbuffered.
-# 2. Set PORT variable that is used by Gunicorn. This should match "EXPOSE"
-#    command.
-ENV PYTHONUNBUFFERED=1 \
-    PORT=8000
+# 2. Port is controlled by WAGTAIL_PORT environment variable in docker-compose
+ENV PYTHONUNBUFFERED=1
 
 # Install system packages required by Wagtail and Django.
 RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-recommends \
