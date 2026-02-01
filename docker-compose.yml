@@ -6,11 +6,7 @@ volumes:
 
 services:
   wagtail_prod:
-    image: beobgrp_site:1.2.2-prod
-    build:
-      context: .
-      args:
-        DEVELOPMENT: "false"
+    image: ${DOCKER_REGISTRY:-localhost:5000}/beobgrp_site:1.2.2-prod
     environment:
       WAGTAIL_DB_PASSWORD: ${WAGTAIL_DB_PASSWORD}
       PGPASSWORD: ${WAGTAIL_DB_PASSWORD}
@@ -35,11 +31,7 @@ services:
       - prod
 
   wagtail_dev:
-    image: beobgrp_site:1.2.2-dev
-    build:
-      context: .
-      args:
-        DEVELOPMENT: "true"
+    image: ${DOCKER_REGISTRY:-localhost:5000}/beobgrp_site:1.2.2-dev
     environment:
       WAGTAIL_DB_PASSWORD: ${WAGTAIL_DB_PASSWORD}
       PGPASSWORD: ${WAGTAIL_DB_PASSWORD}

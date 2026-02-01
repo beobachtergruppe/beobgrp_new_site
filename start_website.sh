@@ -35,8 +35,16 @@ if [ -z "$WAGTAIL_DB_PASSWORD" ]; then
   exit 1
 fi
 
+if [ -z "$DOCKER_REGISTRY" ]; then
+  echo "Warning: DOCKER_REGISTRY not set, using localhost:5000"
+  export DOCKER_REGISTRY="localhost:5000"
+fi
+
 export SITE_INIT_MODE=$SITE_INIT_MODE
 
 PROFILE=$([[ "$DEV_MODE" == "true" ]] && echo "dev" || echo "prod")
 
-cd $(dirname $0) && docker compose --profile "$PROFILE" up -d --build
+echo "Starting website in ${PROFILE} mode from registry: $DOCKER_REGISTRY"
+echo ""
+
+cd $(dirname $0) && docker compose --profile "$PROFILE" up -d
