@@ -2,10 +2,19 @@
 
 set -e
 
+# Source the VERSION file
+SCRIPT_DIR=$(cd $(dirname "$0") && pwd)
+if [ ! -f "$SCRIPT_DIR/VERSION" ]; then
+  echo "Error: VERSION file not found in $SCRIPT_DIR"
+  exit 1
+fi
+source "$SCRIPT_DIR/VERSION"
+
 # Default values
 REGISTRY=""
 BUILD_DEV=false
 BUILD_PROD=false
+AUTO_START_REGISTRY=true
 
 # Function to display usage
 usage() {
@@ -13,14 +22,18 @@ usage() {
   echo ""
   echo "Options:"
   echo "  -r, --registry REGISTRY    Docker registry URL (e.g., localhost:5000 or registry.example.com)"
-  echo "  --dev                      Build development image"
-  echo "  --prod                     Build production image"
-  echo "  --both                     Build both dev and prod images"
+  echo "                             If not provided and no registry is running, will auto-start one at localhost:5000"
+  echo "  --dev                      Build development image variant only (v${VERSION})"
+  echo "  --prod                     Build production image variant only (v${VERSION})"
+  echo "  --both                     Build both dev and prod image variants (v${VERSION})"
+  echo "  --no-auto-registry         Do not auto-start registry if none is provided"
   echo "  -h, --help                 Show this help message"
   echo ""
   echo "Examples:"
-  echo "  $0 --registry localhost:5000 --dev"
-  echo "  $0 --registry localhost:5000 --both"
+  echo "  $0 --dev                          # Auto-starts registry, builds dev only"
+  echo "  $0 --prod                         # Auto-starts registry, builds prod only"
+  echo "  $0 --both                         # Auto-starts registry, builds both"
+  echo "  $0 --registry registry.example.com --dev"
   exit 1
 }
 
@@ -44,6 +57,10 @@ while [[ $# -gt 0 ]]; do
       BUILD_PROD=true
       shift
       ;;
+    --no-auto-registry)
+      AUTO_START_REGISTRY=false
+      shift
+      ;;
     -h|--help)
       usage
       ;;
@@ -54,40 +71,42 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Interactive mode if no options provided
+# Default to localhost:5000 if not specified
 if [ -z "$REGISTRY" ]; then
-  read -p "Enter Docker registry URL (e.g., localhost:5000): " REGISTRY
+  REGISTRY="localhost:5000"
 fi
 
-if [ -z "$REGISTRY" ]; then
-  echo "Error: Registry URL is required"
-  exit 1
+# Auto-start registry if it's localhost:5000 and not running
+if [ "$REGISTRY" = "localhost:5000" ] && [ "$AUTO_START_REGISTRY" = true ]; then
+  if ! docker ps --filter "name=registry" --filter "status=running" -q | grep -q .; then
+    echo "=========================================="
+    echo "Starting Docker registry at localhost:5000..."
+    echo "=========================================="
+    docker run -d \
+      -p 5000:5000 \
+      --name registry \
+      --restart always \
+      registry:latest > /dev/null 2>&1
+    
+    if [ $? -eq 0 ]; then
+      echo "✓ Registry started successfully"
+      echo "  Waiting for registry to be ready..."
+      sleep 2
+    else
+      # Container might already exist but be stopped
+      if docker ps -a --filter "name=registry" -q | grep -q .; then
+        echo "✓ Starting existing registry container..."
+        docker start registry > /dev/null
+        sleep 2
+      fi
+    fi
+    echo ""
+  fi
 fi
 
 if [ "$BUILD_DEV" = false ] && [ "$BUILD_PROD" = false ]; then
-  echo ""
-  echo "What would you like to build?"
-  echo "1) Development image"
-  echo "2) Production image"
-  echo "3) Both images"
-  read -p "Enter choice (1-3): " choice
-  
-  case $choice in
-    1)
-      BUILD_DEV=true
-      ;;
-    2)
-      BUILD_PROD=true
-      ;;
-    3)
-      BUILD_DEV=true
-      BUILD_PROD=true
-      ;;
-    *)
-      echo "Invalid choice"
-      exit 1
-      ;;
-  esac
+  BUILD_DEV=true
+  BUILD_PROD=true
 fi
 
 echo ""
@@ -97,9 +116,9 @@ echo ""
 # Build and push development image
 if [ "$BUILD_DEV" = true ]; then
   echo "=========================================="
-  echo "Building development image..."
+  echo "Building development image variant (v${VERSION})..."
   echo "=========================================="
-  IMAGE_NAME="$REGISTRY/beobgrp_site:1.2.2-dev"
+  IMAGE_NAME="$REGISTRY/beobgrp_site:${VERSION}-dev"
   docker build \
     --build-arg DEVELOPMENT=true \
     -t "$IMAGE_NAME" \
@@ -115,9 +134,9 @@ fi
 # Build and push production image
 if [ "$BUILD_PROD" = true ]; then
   echo "=========================================="
-  echo "Building production image..."
+  echo "Building production image variant (v${VERSION})..."
   echo "=========================================="
-  IMAGE_NAME="$REGISTRY/beobgrp_site:1.2.2-prod"
+  IMAGE_NAME="$REGISTRY/beobgrp_site:${VERSION}-prod"
   docker build \
     --build-arg DEVELOPMENT=false \
     -t "$IMAGE_NAME" \

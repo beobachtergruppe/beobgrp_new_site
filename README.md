@@ -127,25 +127,170 @@ Visit: http://localhost:8001
 
 ## Production Setup (Docker Compose)
 
-Production runs via Docker Compose. See `docker-compose.yml` and related scripts.
+Production runs via Docker Compose. Both development and production modes are supported with separate databases and configurations.
+
+### Overview
+
+The deployment system consists of:
+- **VERSIONS file**: Central location for version management
+- **build_and_push.sh**: Builds Docker images and pushes them to a registry
+- **start_website.sh**: Starts dev, prod, or both instances with specified versions
+- **docker-compose.yml**: Orchestrates containers with separate networks and volumes for dev/prod
 
 ### Environment Variables
+
 Set the following required environment variables:
 - `WAGTAIL_DB_PASSWORD`: Database password for the wagtail user
 - `DJANGO_BACKUP_DIR`: Directory path for storing backups (optional, defaults to `../beobgrp_site_backup`)
+- `DOCKER_REGISTRY`: Docker registry URL (optional, defaults to `localhost:5000`)
 
-### Starting the Server
-Use the `start_website.sh` script with one of the following modes:
-```bash
-./start_website.sh [none|restore|migrate]
+### Version Management
+
+The `VERSION` file contains the single source of truth for image versions:
+
 ```
-- `none`: Start server only
-- `restore`: Restore database and media from backup before starting
+VERSION=1.2.2  # Example version
+```
+
+Both development and production builds use this same version, but are tagged with `-dev` and `-prod` suffixes. Update this file when you want to build and deploy new versions.
+
+### Building Images
+
+The `build_and_push.sh` script builds both dev and prod image variants and pushes them to a registry.
+
+**Prerequisites:**
+- Docker daemon running
+- Docker registry accessible (local or remote)
+
+**Building with local registry (auto-starts if needed):**
+```bash
+./build_and_push.sh
+```
+This will:
+1. Auto-start a registry at `localhost:5000` if not running
+2. Build both `-dev` and `-prod` variants of the version in your VERSION file
+3. Push both images to the registry
+
+**Building for a remote registry:**
+```bash
+./build_and_push.sh -r registry.example.com
+```
+
+**Building without auto-starting registry:**
+```bash
+./build_and_push.sh --no-auto-registry -r registry.example.com
+```
+
+**Image tags created:**
+- `localhost:5000/beobgrp_site:{VERSION}-dev` (with npm and sass for live compilation)
+- `localhost:5000/beobgrp_site:{VERSION}-prod` (optimized, npm/sass removed)
+
+Where `{VERSION}` is the value from your VERSION file.
+
+### Starting Instances
+
+The `start_website.sh` script starts dev, prod, or both instances with independent databases and configurations.
+
+**Starting production only:**
+```bash
+./start_website.sh migrate
+./start_website.sh restore
+./start_website.sh none
+```
 - `migrate`: Run database migrations before starting
+- `restore`: Restore database and media from backup before starting
+- `none`: Start server only (default)
 
-This script runs `docker compose` with building the Docker image for the server.
+**Starting development only:**
+```bash
+./start_website.sh --dev migrate
+./start_website.sh --dev restore
+./start_website.sh --dev none
+```
+- Development runs on port 8001 with `DEBUG=true`
+- Uses separate database (postgres_dev) and volumes
+- Includes npm and sass for live CSS compilation
 
-The server will be available at http://localhost:8000
+**Starting both simultaneously:**
+```bash
+./start_website.sh --dev --prod migrate
+```
+- Dev on port 8001, Prod on port 8000
+- Completely isolated databases and networks
+- Can run different versions of each
+
+**Using specific versions:**
+```bash
+# Dev with older version, Prod with current VERSION file version
+./start_website.sh --dev --dev-version 1.2.1 --prod migrate
+
+# Prod with older version, Dev with current VERSION file version
+./start_website.sh --prod --prod-version 1.2.0 --dev migrate
+```
+
+**Setting custom registry:**
+```bash
+export DOCKER_REGISTRY="registry.example.com"
+./start_website.sh --prod migrate
+```
+
+### Docker Registry Setup
+
+For a local development registry, see [REGISTRY_SETUP.md](REGISTRY_SETUP.md) for detailed setup instructions including:
+- Quick local registry setup
+- Persistent storage configuration
+- SSL/TLS setup for production
+- Troubleshooting
+
+### Access URLs
+
+Once started, the website is available at:
+- **Production**: http://localhost:8000
+- **Development**: http://localhost:8001 (if started with `--dev`)
+
+### Database and Media
+
+Each mode (dev/prod) has:
+- Separate PostgreSQL database
+- Separate media volume
+- Separate network for isolation
+
+You can safely run dev and prod simultaneously without any conflicts.
+
+### Complete Workflow Example
+
+1. **Update version:**
+   ```bash
+   echo "VERSION=1.2.3" > VERSION
+   ```
+
+2. **Build both dev and prod variants:**
+   ```bash
+   export DOCKER_REGISTRY="localhost:5000"
+   ./build_and_push.sh
+   ```
+
+3. **Start production with migrations:**
+   ```bash
+   export WAGTAIL_DB_PASSWORD="your_password"
+   ./start_website.sh migrate
+   ```
+
+4. **Start development for testing (in another terminal):**
+   ```bash
+   export WAGTAIL_DB_PASSWORD="your_password"
+   ./start_website.sh --dev migrate
+   ```
+
+5. **Test development changes:**
+   - Visit http://localhost:8001
+   - Edit SCSS files - they recompile automatically
+   - Make code changes and see them reflected
+
+6. **When ready, stop and clean up:**
+   ```bash
+   docker compose --profile dev,prod down
+   ```
 
 ### Backup and Restore Scripts
 
