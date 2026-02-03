@@ -21,19 +21,13 @@ usage() {
   echo "Usage: $0 [OPTIONS]"
   echo ""
   echo "Options:"
-  echo "  -r, --registry REGISTRY    Docker registry URL (e.g., localhost:5000 or registry.example.com)"
-  echo "                             If not provided and no registry is running, will auto-start one at localhost:5000"
-  echo "  --dev                      Build development image variant only (v${VERSION})"
-  echo "  --prod                     Build production image variant only (v${VERSION})"
-  echo "  --both                     Build both dev and prod image variants (v${VERSION})"
+  echo "  -r, --registry REGISTRY    Docker registry URL (defaults to localhost:5000)"
   echo "  --no-auto-registry         Do not auto-start registry if none is provided"
   echo "  -h, --help                 Show this help message"
   echo ""
   echo "Examples:"
-  echo "  $0 --dev                          # Auto-starts registry, builds dev only"
-  echo "  $0 --prod                         # Auto-starts registry, builds prod only"
-  echo "  $0 --both                         # Auto-starts registry, builds both"
-  echo "  $0 --registry registry.example.com --dev"
+  echo "  $0                         # Auto-starts localhost:5000 registry, builds image"
+  echo "  $0 -r registry.example.com # Build for remote registry"
   exit 1
 }
 
@@ -43,19 +37,6 @@ while [[ $# -gt 0 ]]; do
     -r|--registry)
       REGISTRY="$2"
       shift 2
-      ;;
-    --dev)
-      BUILD_DEV=true
-      shift
-      ;;
-    --prod)
-      BUILD_PROD=true
-      shift
-      ;;
-    --both)
-      BUILD_DEV=true
-      BUILD_PROD=true
-      shift
       ;;
     --no-auto-registry)
       AUTO_START_REGISTRY=false
@@ -104,56 +85,32 @@ if [ "$REGISTRY" = "localhost:5000" ] && [ "$AUTO_START_REGISTRY" = true ]; then
   fi
 fi
 
-if [ "$BUILD_DEV" = false ] && [ "$BUILD_PROD" = false ]; then
-  BUILD_DEV=true
-  BUILD_PROD=true
-fi
-
 echo ""
 echo "Registry: $REGISTRY"
 echo ""
 
-# Build and push development image
-if [ "$BUILD_DEV" = true ]; then
-  echo "=========================================="
-  echo "Building development image variant (v${VERSION})..."
-  echo "=========================================="
-  IMAGE_NAME="$REGISTRY/beobgrp_site:${VERSION}-dev"
-  docker build \
-    --build-arg DEVELOPMENT=true \
-    -t "$IMAGE_NAME" \
-    .
-  
-  echo ""
-  echo "Pushing development image to registry..."
-  docker push "$IMAGE_NAME"
-  echo "✓ Development image pushed: $IMAGE_NAME"
-  echo ""
-fi
+# Build and push image
+echo "=========================================="
+echo "Building Docker image (v${VERSION})..."
+echo "=========================================="
+IMAGE_NAME="$REGISTRY/beobgrp_site:${VERSION}"
+docker build \
+  -t "$IMAGE_NAME" \
+  .
 
-# Build and push production image
-if [ "$BUILD_PROD" = true ]; then
-  echo "=========================================="
-  echo "Building production image variant (v${VERSION})..."
-  echo "=========================================="
-  IMAGE_NAME="$REGISTRY/beobgrp_site:${VERSION}-prod"
-  docker build \
-    --build-arg DEVELOPMENT=false \
-    -t "$IMAGE_NAME" \
-    .
-  
-  echo ""
-  echo "Pushing production image to registry..."
-  docker push "$IMAGE_NAME"
-  echo "✓ Production image pushed: $IMAGE_NAME"
-  echo ""
-fi
+echo ""
+echo "Pushing image to registry..."
+docker push "$IMAGE_NAME"
+echo "✓ Image pushed: $IMAGE_NAME"
+echo ""
 
 echo "=========================================="
 echo "Build and push completed successfully!"
 echo "=========================================="
 echo ""
+echo "Image built and pushed: $IMAGE_NAME"
+echo ""
 echo "Next steps:"
-echo "1. Update docker-compose environment with:"
-echo "   export DOCKER_REGISTRY=$REGISTRY"
-echo "2. Run: ./start_website.sh [--dev] [migrate|restore|none]"
+echo "1. Run: ./start_website.sh --prod migrate"
+echo "2. Or:  ./start_website.sh --dev migrate"
+echo "3. Or:  ./start_website.sh --dev --prod migrate  (both simultaneously)"

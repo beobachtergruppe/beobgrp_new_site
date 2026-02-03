@@ -132,10 +132,12 @@ Production runs via Docker Compose. Both development and production modes are su
 ### Overview
 
 The deployment system consists of:
-- **VERSIONS file**: Central location for version management
-- **build_and_push.sh**: Builds Docker images and pushes them to a registry
-- **start_website.sh**: Starts dev, prod, or both instances with specified versions
+- **VERSION file**: Central location for version management
+- **build_and_push.sh**: Builds a single production Docker image and pushes it to a registry
+- **start_website.sh**: Starts dev, prod, or both instances using the same image with different environment variables
 - **docker-compose.yml**: Orchestrates containers with separate networks and volumes for dev/prod
+
+The same Docker image is used for both development and production modes running in Docker. The difference is controlled by environment variables (PRODUCTION_VERSION flag and port settings). Real development with live code reloading uses `manage.py runserver` locally, not Docker.
 
 ### Environment Variables
 
@@ -156,7 +158,7 @@ Both development and production builds use this same version, but are tagged wit
 
 ### Building Images
 
-The `build_and_push.sh` script builds both dev and prod image variants and pushes them to a registry.
+The `build_and_push.sh` script builds a single production Docker image and pushes it to a registry.
 
 **Prerequisites:**
 - Docker daemon running
@@ -168,8 +170,8 @@ The `build_and_push.sh` script builds both dev and prod image variants and pushe
 ```
 This will:
 1. Auto-start a registry at `localhost:5000` if not running
-2. Build both `-dev` and `-prod` variants of the version in your VERSION file
-3. Push both images to the registry
+2. Build the Docker image from your VERSION file
+3. Push the image to the registry
 
 **Building for a remote registry:**
 ```bash
@@ -181,11 +183,8 @@ This will:
 ./build_and_push.sh --no-auto-registry -r registry.example.com
 ```
 
-**Image tags created:**
-- `localhost:5000/beobgrp_site:{VERSION}-dev` (with npm and sass for live compilation)
-- `localhost:5000/beobgrp_site:{VERSION}-prod` (optimized, npm/sass removed)
-
-Where `{VERSION}` is the value from your VERSION file.
+**Image tag created:**
+- `localhost:5000/beobgrp_site:{VERSION}` (production-optimized image)
 
 ### Starting Instances
 
@@ -207,9 +206,9 @@ The `start_website.sh` script starts dev, prod, or both instances with independe
 ./start_website.sh --dev restore
 ./start_website.sh --dev none
 ```
-- Development runs on port 8001 with `DEBUG=true`
+- Development runs on port 8001 with `PRODUCTION_VERSION=false` (DEBUG=true in Django)
 - Uses separate database (postgres_dev) and volumes
-- Includes npm and sass for live CSS compilation
+- Runs the same production-optimized Docker image
 
 **Starting both simultaneously:**
 ```bash

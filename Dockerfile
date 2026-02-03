@@ -4,9 +4,6 @@
 # Use an official Python runtime based on Debian bookworm as a parent image.
 FROM python:3.12.12-bookworm
 
-# Build argument to distinguish development from production
-ARG DEVELOPMENT=false
-
 # Get the database password from the build argument
 ENV WAGTAIL_DB_PASSWORD=${WAGTAIL_DB_PASSWORD}
 
@@ -105,15 +102,13 @@ RUN apt-get update && apt-get purge -y --auto-remove \
     zlib1g-dev \
     libwebp-dev \
     pkg-config \
-    python3-dev && \
+    python3-dev \
+    npm && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Remove npm packages and cache only in production
-RUN if [ "$DEVELOPMENT" = "false" ]; then \
-    apt-get purge -y --auto-remove npm && \
-    rm -rf /usr/local/lib/node_modules /root/.npm; \
-    fi
+# Remove npm packages and cache
+RUN rm -rf /usr/local/lib/node_modules /root/.npm
 
 # The persistent media directory must also be writeable by the "wagtail" user.
 RUN mkdir -p /media && chown -R wagtail:wagtail /media
