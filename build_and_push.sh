@@ -2,6 +2,9 @@
 
 set -e
 
+# Get current git branch
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+
 # Source the VERSION file
 SCRIPT_DIR=$(cd $(dirname "$0") && pwd)
 if [ ! -f "$SCRIPT_DIR/VERSION" ]; then
@@ -9,6 +12,15 @@ if [ ! -f "$SCRIPT_DIR/VERSION" ]; then
   exit 1
 fi
 source "$SCRIPT_DIR/VERSION"
+
+# Determine the actual version to build
+BUILD_VERSION=$VERSION
+if [ "$CURRENT_BRANCH" != "main" ] && [ -n "$CURRENT_BRANCH" ]; then
+  BUILD_VERSION="${VERSION}.dev"
+  echo "Building from branch '$CURRENT_BRANCH' - using development version: $BUILD_VERSION"
+else
+  echo "Building from main branch - using release version: $BUILD_VERSION"
+fi
 
 # Default values
 REGISTRY=""
@@ -28,6 +40,11 @@ usage() {
   echo "Examples:"
   echo "  $0                         # Auto-starts localhost:5000 registry, builds image"
   echo "  $0 -r registry.example.com # Build for remote registry"
+  echo ""
+  echo "Version:"
+  echo "  Current branch: $CURRENT_BRANCH"
+  echo "  BASE_VERSION (from VERSION file): $VERSION"
+  echo "  Build version: $BUILD_VERSION"
   exit 1
 }
 
@@ -64,7 +81,7 @@ if [ "$REGISTRY" = "localhost:5000" ] && [ "$AUTO_START_REGISTRY" = true ]; then
     echo "Starting Docker registry at localhost:5000..."
     echo "=========================================="
     docker run -d \
-      -p 5000:5000 \
+      -p 127.0.0.1:5000:5000 \
       --name registry \
       --restart always \
       registry:latest > /dev/null 2>&1
@@ -87,13 +104,14 @@ fi
 
 echo ""
 echo "Registry: $REGISTRY"
+echo "Build version: $BUILD_VERSION"
 echo ""
 
 # Build and push image
 echo "=========================================="
-echo "Building Docker image (v${VERSION})..."
+echo "Building Docker image (v${BUILD_VERSION})..."
 echo "=========================================="
-IMAGE_NAME="$REGISTRY/beobgrp_site:${VERSION}"
+IMAGE_NAME="$REGISTRY/beobgrp_site:${BUILD_VERSION}"
 docker build \
   -t "$IMAGE_NAME" \
   .

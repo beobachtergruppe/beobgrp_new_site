@@ -160,18 +160,26 @@ Both development and production builds use this same version, but are tagged wit
 
 The `build_and_push.sh` script builds a single production Docker image and pushes it to a registry.
 
+**Git Branch-Based Versioning:**
+- **On `main` branch**: Builds version from VERSION file (e.g., `1.2.2`)
+- **On feature branches**: Automatically appends `.dev` suffix (e.g., `1.2.2.dev`)
+
+This ensures release versions can only be built from the main branch.
+
 **Prerequisites:**
 - Docker daemon running
 - Docker registry accessible (local or remote)
+- Git repository initialized
 
 **Building with local registry (auto-starts if needed):**
 ```bash
 ./build_and_push.sh
 ```
 This will:
-1. Auto-start a registry at `localhost:5000` if not running
-2. Build the Docker image from your VERSION file
-3. Push the image to the registry
+1. Detect current git branch
+2. Auto-start a registry at `localhost:5000` if not running
+3. Build the Docker image with appropriate version
+4. Push the image to the registry
 
 **Building for a remote registry:**
 ```bash
@@ -183,55 +191,87 @@ This will:
 ./build_and_push.sh --no-auto-registry -r registry.example.com
 ```
 
-**Image tag created:**
-- `localhost:5000/beobgrp_site:{VERSION}` (production-optimized image)
+**Example builds:**
+```bash
+# On main branch
+./build_and_push.sh  # Builds: beobgrp_site:1.2.2
+
+# On feature-xyz branch
+./build_and_push.sh  # Builds: beobgrp_site:1.2.2.dev
+```
 
 ### Starting Instances
 
-The `start_website.sh` script starts dev, prod, or both instances with independent databases and configurations.
+The `start_website.sh` script starts dev or prod instances. Only one can run at a time.
 
-**Starting production only:**
+**Key constraints:**
+- Production server (`--prod`): Only available on `main` branch, uses VERSION from VERSION file (unless `--version` specified)
+- Development server (`--dev`): Available on any branch, requires explicit `--version` with `.dev` suffix
+
+**Starting production (main branch only):**
 ```bash
-./start_website.sh migrate
-./start_website.sh restore
-./start_website.sh none
+./start_website.sh --prod migrate              # Uses VERSION file
+./start_website.sh --prod --version 1.2.3     # Specific version
+./start_website.sh --prod restore
+./start_website.sh --prod none
 ```
-- `migrate`: Run database migrations before starting
-- `restore`: Restore database and media from backup before starting
-- `none`: Start server only (default)
+- Production runs on port 8000 with `PRODUCTION_VERSION=true` (DEBUG=false in Django)
+- Uses database (postgres) and media volumes
+- Runs production-optimized Docker image
 
-**Starting development only:**
+**Starting development:**
 ```bash
-./start_website.sh --dev migrate
-./start_website.sh --dev restore
-./start_website.sh --dev none
+./start_website.sh --dev --version 1.2.1.dev migrate
+./start_website.sh --dev --version 1.2.1.dev restore
+./start_website.sh --dev --version 1.2.1.dev none
 ```
 - Development runs on port 8001 with `PRODUCTION_VERSION=false` (DEBUG=true in Django)
 - Uses separate database (postgres_dev) and volumes
-- Runs the same production-optimized Docker image
-
-**Starting both simultaneously:**
-```bash
-./start_website.sh --dev --prod migrate
-```
-- Dev on port 8001, Prod on port 8000
-- Completely isolated databases and networks
-- Can run different versions of each
-
-**Using specific versions:**
-```bash
-# Dev with older version, Prod with current VERSION file version
-./start_website.sh --dev --dev-version 1.2.1 --prod migrate
-
-# Prod with older version, Dev with current VERSION file version
-./start_website.sh --prod --prod-version 1.2.0 --dev migrate
-```
+- Version MUST have `.dev` suffix (enforced constraint)
+- Available on any branch
 
 **Setting custom registry:**
 ```bash
 export DOCKER_REGISTRY="registry.example.com"
 ./start_website.sh --prod migrate
 ```
+
+### Typical Development Workflow
+
+1. Create feature branch and make changes:
+   ```bash
+   git checkout -b feature-xyz
+   ```
+
+2. Build dev image with `.dev` suffix (automatic):
+   ```bash
+   ./build_and_push.sh
+   # Builds: beobgrp_site:1.2.2.dev
+   ```
+
+3. Test in development Docker container:
+   ```bash
+   ./start_website.sh --dev --version 1.2.2.dev migrate
+   # Runs on port 8001 with DEBUG=true
+   ```
+
+4. Commit, test, merge to main:
+   ```bash
+   git checkout main
+   git merge feature-xyz
+   ```
+
+5. Build release image (no `.dev` suffix):
+   ```bash
+   ./build_and_push.sh
+   # Builds: beobgrp_site:1.2.2
+   ```
+
+6. Start production:
+   ```bash
+   ./start_website.sh --prod migrate
+   # Runs on port 8000 with DEBUG=false
+   ```
 
 ### Docker Registry Setup
 
