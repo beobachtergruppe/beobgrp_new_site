@@ -154,11 +154,52 @@ The `VERSION` file contains the single source of truth for image versions:
 VERSION=1.2.2  # Example version
 ```
 
-Both development and production builds use this same version, but are tagged with `-dev` and `-prod` suffixes. Update this file when you want to build and deploy new versions.
+Both development and production builds use this same version. Update this file when you want to build and deploy new versions.
+
+### Local Docker Registry
+
+For local development, use a persistent Docker registry to store built images.
+
+**Start the registry:**
+```bash
+./start_registry.sh
+```
+
+This starts:
+- Docker registry at `http://localhost:5000`
+- Web UI at `http://localhost:8080` (for browsing and deleting images)
+- Persistent storage at `~/.docker-registry`
+
+**Restart the registry:**
+```bash
+./start_registry.sh --restart
+```
+
+**Stop the registry:**
+```bash
+docker compose -f registry-docker-compose.yml down
+```
+
+**Manage images via CLI:**
+```bash
+# List all images
+curl -s http://localhost:5000/v2/_catalog | jq '.repositories'
+
+# List all tags for an image
+curl -s http://localhost:5000/v2/beobgrp_site/tags/list | jq '.tags'
+
+# Delete an image tag
+curl -X DELETE http://localhost:5000/v2/beobgrp_site/manifests/1.2.1.dev
+```
 
 ### Building Images
 
-The `build_and_push.sh` script builds a single production Docker image and pushes it to a registry.
+The `build_and_push.sh` script builds a Docker image and pushes it to a registry.
+
+**Prerequisites:**
+- Docker daemon running
+- Local registry running (`./start_registry.sh` for local development)
+- Git repository initialized
 
 **Git Branch-Based Versioning:**
 - **On `main` branch**: Builds version from VERSION file (e.g., `1.2.2`)
@@ -166,29 +207,15 @@ The `build_and_push.sh` script builds a single production Docker image and pushe
 
 This ensures release versions can only be built from the main branch.
 
-**Prerequisites:**
-- Docker daemon running
-- Docker registry accessible (local or remote)
-- Git repository initialized
-
-**Building with local registry (auto-starts if needed):**
+**Building with local registry:**
 ```bash
-./build_and_push.sh
+./start_registry.sh        # Start registry first (if not running)
+./build_and_push.sh        # Build and push to localhost:5000
 ```
-This will:
-1. Detect current git branch
-2. Auto-start a registry at `localhost:5000` if not running
-3. Build the Docker image with appropriate version
-4. Push the image to the registry
 
 **Building for a remote registry:**
 ```bash
 ./build_and_push.sh -r registry.example.com
-```
-
-**Building without auto-starting registry:**
-```bash
-./build_and_push.sh --no-auto-registry -r registry.example.com
 ```
 
 **Example builds:**
