@@ -39,22 +39,27 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     *)
-      echo "Usage: $0 --dev --version VERSION [migrate|restore|none]"
-      echo "       $0 --prod [--version VERSION] [migrate|restore|none]"
-      echo ""
-      echo "Options:"
-      echo "  --dev                  Start in development mode (port 8001, DEBUG=true)"
-      echo "  --version VERSION      Version to use (REQUIRED for --dev, must have .dev suffix)"
-      echo "  --prod                 Start in production mode (port 8000, DEBUG=false)"
-      echo "                         Only available on main branch. Defaults to VERSION file."
-      echo "  migrate                Run database migrations on startup"
-      echo "  restore                Restore database from backup on startup"
-      echo "  none                   Skip database operations (default)"
+      if [ "$IS_MAIN_BRANCH" = true ]; then
+        echo "Usage: $0 [--dev --version VERSION | --prod [--version VERSION]] [migrate|restore|none]"
+        echo ""
+        echo "Options (on main branch):"
+        echo "  --prod                 Start in production mode (port 8000) [DEFAULT]"
+        echo "  --version VERSION      Version for production (optional, uses VERSION file if not specified)"
+        echo "  --dev --version VERSION Start development server for testing (requires .dev suffix)"
+        echo "  migrate|restore|none   Database operation (default: none)"
+      else
+        echo "Usage: $0 [--version VERSION] [--dev] [migrate|restore|none]"
+        echo ""
+        echo "Options (on feature branch):"
+        echo "  --version VERSION      Version to use (REQUIRED, must have .dev suffix) [DEFAULT if on feature branch]"
+        echo "  --dev                  Start development server (optional, implied on feature branch)"
+        echo "  migrate|restore|none   Database operation (default: none)"
+      fi
       echo ""
       echo "Examples:"
-      echo "  $0 --dev --version 1.2.1.dev migrate      # Dev with specific version"
-      echo "  $0 --prod migrate                         # Prod with VERSION file version"
-      echo "  $0 --prod --version 1.2.0 migrate         # Prod with specific version"
+      echo "  $0 --prod migrate                         # Start prod (main branch only)"
+      echo "  $0 --dev --version 1.2.1.dev migrate      # Start dev server to test version"
+      echo "  $0 --version 1.2.3.dev migrate            # Start dev (on feature branch)"
       echo ""
       echo "Current branch: $CURRENT_BRANCH"
       echo "VERSION file: $VERSION"
@@ -68,40 +73,57 @@ if [ -z "$WAGTAIL_DB_PASSWORD" ]; then
   exit 1
 fi
 
-# Validate constraints
-if [ "$START_PROD" = true ]; then
-  if [ "$IS_MAIN_BRANCH" != true ]; then
+# Check for conflicting options
+if [ "$START_DEV" = true ] && [ "$START_PROD" = true ]; then
+  echo "Error: Cannot use both --dev and --prod"
+  exit 1
+fi
+
+# Validate constraints and set defaults based on branch
+if [ "$IS_MAIN_BRANCH" = true ]; then
+  # On main branch: default to prod, but allow dev for testing
+  if [ "$START_DEV" = true ]; then
+    # Dev mode on main branch - requires .dev version
+    if [ -z "$CUSTOM_VERSION" ]; then
+      echo "Error: --version is required with --dev"
+      echo "The version must have .dev suffix"
+      exit 1
+    fi
+    if [[ ! "$CUSTOM_VERSION" =~ \.dev$ ]]; then
+      echo "Error: Development version must have .dev suffix"
+      echo "Provided: $CUSTOM_VERSION"
+      exit 1
+    fi
+  elif [ "$START_PROD" = false ]; then
+    # Default to prod if neither flag specified
+    START_PROD=true
+    if [ -n "$CUSTOM_VERSION" ]; then
+      PROD_VERSION=$CUSTOM_VERSION
+    fi
+  else
+    # Prod mode explicitly requested
+    if [ -n "$CUSTOM_VERSION" ]; then
+      PROD_VERSION=$CUSTOM_VERSION
+    fi
+  fi
+else
+  # On feature branch: default to dev, disallow prod
+  if [ "$START_PROD" = true ]; then
     echo "Error: Production server can only be started from main branch"
     echo "Current branch: $CURRENT_BRANCH"
     exit 1
   fi
-  # Use custom version if provided, otherwise use VERSION file
-  if [ -n "$CUSTOM_VERSION" ]; then
-    PROD_VERSION=$CUSTOM_VERSION
-  fi
-fi
-
-if [ "$START_DEV" = true ]; then
+  # Default to dev mode
+  START_DEV=true
+  
+  # Dev mode on feature branch - requires .dev version
   if [ -z "$CUSTOM_VERSION" ]; then
-    echo "Error: --version is required when starting development server"
-    echo "The version must have .dev suffix"
+    echo "Error: --version is required (must have .dev suffix)"
     exit 1
   fi
   if [[ ! "$CUSTOM_VERSION" =~ \.dev$ ]]; then
     echo "Error: Development version must have .dev suffix"
     echo "Provided: $CUSTOM_VERSION"
-    exit 1
-  fi
-fi
-
-# If no mode specified, try to default to prod (if on main branch)
-if [ "$START_DEV" = false ] && [ "$START_PROD" = false ]; then
-  if [ "$IS_MAIN_BRANCH" = true ]; then
-    START_PROD=true
-  else
-    echo "Error: Must specify --dev or --prod"
-    echo "Current branch: $CURRENT_BRANCH"
-    echo "Production (--prod) is only available on main branch"
     exit 1
   fi
 fi

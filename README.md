@@ -202,38 +202,32 @@ This will:
 
 ### Starting Instances
 
-The `start_website.sh` script starts dev or prod instances. Only one can run at a time.
+The `start_website.sh` script intelligently defaults based on your git branch:
 
-**Key constraints:**
-- Production server (`--prod`): Only available on `main` branch, uses VERSION from VERSION file (unless `--version` specified)
-- Development server (`--dev`): Available on any branch, requires explicit `--version` with `.dev` suffix
-
-**Starting production (main branch only):**
+**On main branch** (defaults to production):
 ```bash
-./start_website.sh --prod migrate              # Uses VERSION file
-./start_website.sh --prod --version 1.2.3     # Specific version
-./start_website.sh --prod restore
-./start_website.sh --prod none
+./start_website.sh migrate              # Start production server (port 8000)
+./start_website.sh --version 1.2.3      # Specific version
+./start_website.sh --dev --version 1.2.1.dev migrate  # Test dev server before deploying
 ```
-- Production runs on port 8000 with `PRODUCTION_VERSION=true` (DEBUG=false in Django)
-- Uses database (postgres) and media volumes
-- Runs production-optimized Docker image
 
-**Starting development:**
+**On feature branch** (defaults to development):
 ```bash
-./start_website.sh --dev --version 1.2.1.dev migrate
-./start_website.sh --dev --version 1.2.1.dev restore
-./start_website.sh --dev --version 1.2.1.dev none
+./start_website.sh --version 1.2.1.dev migrate  # Required: .dev suffix
+./start_website.sh --version 1.2.1.dev         # Runs dev server on port 8001
 ```
-- Development runs on port 8001 with `PRODUCTION_VERSION=false` (DEBUG=true in Django)
-- Uses separate database (postgres_dev) and volumes
-- Version MUST have `.dev` suffix (enforced constraint)
-- Available on any branch
+
+**Important Constraints:**
+- **--dev and --prod are mutually exclusive** - cannot use both together
+- **Development version requires `.dev` suffix** (e.g., `1.2.1.dev`)
+- **Production only available on main branch**
+- On main: `--prod` is default, `--dev` lets you test a version before production
+- On feature branch: `--dev` is default, `--prod` is not allowed
 
 **Setting custom registry:**
 ```bash
 export DOCKER_REGISTRY="registry.example.com"
-./start_website.sh --prod migrate
+./start_website.sh migrate
 ```
 
 ### Typical Development Workflow
@@ -249,10 +243,10 @@ export DOCKER_REGISTRY="registry.example.com"
    # Builds: beobgrp_site:1.2.2.dev
    ```
 
-3. Test in development Docker container:
+3. Test in development Docker container (defaults to dev on feature branch):
    ```bash
-   ./start_website.sh --dev --version 1.2.2.dev migrate
-   # Runs on port 8001 with DEBUG=true
+   ./start_website.sh --version 1.2.2.dev migrate
+   # Runs on port 8001
    ```
 
 4. Commit, test, merge to main:
@@ -267,11 +261,21 @@ export DOCKER_REGISTRY="registry.example.com"
    # Builds: beobgrp_site:1.2.2
    ```
 
-6. Start production:
+6. Deploy to production (defaults to prod on main branch):
    ```bash
-   ./start_website.sh --prod migrate
-   # Runs on port 8000 with DEBUG=false
+   ./start_website.sh migrate
+   # Runs on port 8000
    ```
+
+**Optional: Test a version in dev mode before production**
+
+If you want to test a production version in the dev server before deploying:
+```bash
+git checkout main
+./build_and_push.sh           # Build version 1.2.2
+./start_website.sh --dev --version 1.2.2.dev migrate  # Test in dev mode
+./start_website.sh migrate    # Deploy to production when satisfied
+```
 
 ### Docker Registry Setup
 
