@@ -194,8 +194,8 @@ For local development, use a persistent Docker registry to store built images.
 ```
 
 This starts:
-- Docker registry at `http://localhost:5000`
-- Web UI at `http://localhost:8080` (for browsing and deleting images)
+- Docker registry at `http://127.0.0.1:5000`
+- Web UI at `http://127.0.0.1:8080` (for browsing and deleting images)
 - Persistent storage at `~/.docker-registry`
 
 **Restart the registry:**
@@ -211,13 +211,13 @@ docker compose -f registry-docker-compose.yml down
 **Manage images via CLI:**
 ```bash
 # List all images
-curl -s http://localhost:5000/v2/_catalog | jq '.repositories'
+curl -s http://127.0.0.1:5000/v2/_catalog | jq '.repositories'
 
 # List all tags for an image
-curl -s http://localhost:5000/v2/beobgrp_site/tags/list | jq '.tags'
+curl -s http://127.0.0.1:5000/v2/beobgrp_site/tags/list | jq '.tags'
 
 # Delete an image tag
-curl -X DELETE http://localhost:5000/v2/beobgrp_site/manifests/1.2.1.dev
+curl -X DELETE http://127.0.0.1:5000/v2/beobgrp_site/manifests/1.2.1.dev
 ```
 
 ### Building Images
@@ -238,7 +238,7 @@ This ensures release versions can only be built from the main branch.
 **Building with local registry:**
 ```bash
 ./start_registry.sh        # Start registry first (if not running)
-./build_and_push.sh        # Build and push to localhost:5000
+./build_and_push.sh        # Build and push to 127.0.0.1:5000
 ```
 
 **Building for a remote registry:**

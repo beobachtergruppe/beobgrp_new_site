@@ -129,8 +129,8 @@ else
 fi
 
 if [ -z "$DOCKER_REGISTRY" ]; then
-  echo "Warning: DOCKER_REGISTRY not set, using localhost:5000"
-  export DOCKER_REGISTRY="localhost:5000"
+  echo "Warning: DOCKER_REGISTRY not set, using 127.0.0.1:5000"
+  export DOCKER_REGISTRY="127.0.0.1:5000"
 fi
 
 export SITE_INIT_MODE=$SITE_INIT_MODE

@@ -32,14 +32,14 @@ usage() {
   echo "Usage: $0 [OPTIONS]"
   echo ""
   echo "Options:"
-  echo "  -r, --registry REGISTRY    Docker registry URL (defaults to localhost:5000)"
+  echo "  -r, --registry REGISTRY    Docker registry URL (defaults to 127.0.0.1:5000)"
   echo "  -h, --help                 Show this help message"
   echo ""
   echo "Examples:"
-  echo "  $0                         # Build and push to localhost:5000"
+  echo "  $0                         # Build and push to 127.0.0.1:5000"
   echo "  $0 -r registry.example.com # Build and push to remote registry"
   echo ""
-  echo "Before using localhost:5000, start the registry with:"
+  echo "Before using 127.0.0.1:5000, start the registry with:"
   echo "  ./start_registry.sh"
   echo ""
   echo "Version:"
@@ -68,11 +68,11 @@ done
 
 # Default to localhost:5000 if not specified
 if [ -z "$REGISTRY" ]; then
-  REGISTRY="localhost:5000"
+  REGISTRY="127.0.0.1:5000"
 fi
 
 # Check if registry is available for localhost:5000
-if [ "$REGISTRY" = "localhost:5000" ]; then
+if [ "$REGISTRY" = "127.0.0.1:5000" ]; then
   if ! docker ps --filter "name=registry" --filter "status=running" -q | grep -q .; then
     echo "=========================================="
     echo "Error: Registry not running"
