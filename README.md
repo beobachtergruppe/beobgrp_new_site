@@ -11,10 +11,36 @@ This is a Wagtail-based web application. Wagtail is an open source CMS built on 
 A good entrypoint for getting to know wagtail better is this page: [Wagtail getting started](https://docs.wagtail.org/en/stable/getting_started/index.html)
 
 ## Table of Contents
+
 - [Development Setup (Linux)](#development-setup-linux)
+  - [Prerequisites](#prerequisites)
+  - [Database Configuration (Linux)](#database-configuration-linux)
+  - [Clone the Repository](#clone-the-repository)
+  - [Python Environment Setup](#python-environment-setup)
+  - [Database Setup](#database-setup)
+  - [Dart Sass Installation](#dart-sass-installation)
 - [Production Setup (Docker Compose)](#production-setup-docker-compose)
+  - [Overview](#overview)
+  - [Environment Variables](#environment-variables)
+  - [Version Management](#version-management)
+  - [Local Docker Registry](#local-docker-registry)
+  - [Building Images](#building-images)
+  - [Starting Instances](#starting-instances)
+  - [Typical Development Workflow](#typical-development-workflow)
+  - [Docker Registry Setup](#docker-registry-setup)
+  - [Access URLs](#access-urls)
+  - [Database and Media](#database-and-media)
+  - [Complete Workflow Example](#complete-workflow-example)
+  - [Backup and Restore Scripts](#backup-and-restore-scripts)
 - [Testing](#testing)
+  - [Prerequisites for Testing](#prerequisites-for-testing)
+  - [Running Tests](#running-tests)
 - [Type Checking](#type-checking)
+  - [Setup](#setup)
+  - [Running Type Checks](#running-type-checks)
+  - [Configuration](#configuration)
+  - [Type Annotations](#type-annotations)
+  - [Running All Quality Checks](#running-all-quality-checks)
 - [Windows/WSL Notes](#windowswsl-notes)
 - [License](#license)
 
@@ -23,6 +49,8 @@ A good entrypoint for getting to know wagtail better is this page: [Wagtail gett
 ## Development Setup (Linux)
 
 This project is primarily developed and tested on Linux. You can also try using Windows Subsystem for Linux (WSL), but it is not officially tested.
+
+This section describes how to setup a local development environment to run the website in debug mode and have realtime website updates, when code or CSS files are changed. Once your fixes are fine you can push your code and proceed with testing the production as described in the next section.
 
 ### Prerequisites
 
