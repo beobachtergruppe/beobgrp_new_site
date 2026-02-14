@@ -1,20 +1,23 @@
 volumes:
-  internal_postgres16: {}
-  internal_wagtail: {}
+  internal_postgres16_prod: {}
+  internal_postgres16_dev: {}
+  internal_wagtail_prod: {}
+  internal_wagtail_dev: {}
 
 services:
   wagtail:
-    image: beobgrp_site:1.2.2
-    build: .
+    image: ${DOCKER_REGISTRY:+$DOCKER_REGISTRY/}beobgrp_site:${VERSION_PROD}
     environment:
       WAGTAIL_DB_PASSWORD: ${WAGTAIL_DB_PASSWORD}
       PGPASSWORD: ${WAGTAIL_DB_PASSWORD}
       SITE_INIT_MODE: ${SITE_INIT_MODE:-"none"}
       SECRET_KEY: ${SECRET_KEY}
       DJANGO_SECURE_SSL_REDIRECT: ${DJANGO_SECURE_SSL_REDIRECT:-"false"}
+      WAGTAIL_PORT: 8000
+      WAGTAIL_DB_HOST: postgres
     volumes:
       - ${DJANGO_BACKUP_DIR}:/site_backup
-      - internal_wagtail:/media
+      - internal_wagtail_prod:/media
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:
@@ -22,7 +25,33 @@ services:
         condition: service_healthy
     restart: unless-stopped
     networks:
-      - wagtail_network
+      - wagtail_network_prod
+    profiles:
+      - prod
+
+  wagtail_dev:
+    image: ${DOCKER_REGISTRY:+$DOCKER_REGISTRY/}beobgrp_site:${VERSION_DEV}
+    environment:
+      WAGTAIL_DB_PASSWORD: ${WAGTAIL_DB_PASSWORD}
+      PGPASSWORD: ${WAGTAIL_DB_PASSWORD}
+      SITE_INIT_MODE: ${SITE_INIT_MODE:-"none"}
+      SECRET_KEY: ${SECRET_KEY}
+      DJANGO_SECURE_SSL_REDIRECT: "false"
+      WAGTAIL_PORT: 8001
+      WAGTAIL_DB_HOST: postgres_dev
+    volumes:
+      - ${DJANGO_BACKUP_DIR}:/site_backup
+      - internal_wagtail_dev:/media
+    ports:
+      - "127.0.0.1:8001:8001"
+    depends_on:
+      postgres_dev:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - wagtail_network_dev
+    profiles:
+      - dev
 
   postgres:
     image: postgres:16-alpine
@@ -38,10 +67,33 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - internal_postgres16:/var/lib/postgresql/data
+      - internal_postgres16_prod:/var/lib/postgresql/data
     networks:
-      - wagtail_network
+      - wagtail_network_prod
+    profiles:
+      - prod
+
+  postgres_dev:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: wagtail
+      POSTGRES_PASSWORD: ${WAGTAIL_DB_PASSWORD}
+      POSTGRES_DB: beobgrp_site
+    ports:
+      - "127.0.0.1:54321:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U wagtail" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - internal_postgres16_dev:/var/lib/postgresql/data
+    networks:
+      - wagtail_network_dev
+    profiles:
+      - dev
 
 networks:
-  wagtail_network:
+  wagtail_network_prod:
+  wagtail_network_dev:
 

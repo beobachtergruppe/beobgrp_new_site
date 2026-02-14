@@ -1,0 +1,5 @@
+# Docker image version
+# Update this when you want to build a new version
+# This version will be used for both dev and prod builds
+
+VERSION=1.2.3

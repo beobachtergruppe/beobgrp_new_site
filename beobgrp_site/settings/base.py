@@ -212,4 +212,6 @@ COMPRESS_PRECOMPILERS = (
 )
 
 COMPRESS_ENABLED = True
-COMPRESS_OFFLINE = os.environ.get("PRODUCTION_VERSION","false").lower() == "true"
+# In Docker containers, always use offline (pre-compiled) assets since sass is removed after build
+# Local development uses manage.py runserver, not Docker, so this doesn't affect local dev
+COMPRESS_OFFLINE = True

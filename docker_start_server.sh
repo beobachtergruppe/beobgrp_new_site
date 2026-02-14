@@ -18,7 +18,7 @@ case "$SITE_INIT_MODE" in
     python manage.py migrate --noinput
     ;;
   restore)
-    psql -h postgres -U wagtail -d beobgrp_site -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;" &&
+    psql -h ${WAGTAIL_DB_HOST} -U wagtail -d beobgrp_site -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;" &&
     python manage.py dbrestore --noinput --pg-options="--if-exists" &&
     python manage.py mediarestore --noinput &&
     python manage.py migrate --noinput
@@ -32,7 +32,7 @@ case "$SITE_INIT_MODE" in
 esac
 
 python manage.py clearsessions
-gunicorn beobgrp_site.wsgi:application
+gunicorn beobgrp_site.wsgi:application --bind 0.0.0.0:${WAGTAIL_PORT:-8000}
 '
 
 
