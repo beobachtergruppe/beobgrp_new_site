@@ -184,11 +184,18 @@ VERSION=1.2.2  # Example version
 
 Both development and production builds use this same version. Update this file when you want to build and deploy new versions.
 
-### Local Docker Registry
+### Local Docker Registry (Optional)
 
-For local development, use a persistent Docker registry to store built images.
+A Docker registry is **only needed if building and running on different machines**. For single-machine development and testing, you don't need a registry - Docker uses locally built images automatically.
 
-**Start the registry:**
+**When you need a registry:**
+- Building images on one machine and running on another
+- Sharing images across a team
+- Production CI/CD pipelines that push to remote registries
+
+**Optional local registry for testing multi-machine setups:**
+
+Start a local registry:
 ```bash
 ./start_registry.sh
 ```
@@ -198,23 +205,22 @@ This starts:
 - Web UI at `http://127.0.0.1:8080` (for browsing and deleting images)
 - Persistent storage at `~/.docker-registry`
 
-**Restart the registry:**
+Build and push to local registry:
 ```bash
+./build_and_push.sh -r 127.0.0.1:5000  # Build and push to local registry
+./start_website.sh migrate              # Docker pulls from local registry
+```
+
+**Manage local registry:**
+```bash
+# Restart the registry
 ./start_registry.sh --restart
-```
 
-**Stop the registry:**
-```bash
+# Stop the registry
 docker compose -f registry-docker-compose.yml down
-```
 
-**Manage images via CLI:**
-```bash
-# List all images
+# List images
 curl -s http://127.0.0.1:5000/v2/_catalog | jq '.repositories'
-
-# List all tags for an image
-curl -s http://127.0.0.1:5000/v2/beobgrp_site/tags/list | jq '.tags'
 
 # Delete an image tag
 curl -X DELETE http://127.0.0.1:5000/v2/beobgrp_site/manifests/1.2.1.dev
@@ -222,12 +228,7 @@ curl -X DELETE http://127.0.0.1:5000/v2/beobgrp_site/manifests/1.2.1.dev
 
 ### Building Images
 
-The `build_and_push.sh` script builds a Docker image and pushes it to a registry.
-
-**Prerequisites:**
-- Docker daemon running
-- Local registry running (`./start_registry.sh` for local development)
-- Git repository initialized
+The `build_and_push.sh` script builds a Docker image and optionally pushes it to a registry.
 
 **Git Branch-Based Versioning:**
 - **On `main` branch**: Builds version from VERSION file (e.g., `1.2.2`)
@@ -235,41 +236,50 @@ The `build_and_push.sh` script builds a Docker image and pushes it to a registry
 
 This ensures release versions can only be built from the main branch.
 
-**Building with local registry:**
+**For local development (build only, no registry needed):**
 ```bash
-./start_registry.sh        # Start registry first (if not running)
-./build_and_push.sh        # Build and push to 127.0.0.1:5000
+./build_and_push.sh        # Build image locally: beobgrp_site:1.2.2.dev
+./start_website.sh --version 1.2.2.dev migrate  # Run on same machine
 ```
 
-**Building for a remote registry:**
+**For production or remote servers (push to registry):**
 ```bash
-./build_and_push.sh -r registry.example.com
+./build_and_push.sh -r registry.example.com           # Build and push
+DOCKER_REGISTRY=registry.example.com ./start_website.sh migrate  # Pull and run on remote server
+```
+
+**Local registry (optional, for testing multi-machine setups):**
+```bash
+./start_registry.sh                     # Start local registry
+./build_and_push.sh -r 127.0.0.1:5000  # Build and push locally
+./start_website.sh migrate              # Run with local images
 ```
 
 **Example builds:**
 ```bash
-# On main branch
-./build_and_push.sh  # Builds: beobgrp_site:1.2.2
+# On main branch - builds as 1.2.2
+./build_and_push.sh  # Local: beobgrp_site:1.2.2
+-r registry.example.com  # Push to registry
 
-# On feature-xyz branch
-./build_and_push.sh  # Builds: beobgrp_site:1.2.2.dev
+# On feature-xyz branch - builds as 1.2.2.dev
+./build_and_push.sh  # Local: beobgrp_site:1.2.2.dev
 ```
 
 ### Starting Instances
 
-The `start_website.sh` script intelligently defaults based on your git branch:
+The `start_website.sh` script intelligently defaults based on your git branch and whether a registry is configured.
 
 **On main branch** (defaults to production):
 ```bash
-./start_website.sh migrate              # Start production server (port 8000)
-./start_website.sh --version 1.2.3      # Specific version
-./start_website.sh --dev --version 1.2.1.dev migrate  # Test dev server before deploying
+./start_website.sh migrate                                    # Start production server
+./start_website.sh --version 1.2.3 migrate                   # Specific version
+./start_website.sh --dev --version 1.2.1.dev migrate         # Test dev server before deploying
 ```
 
 **On feature branch** (defaults to development):
 ```bash
-./start_website.sh --version 1.2.1.dev migrate  # Required: .dev suffix
-./start_website.sh --version 1.2.1.dev         # Runs dev server on port 8001
+./start_website.sh --version 1.2.1.dev migrate   # Required: .dev suffix
+./start_website.sh --version 1.2.1.dev           # Runs dev server on port 8001
 ```
 
 **Important Constraints:**
@@ -279,29 +289,33 @@ The `start_website.sh` script intelligently defaults based on your git branch:
 - On main: `--prod` is default, `--dev` lets you test a version before production
 - On feature branch: `--dev` is default, `--prod` is not allowed
 
-**Setting custom registry:**
+**Using images from a remote registry:**
 ```bash
 export DOCKER_REGISTRY="registry.example.com"
-./start_website.sh migrate
+./start_website.sh migrate      # Pulls image from registry and runs it
 ```
 
+If `DOCKER_REGISTRY` is not set, Docker uses locally built images.
+
 ### Typical Development Workflow
+
+**Local testing (simplest case):**
 
 1. Create feature branch and make changes:
    ```bash
    git checkout -b feature-xyz
    ```
 
-2. Build dev image with `.dev` suffix (automatic):
+2. Build image locally:
    ```bash
    ./build_and_push.sh
    # Builds: beobgrp_site:1.2.2.dev
    ```
 
-3. Test in development Docker container (defaults to dev on feature branch):
+3. Test in development Docker container:
    ```bash
    ./start_website.sh --version 1.2.2.dev migrate
-   # Runs on port 8001
+   # Runs on port 8001 with locally built image
    ```
 
 4. Commit, test, merge to main:
@@ -310,27 +324,31 @@ export DOCKER_REGISTRY="registry.example.com"
    git merge feature-xyz
    ```
 
-5. Build release image (no `.dev` suffix):
+5. Build production image:
    ```bash
    ./build_and_push.sh
    # Builds: beobgrp_site:1.2.2
    ```
 
-6. Deploy to production (defaults to prod on main branch):
+6. Deploy to production:
    ```bash
    ./start_website.sh migrate
-   # Runs on port 8000
+   # Runs on port 8000 with locally built image
    ```
 
-**Optional: Test a version in dev mode before production**
+**With remote registry (for multi-server setup):**
 
-If you want to test a production version in the dev server before deploying:
-```bash
-git checkout main
-./build_and_push.sh           # Build version 1.2.2
-./start_website.sh --dev --version 1.2.2.dev migrate  # Test in dev mode
-./start_website.sh migrate    # Deploy to production when satisfied
-```
+1. Build and push to registry:
+   ```bash
+   ./build_and_push.sh -r registry.example.com
+   ```
+
+2. On remote server, pull and run:
+   ```bash
+   export DOCKER_REGISTRY="registry.example.com"
+   ./start_website.sh migrate
+   # Docker pulls image from registry and runs it
+   ```
 
 ### Docker Registry Setup
 

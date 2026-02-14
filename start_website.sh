@@ -129,8 +129,8 @@ else
 fi
 
 if [ -z "$DOCKER_REGISTRY" ]; then
-  echo "Warning: DOCKER_REGISTRY not set, using 127.0.0.1:5000"
-  export DOCKER_REGISTRY="127.0.0.1:5000"
+  echo "Note: Using local Docker images (DOCKER_REGISTRY not set)"
+  export DOCKER_REGISTRY=""
 fi
 
 export SITE_INIT_MODE=$SITE_INIT_MODE

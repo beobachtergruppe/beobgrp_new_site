@@ -6,7 +6,7 @@ volumes:
 
 services:
   wagtail:
-    image: ${DOCKER_REGISTRY:-127.0.0.1:5000}/beobgrp_site:${VERSION_PROD}
+    image: ${DOCKER_REGISTRY:+$DOCKER_REGISTRY/}beobgrp_site:${VERSION_PROD}
     environment:
       WAGTAIL_DB_PASSWORD: ${WAGTAIL_DB_PASSWORD}
       PGPASSWORD: ${WAGTAIL_DB_PASSWORD}
@@ -30,7 +30,7 @@ services:
       - prod
 
   wagtail_dev:
-    image: ${DOCKER_REGISTRY:-127.0.0.1:5000}/beobgrp_site:${VERSION_DEV}
+    image: ${DOCKER_REGISTRY:+$DOCKER_REGISTRY/}beobgrp_site:${VERSION_DEV}
     environment:
       WAGTAIL_DB_PASSWORD: ${WAGTAIL_DB_PASSWORD}
       PGPASSWORD: ${WAGTAIL_DB_PASSWORD}
