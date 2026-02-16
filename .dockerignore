@@ -43,6 +43,28 @@ wheels/
 
 # Ignore Docker related files
 Dockerfile
+docker-compose.yml
+registry-docker-compose.yml
+registry-nginx.conf
+
+# Ignore server and development scripts
+build_and_push.sh
+grant_test_db_permission.sh
+restore.sh
+run_checks.sh
+server_backup.sh
+start_registry.sh
+start_website.sh
+
+# Ignore development configuration
+apache_config/
+development_files/
+docs/
+
+# Ignore type checking tools and configuration
+mypy.ini
+mypy-requirements.txt
+.mypy_cache/
 
 # Ignore temporary files
 tmp*

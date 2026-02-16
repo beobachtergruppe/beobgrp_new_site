@@ -27,6 +27,7 @@ ALLOWED_HOSTS = [
 CSRF_TRUSTED_ORIGINS = [
     f"https://{allowed_host}",
     "https://www.beobachtergruppe.de",  # Include the www version for compatibility
+    "https://testwww.beobachtergruppe.de"  # Include the testwww version for testing
 ]
 
 # In production, these should all be True. For local testing over HTTP, they can be disabled.
