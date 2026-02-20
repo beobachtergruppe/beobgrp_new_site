@@ -200,5 +200,9 @@ blocks_for_event_body.append(("event_list", EventListBlock()))  # type: ignore
 class EventPage(CommonContextMixin,Page):
     body = StreamField([
         *blocks_for_event_body,
-        ("multi_column", create_multi_column_block(content_blocks=blocks_for_event_body)),
+        ("multi_column", create_multi_column_block(content_blocks=blocks_for_event_body)()),
     ], default=[])
+
+    content_panels = Page.content_panels + [FieldPanel("body", heading="Inhalt")]
+
+    subpage_types = ["home.SingleEvent","home.EventPage", "home.GalleryPage"]

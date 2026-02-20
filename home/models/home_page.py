@@ -9,7 +9,7 @@ from wagtail.models import Page
 class HomePage(CommonContextMixin,Page):
     body = StreamField([
         *gen_body_content,
-        ("multi_column", create_multi_column_block(content_blocks=gen_body_content)),
+        ("multi_column", create_multi_column_block(content_blocks=gen_body_content)()),
     ], default=[])
     content_panels = Page.content_panels + [FieldPanel("body", heading="Inhalt")]
 

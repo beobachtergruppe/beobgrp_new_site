@@ -128,9 +128,9 @@ class ImageWithCaptionBlock(StructBlock):
 
 def create_multi_column_block(content_blocks=None):
     """
-    Factory function to create a MultiColumnBlock with configurable content blocks.
+    Factory function to create a MultiColumnBlock class with configurable content blocks.
     
-    This function returns a StructBlock that allows nesting multiple blocks in a 
+    This function returns a StructBlock class that allows nesting multiple blocks in a 
     configurable multi-column layout. Content blocks can be arranged in 1, 2, 4, or 8 columns.
     
     Args:
@@ -138,10 +138,10 @@ def create_multi_column_block(content_blocks=None):
                        If None, will use a minimal set of basic blocks.
     
     Returns:
-        A configured MultiColumnBlock (StructBlock) instance
+        A configured MultiColumnBlock StructBlock class (not an instance)
         
     Example usage:
-        create_multi_column_block(content_blocks=gen_body_content)
+        MultiColumnBlockClass = create_multi_column_block(content_blocks=gen_body_content)
     """
     if content_blocks is None:
         # Fallback to basic blocks if none provided
@@ -169,7 +169,7 @@ def create_multi_column_block(content_blocks=None):
             label = "Multi-Spalten-Layout"
             template = "blocks/multi_column_block.html"
     
-    return MultiColumnBlock()
+    return MultiColumnBlock
 
 
 gen_body_content: list[Tuple[str, Block]] = [
