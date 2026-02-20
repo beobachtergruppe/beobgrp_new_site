@@ -2,7 +2,6 @@
 Simple tests for HomePage model
 """
 from django.test import TestCase
-from wagtail.models import Page
 from wagtail.rich_text import RichText
 
 from home.models import HomePage

@@ -20,14 +20,12 @@ from copy import deepcopy
 from django.db.models import TextChoices
 from django.utils.timezone import localtime, now
 from wagtail.admin.forms.pages import WagtailAdminPageForm
-from wagtail.admin.panels.field_panel import FieldPanel
 from wagtail.blocks.field_block import MultipleChoiceBlock
 from wagtail.blocks.struct_block import StructBlock
 from wagtail.fields import StreamField
-from wagtail.models import Page
 
 
-from home.models.common import CommonContextMixin, gen_body_content
+from home.models.common import CommonContextMixin, gen_body_content, create_multi_column_block
 
 logger = logging.getLogger(__name__)
 
@@ -200,8 +198,7 @@ blocks_for_event_body.append(("event_list", EventListBlock()))  # type: ignore
 
 
 class EventPage(CommonContextMixin,Page):
-    body = StreamField(blocks_for_event_body, default=[])
-
-    content_panels = Page.content_panels + [FieldPanel("body", heading="Inhalt")]
-    
-    subpage_types = ["home.SingleEvent","home.EventPage", "home.GalleryPage"]
+    body = StreamField([
+        *blocks_for_event_body,
+        ("multi_column", create_multi_column_block(content_blocks=blocks_for_event_body)),
+    ], default=[])

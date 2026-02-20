@@ -2,8 +2,6 @@
 Simplified tests for common blocks
 """
 from django.test import TestCase
-from django.core.exceptions import ValidationError
-from wagtail.rich_text import RichText
 
 from home.models.common import LinkBlock, ImageWithCaptionBlock
 

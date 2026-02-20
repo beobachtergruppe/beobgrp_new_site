@@ -1,9 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Tuple
-import re
 
-from wagtail.blocks import Block
-from wagtail.blocks.field_block import RichTextBlock, CharBlock, FieldBlock, URLBlock, ChoiceBlock
+from wagtail.blocks import Block, StreamBlock
+from wagtail.blocks.field_block import RichTextBlock, CharBlock, URLBlock, ChoiceBlock
 from wagtail.blocks.struct_block import StructBlock, StructBlockValidationError
 from django.core.exceptions import ValidationError
 from wagtail.images.blocks import ImageChooserBlock
@@ -125,6 +124,52 @@ class ImageWithCaptionBlock(StructBlock):
         icon = "image"
         label = "Bild mit Bildunterschrift"
         template = "blocks/image_with_caption.html"
+
+
+def create_multi_column_block(content_blocks=None):
+    """
+    Factory function to create a MultiColumnBlock with configurable content blocks.
+    
+    This function returns a StructBlock that allows nesting multiple blocks in a 
+    configurable multi-column layout. Content blocks can be arranged in 1, 2, 4, or 8 columns.
+    
+    Args:
+        content_blocks: A list of (name, block) tuples, like gen_body_content.
+                       If None, will use a minimal set of basic blocks.
+    
+    Returns:
+        A configured MultiColumnBlock (StructBlock) instance
+        
+    Example usage:
+        create_multi_column_block(content_blocks=gen_body_content)
+    """
+    if content_blocks is None:
+        # Fallback to basic blocks if none provided
+        content_blocks = [
+            ("paragraph", RichTextBlock(features=['bold', 'italic', 'link'])),
+            ("image", ImageChooserBlock()),
+        ]
+    
+    class MultiColumnBlock(StructBlock):
+        max_columns = ChoiceBlock(
+            choices=[
+                ('1', '1 Spalte'),
+                ('2', '2 Spalten'),
+                ('4', '4 Spalten'),
+                ('8', '8 Spalten'),
+            ],
+            default='1',
+            label="Maximale Anzahl von Spalten",
+            help_text="Die Anzahl der Spalten für das Layout"
+        )
+        content = StreamBlock(content_blocks, label='Inhalt')
+        
+        class Meta: # type: ignore[misc]
+            icon = "columns"
+            label = "Multi-Spalten-Layout"
+            template = "blocks/multi_column_block.html"
+    
+    return MultiColumnBlock()
 
 
 gen_body_content: list[Tuple[str, Block]] = [

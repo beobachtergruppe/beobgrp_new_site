@@ -1,0 +1,23 @@
+{% load wagtailcore_tags %}
+
+<div class="columns is-mobile is-multiline">
+    {% for item in value.content %}
+        {% if value.max_columns == "1" %}
+            <div class="column is-full">
+                {% include_block item %}
+            </div>
+        {% elif value.max_columns == "2" %}
+            <div class="column is-full is-half-desktop">
+                {% include_block item %}
+            </div>
+        {% elif value.max_columns == "4" %}
+            <div class="column is-full is-half-tablet is-one-quarter-desktop">
+                {% include_block item %}
+            </div>
+        {% elif value.max_columns == "8" %}
+            <div class="column is-full is-half-tablet is-one-quarter-desktop is-one-eighth-widescreen">
+                {% include_block item %}
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>

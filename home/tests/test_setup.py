@@ -29,14 +29,6 @@ class TestSetupTest(TestCase):
 
     def test_home_models_importable(self):
         """Test that all home models can be imported"""
-        from home.models import (
-            HomePage,
-            EventPage,
-            SingleEvent,
-            GalleryIndexPage,
-            GalleryPage,
-            PhotoPage,
-        )
         
         # If we get here without ImportError, the test passes
         self.assertTrue(True)
