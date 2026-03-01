@@ -535,3 +535,7 @@ $title-bottom-padding: 0.2em;
   }
 }
 
+// Multi-column layout styles - only gap styling, column widths use Bulma classes
+.multi-column-layout {
+  gap: 1.5rem;
+}

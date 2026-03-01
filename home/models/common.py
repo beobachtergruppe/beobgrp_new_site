@@ -155,8 +155,7 @@ def create_multi_column_block(content_blocks=None):
             choices=[
                 ('1', '1 Spalte'),
                 ('2', '2 Spalten'),
-                ('4', '4 Spalten'),
-                ('8', '8 Spalten'),
+                ('4', '4 Spalten')
             ],
             default='1',
             label="Maximale Anzahl von Spalten",
