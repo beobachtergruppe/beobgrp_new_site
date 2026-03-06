@@ -171,6 +171,16 @@ def create_multi_column_block(content_blocks=None):
             label="Minimale Anzahl von Spalten",
             help_text="Die Mindestanzahl von Spalten auch auf mobilen Geräten"
         )
+        width = ChoiceBlock(
+            choices=[
+                ('full', 'Volle Breite'),
+                ('half', '1/2 Breite (auf Desktop)'),
+                ('quarter', '1/4 Breite (auf Desktop)'),
+            ],
+            default='full',
+            label="Breite des Blocks",
+            help_text="Auf mobilen Geräten wird immer die volle Breite verwendet"
+        )
         content = StreamBlock(content_blocks, label='Inhalt')
         
         def clean(self, value):

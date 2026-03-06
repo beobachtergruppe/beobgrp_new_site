@@ -1,35 +1,23 @@
 {% load wagtailcore_tags %}
 
-<div class="columns is-mobile is-multiline">
-    {% for item in value.content %}
-        {% if value.max_columns == "1" %}
-            <div class="column is-full-mobile">
-                {% include_block item %}
+{% if value.width == "half" %}
+    <div class="columns is-mobile is-multiline">
+        <div class="column is-full-mobile is-half-tablet is-half-desktop">
+            <div class="columns is-mobile is-multiline">
+                {% include "blocks/multi_column_content.html" %}
             </div>
-        {% elif value.max_columns == "2" %}
-            {% if value.min_columns == "2" %}
-                <div class="column is-half-mobile is-half-tablet">
-                    {% include_block item %}
-                </div>
-            {% else %}
-                <div class="column is-full-mobile is-half-tablet">
-                    {% include_block item %}
-                </div>
-            {% endif %}
-        {% elif value.max_columns == "4" %}
-            {% if value.min_columns == "4" %}
-                <div class="column is-one-quarter-mobile is-one-quarter-tablet is-one-quarter-desktop">
-                    {% include_block item %}
-                </div>
-            {% elif value.min_columns == "2" %}
-                <div class="column is-half-mobile is-half-tablet is-one-quarter-desktop">
-                    {% include_block item %}
-                </div>
-            {% else %}
-                <div class="column is-full-mobile is-half-tablet is-one-quarter-desktop">
-                    {% include_block item %}
-                </div>
-            {% endif %}
-        {% endif %}
-    {% endfor %}
-</div>
+        </div>
+    </div>
+{% elif value.width == "quarter" %}
+    <div class="columns is-mobile is-multiline">
+        <div class="column is-full-mobile is-one-quarter-tablet is-one-quarter-desktop">
+            <div class="columns is-mobile is-multiline">
+                {% include "blocks/multi_column_content.html" %}
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="columns is-mobile is-multiline">
+        {% include "blocks/multi_column_content.html" %}
+    </div>
+{% endif %}
