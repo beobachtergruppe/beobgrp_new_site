@@ -7,13 +7,29 @@
                 {% include_block item %}
             </div>
         {% elif value.max_columns == "2" %}
-            <div class="column is-full-mobile is-half-tablet">
-                {% include_block item %}
-            </div>
+            {% if value.min_columns == "2" %}
+                <div class="column is-half-mobile is-half-tablet">
+                    {% include_block item %}
+                </div>
+            {% else %}
+                <div class="column is-full-mobile is-half-tablet">
+                    {% include_block item %}
+                </div>
+            {% endif %}
         {% elif value.max_columns == "4" %}
-            <div class="column is-full-mobile is-half-tablet is-one-quarter-desktop">
-                {% include_block item %}
-            </div>
+            {% if value.min_columns == "4" %}
+                <div class="column is-one-quarter-mobile is-one-quarter-tablet is-one-quarter-desktop">
+                    {% include_block item %}
+                </div>
+            {% elif value.min_columns == "2" %}
+                <div class="column is-half-mobile is-half-tablet is-one-quarter-desktop">
+                    {% include_block item %}
+                </div>
+            {% else %}
+                <div class="column is-full-mobile is-half-tablet is-one-quarter-desktop">
+                    {% include_block item %}
+                </div>
+            {% endif %}
         {% endif %}
     {% endfor %}
 </div>

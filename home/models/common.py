@@ -161,7 +161,44 @@ def create_multi_column_block(content_blocks=None):
             label="Maximale Anzahl von Spalten",
             help_text="Die Anzahl der Spalten für das Layout"
         )
+        min_columns = ChoiceBlock(
+            choices=[
+                ('1', '1 Spalte'),
+                ('2', '2 Spalten'),
+                ('4', '4 Spalten')
+            ],
+            default='1',
+            label="Minimale Anzahl von Spalten",
+            help_text="Die Mindestanzahl von Spalten auch auf mobilen Geräten"
+        )
         content = StreamBlock(content_blocks, label='Inhalt')
+        
+        def clean(self, value):
+            """
+            Validate that min_columns is not greater than max_columns.
+            """
+            errors = {}
+            
+            if isinstance(value, dict):
+                min_cols = value.get('min_columns')
+                max_cols = value.get('max_columns')
+                
+                # Convert string values to integers for comparison
+                try:
+                    min_val = int(min_cols) if min_cols else 1
+                    max_val = int(max_cols) if max_cols else 1
+                    
+                    if min_val > max_val:
+                        errors['min_columns'] = ValidationError(
+                            'Die minimale Anzahl von Spalten kann nicht größer als die maximale Anzahl sein.'
+                        )
+                except (ValueError, TypeError):
+                    pass
+            
+            if errors:
+                raise StructBlockValidationError(errors)
+            
+            return super().clean(value)
         
         class Meta: # type: ignore[misc]
             icon = "columns"
