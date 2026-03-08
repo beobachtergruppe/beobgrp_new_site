@@ -19,5 +19,8 @@
   "homepage": "https://github.com/beobachtergruppe/beobgrp_new_site#readme",
   "dependencies": {
     "bulma": "^1.0.4"
+  },
+  "devDependencies": {
+    "sass": "^1.97.3"
   }
 }

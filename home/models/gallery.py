@@ -1,4 +1,3 @@
-from typing import cast
 from django.db import models
 from django.db.models.fields import DateField, CharField, TimeField
 from wagtail.models import Page
