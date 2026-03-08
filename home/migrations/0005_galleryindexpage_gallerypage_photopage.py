@@ -6,51 +6,109 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('home', '0004_singleevent_needs_reservation_alter_eventpage_body_and_more'),
-        ('wagtailcore', '0094_alter_page_locale'),
-        ('wagtailimages', '0027_image_description'),
+        ("home", "0004_singleevent_needs_reservation_alter_eventpage_body_and_more"),
+        ("wagtailcore", "0094_alter_page_locale"),
+        ("wagtailimages", "0027_image_description"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='GalleryIndexPage',
+            name="GalleryIndexPage",
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('description', wagtail.fields.RichTextField(default='', max_length=800)),
+                (
+                    "page_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="wagtailcore.page",
+                    ),
+                ),
+                (
+                    "description",
+                    wagtail.fields.RichTextField(default="", max_length=800),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
-            bases=('wagtailcore.page',),
+            bases=("wagtailcore.page",),
         ),
         migrations.CreateModel(
-            name='GalleryPage',
+            name="GalleryPage",
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('description', wagtail.fields.RichTextField(default='', max_length=800)),
-                ('cover_image', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='wagtailimages.image')),
+                (
+                    "page_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="wagtailcore.page",
+                    ),
+                ),
+                (
+                    "description",
+                    wagtail.fields.RichTextField(default="", max_length=800),
+                ),
+                (
+                    "cover_image",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to="wagtailimages.image",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
-            bases=('wagtailcore.page',),
+            bases=("wagtailcore.page",),
         ),
         migrations.CreateModel(
-            name='PhotoPage',
+            name="PhotoPage",
             fields=[
-                ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.page')),
-                ('description', wagtail.fields.RichTextField(blank=True, default='', max_length=800)),
-                ('author', models.CharField(blank=True, default='', max_length=120)),
-                ('date', models.DateField()),
-                ('time', models.TimeField(blank=True, null=True)),
-                ('location', models.CharField(blank=True, default='', max_length=255)),
-                ('photo', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='wagtailimages.image')),
+                (
+                    "page_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="wagtailcore.page",
+                    ),
+                ),
+                (
+                    "description",
+                    wagtail.fields.RichTextField(
+                        blank=True, default="", max_length=800
+                    ),
+                ),
+                ("author", models.CharField(blank=True, default="", max_length=120)),
+                ("date", models.DateField()),
+                ("time", models.TimeField(blank=True, null=True)),
+                ("location", models.CharField(blank=True, default="", max_length=255)),
+                (
+                    "photo",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to="wagtailimages.image",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
-            bases=('wagtailcore.page',),
+            bases=("wagtailcore.page",),
         ),
     ]

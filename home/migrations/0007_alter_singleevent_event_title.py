@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('home', '0006_alter_singleevent_image'),
+        ("home", "0006_alter_singleevent_image"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='singleevent',
-            name='event_title',
-            field=models.CharField(default='', max_length=140),
+            model_name="singleevent",
+            name="event_title",
+            field=models.CharField(default="", max_length=140),
         ),
     ]

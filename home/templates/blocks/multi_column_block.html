@@ -1,0 +1,23 @@
+{% load wagtailcore_tags %}
+
+{% if value.width == "half" %}
+    <div class="columns is-mobile is-multiline">
+        <div class="column is-full-mobile is-half-tablet is-half-desktop">
+            <div class="columns is-mobile is-multiline">
+                {% include "blocks/multi_column_content.html" %}
+            </div>
+        </div>
+    </div>
+{% elif value.width == "quarter" %}
+    <div class="columns is-mobile is-multiline">
+        <div class="column is-full-mobile is-one-quarter-tablet is-one-quarter-desktop">
+            <div class="columns is-mobile is-multiline">
+                {% include "blocks/multi_column_content.html" %}
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="columns is-mobile is-multiline">
+        {% include "blocks/multi_column_content.html" %}
+    </div>
+{% endif %}

@@ -14,7 +14,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("PRODUCTION_VERSION","false").lower() != "true"
+DEBUG = os.environ.get("PRODUCTION_VERSION", "false").lower() != "true"
 
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
@@ -26,24 +26,24 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 # Logging
 
 LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'console': {
-                'class': 'logging.StreamHandler',
-            },
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
         },
-        'loggers': {
-            'django': {
-                'handlers': ['console'],
-                'level': 'INFO',  # Or 'INFO', 'WARNING', etc.
-            },
-            'compressor': { #for debugging compressor
-                'handlers': ['console'],
-                'level': 'DEBUG',
-            }
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",  # Or 'INFO', 'WARNING', etc.
         },
-    }
+        "compressor": {  # for debugging compressor
+            "handlers": ["console"],
+            "level": "DEBUG",
+        },
+    },
+}
 
 # Application definition
 
@@ -73,7 +73,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.postgres",
     "dbbackup",
-    "compressor"
+    "compressor",
 ]
 
 MIDDLEWARE = [
@@ -103,8 +103,8 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-            ]   
-        }
+            ]
+        },
     }
 ]
 
@@ -115,13 +115,15 @@ WSGI_APPLICATION = "beobgrp_site.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'beobgrp_site',
-        'USER': 'wagtail',
-        'PASSWORD': os.environ.get('WAGTAIL_DB_PASSWORD',''),
-        'HOST': os.environ.get('WAGTAIL_DB_HOST','localhost'),  # or use IP address of the host
-        'PORT': '5432'
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "beobgrp_site",
+        "USER": "wagtail",
+        "PASSWORD": os.environ.get("WAGTAIL_DB_PASSWORD", ""),
+        "HOST": os.environ.get(
+            "WAGTAIL_DB_HOST", "localhost"
+        ),  # or use IP address of the host
+        "PORT": "5432",
     }
 }
 
@@ -160,7 +162,7 @@ USE_TZ = True
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-    'compressor.finders.CompressorFinder'
+    "compressor.finders.CompressorFinder",
 ]
 
 STATIC_ROOT = os.environ.get("DJANGO_STATIC_ROOT", os.path.join(BASE_DIR, "static"))
@@ -176,17 +178,19 @@ STORAGES = {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+        if not DEBUG
+        else "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
     "dbbackup": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
         "OPTIONS": {
             "location": os.environ.get("DJANGO_BACKUP_DIR", "../beobgrp_site_backup")
-        }
-    }
+        },
+    },
 }
 
-# Configure Whitenoise 
+# Configure Whitenoise
 WHITENOISE_USE_FINDERS = True
 WHITENOISE_AUTOREFRESH = DEBUG
 
@@ -206,13 +210,15 @@ WAGTAILSEARCH_BACKENDS = {
 # e.g. in notification emails. Don't include '/admin' or a trailing slash
 WAGTAILADMIN_BASE_URL = "https://beobachtergruppe.de"
 
-SASS_LOAD_PATH = os.environ.get("SASS_LOAD_PATH", os.path.join(BASE_DIR,'node_modules'))
+SASS_LOAD_PATH = os.environ.get(
+    "SASS_LOAD_PATH", os.path.join(BASE_DIR, "node_modules")
+)
 
 COMPRESS_PRECOMPILERS = (
-    ('text/x-scss', f'sass -q --load-path {SASS_LOAD_PATH} '+'{infile}'),
+    ("text/x-scss", f"sass -q --load-path {SASS_LOAD_PATH} " + "{infile}"),
 )
 
 COMPRESS_ENABLED = True
-# In Docker containers, always use offline (pre-compiled) assets since sass is removed after build
-# Local development uses manage.py runserver, not Docker, so this doesn't affect local dev
-COMPRESS_OFFLINE = True
+# In development (DEBUG=True), use online compression so SCSS compiles automatically
+# In production, use offline (pre-compiled) assets
+COMPRESS_OFFLINE = not DEBUG

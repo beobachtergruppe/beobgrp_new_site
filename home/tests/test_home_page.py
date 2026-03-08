@@ -1,8 +1,8 @@
 """
 Simple tests for HomePage model
 """
+
 from django.test import TestCase
-from wagtail.models import Page
 from wagtail.rich_text import RichText
 
 from home.models import HomePage
@@ -24,7 +24,7 @@ class HomePageSimpleTests(TestCase):
     def test_homepage_has_body_field(self):
         """Test that HomePage has a body field"""
         home_page = HomePage(title="Test", slug="test")
-        self.assertTrue(hasattr(home_page, 'body'))
+        self.assertTrue(hasattr(home_page, "body"))
 
     def test_homepage_body_can_accept_content(self):
         """Test that HomePage body can accept StreamField content"""

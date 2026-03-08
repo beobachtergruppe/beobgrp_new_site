@@ -13,7 +13,6 @@ def set_image_to_null(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("home", "0005_galleryindexpage_gallerypage_photopage"),
         ("wagtailimages", "0027_image_description"),
@@ -29,11 +28,9 @@ class Migration(migrations.Migration):
                 max_length=255, null=True, blank=True
             ),  # Assuming it was CharField for paths
         ),
-
         # Step 2: Run a Python function to clear the existing 'image' data
         # This will now succeed because the field allows NULL
         migrations.RunPython(set_image_to_null, migrations.RunPython.noop),
-        
         # Step 3: Alter the field type to ForeignKey (this will now work as the column is clean and allows NULL)
         migrations.AlterField(
             model_name="singleevent",
@@ -45,5 +42,5 @@ class Migration(migrations.Migration):
                 related_name="+",
                 to="wagtailimages.image",
             ),
-        )
+        ),
     ]

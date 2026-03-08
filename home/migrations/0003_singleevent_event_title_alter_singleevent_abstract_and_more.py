@@ -5,30 +5,29 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('home', '0002_alter_eventpage_body_alter_homepage_body'),
+        ("home", "0002_alter_eventpage_body_alter_homepage_body"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='singleevent',
-            name='event_title',
-            field=models.CharField(default='', max_length=100),
+            model_name="singleevent",
+            name="event_title",
+            field=models.CharField(default="", max_length=100),
         ),
         migrations.AlterField(
-            model_name='singleevent',
-            name='abstract',
+            model_name="singleevent",
+            name="abstract",
             field=wagtail.fields.RichTextField(max_length=800),
         ),
         migrations.AlterField(
-            model_name='singleevent',
-            name='location',
-            field=models.CharField(default='Deutsches Museum', max_length=120),
+            model_name="singleevent",
+            name="location",
+            field=models.CharField(default="Deutsches Museum", max_length=120),
         ),
         migrations.AlterField(
-            model_name='singleevent',
-            name='referent',
+            model_name="singleevent",
+            name="referent",
             field=models.CharField(max_length=120),
         ),
     ]

@@ -20,14 +20,16 @@ from copy import deepcopy
 from django.db.models import TextChoices
 from django.utils.timezone import localtime, now
 from wagtail.admin.forms.pages import WagtailAdminPageForm
-from wagtail.admin.panels.field_panel import FieldPanel
 from wagtail.blocks.field_block import MultipleChoiceBlock
 from wagtail.blocks.struct_block import StructBlock
 from wagtail.fields import StreamField
-from wagtail.models import Page
 
 
-from home.models.common import CommonContextMixin, gen_body_content
+from home.models.common import (
+    CommonContextMixin,
+    gen_body_content,
+    create_multi_column_block,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +43,6 @@ class EventTypes(TextChoices):
 
 
 class SingleEventForm(WagtailAdminPageForm):
-
     def clean(self):
         if not self.data.get("title"):
             self.data = self.data.copy()
@@ -121,7 +122,7 @@ class SingleEvent(Page):
         if self.cancelled or self.booked_out:
             return "not-available"
         return ""
-    
+
     @cached_property
     def status(self) -> str:
         if self.cancelled:
@@ -178,9 +179,11 @@ class EventListBlock(StructBlock):
             event_types = value.get("event_type")
             if isinstance(event_types, str):
                 event_types = [event_types]
-                
-            events_qs = SingleEvent.objects.child_of(parent_page).live().filter(
-                start_time__gte=now()
+
+            events_qs = (
+                SingleEvent.objects.child_of(parent_page)
+                .live()
+                .filter(start_time__gte=now())
             )
             if event_types:
                 events_qs = events_qs.filter(event_type__in=event_types)
@@ -199,9 +202,18 @@ blocks_for_event_body = deepcopy(gen_body_content)
 blocks_for_event_body.append(("event_list", EventListBlock()))  # type: ignore
 
 
-class EventPage(CommonContextMixin,Page):
-    body = StreamField(blocks_for_event_body, default=[])
+class EventPage(CommonContextMixin, Page):
+    body = StreamField(
+        [
+            *blocks_for_event_body,
+            (
+                "multi_column",
+                create_multi_column_block(content_blocks=blocks_for_event_body)(),
+            ),
+        ],
+        default=[],
+    )
 
     content_panels = Page.content_panels + [FieldPanel("body", heading="Inhalt")]
-    
-    subpage_types = ["home.SingleEvent","home.EventPage", "home.GalleryPage"]
+
+    subpage_types = ["home.SingleEvent", "home.EventPage", "home.GalleryPage"]
