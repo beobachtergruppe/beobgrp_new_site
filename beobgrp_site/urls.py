@@ -1,4 +1,3 @@
-
 from django.conf import settings
 from django.urls import include, path, re_path
 from django.contrib import admin
@@ -20,7 +19,7 @@ urlpatterns = [
 # Add media serving pattern for production
 if not settings.DEBUG:
     urlpatterns.append(
-        re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT})
+        re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT})
     )
 
 from django.conf.urls.static import static

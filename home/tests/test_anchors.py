@@ -1,6 +1,7 @@
 """
 Tests for anchor link functionality
 """
+
 from django.test import TestCase
 from wagtail.models import Page
 from wagtail.rich_text import RichText
@@ -67,7 +68,7 @@ class PageAnchorExtractionTests(TestCase):
             title="Test Home",
             slug="test-home",
         )
-        self.assertTrue(hasattr(home, 'get_anchors'))
+        self.assertTrue(hasattr(home, "get_anchors"))
         self.assertTrue(callable(home.get_anchors))
 
     def test_get_anchors_with_headings(self):
@@ -82,12 +83,12 @@ class PageAnchorExtractionTests(TestCase):
             ("paragraph", RichText("<p>Some text</p>")),
             ("h3", "Contact"),
         ]
-        
+
         anchors = home.get_anchors()
-        
+
         # Should have 3 anchors (h1, h2, h3)
         self.assertEqual(len(anchors), 3)
-        
+
         # Check anchor format: list of tuples (anchor_id, text)
         self.assertEqual(anchors[0], ("block-welcome", "Welcome"))
         self.assertEqual(anchors[1], ("block-about-us", "About Us"))
@@ -103,9 +104,9 @@ class PageAnchorExtractionTests(TestCase):
             ("paragraph", RichText("<p>Just a paragraph</p>")),
             ("paragraph", RichText("<p>Another paragraph</p>")),
         ]
-        
+
         anchors = home.get_anchors()
-        
+
         # Should have no anchors
         self.assertEqual(len(anchors), 0)
 
@@ -116,9 +117,9 @@ class PageAnchorExtractionTests(TestCase):
             slug="test-home",
         )
         home.body = []
-        
+
         anchors = home.get_anchors()
-        
+
         # Should have no anchors
         self.assertEqual(len(anchors), 0)
 
@@ -128,17 +129,17 @@ class PageAnchorExtractionTests(TestCase):
             title="Test Events",
             slug="test-events",
         )
-        
+
         # EventPage should also have get_anchors method (from CommonContextMixin)
-        self.assertTrue(hasattr(event_page, 'get_anchors'))
-        
+        self.assertTrue(hasattr(event_page, "get_anchors"))
+
         event_page.body = [
             ("h1", "Upcoming Events"),
             ("h2", "Past Events"),
         ]
-        
+
         anchors = event_page.get_anchors()
-        
+
         self.assertEqual(len(anchors), 2)
         self.assertEqual(anchors[0], ("block-upcoming-events", "Upcoming Events"))
         self.assertEqual(anchors[1], ("block-past-events", "Past Events"))
@@ -153,9 +154,9 @@ class PageAnchorExtractionTests(TestCase):
             ("h1", "Welcome"),
             ("h2", "Welcome"),
         ]
-        
+
         anchors = home.get_anchors()
-        
+
         # Both should have the same anchor ID (slugify produces same result)
         self.assertEqual(len(anchors), 2)
         self.assertEqual(anchors[0][0], "block-welcome")
@@ -172,9 +173,9 @@ class PageAnchorExtractionTests(TestCase):
         home.body = [
             ("h1", original_text),
         ]
-        
+
         anchors = home.get_anchors()
-        
+
         # Text should be preserved as-is, only ID is slugified
         self.assertEqual(len(anchors), 1)
         self.assertEqual(anchors[0][1], original_text)
