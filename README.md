@@ -26,6 +26,7 @@ A good entrypoint for getting to know wagtail better is this page: [Wagtail gett
   - [Local Docker Registry](#local-docker-registry)
   - [Building Images](#building-images)
   - [Starting Instances](#starting-instances)
+  - [Stopping Instances](#stopping-instances)
   - [Typical Development Workflow](#typical-development-workflow)
   - [Docker Registry Setup](#docker-registry-setup)
   - [Access URLs](#access-urls)
@@ -296,6 +297,27 @@ export DOCKER_REGISTRY="registry.example.com"
 ```
 
 If `DOCKER_REGISTRY` is not set, Docker uses locally built images.
+
+### Stopping Instances
+
+The `stop_website.sh` script stops the running production or development server using the same profile system as `start_website.sh`.
+
+**Stop production server** (main branch only):
+```bash
+./stop_website.sh --prod
+```
+
+**Stop development server:**
+```bash
+./stop_website.sh --dev
+```
+
+**Important Constraints:**
+- **--dev and --prod are mutually exclusive** - cannot use both together
+- **One flag is required** - must specify either `--dev` or `--prod`
+- **Production only available on main branch** - attempting `--prod` on a feature branch will fail
+
+The script uses Docker Compose's `down` command to cleanly stop the containers for the specified profile.
 
 ### Typical Development Workflow
 
