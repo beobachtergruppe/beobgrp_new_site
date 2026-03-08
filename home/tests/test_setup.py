@@ -2,6 +2,7 @@
 Simple integration test to verify the test setup works.
 This test can be run to ensure the testing infrastructure is properly configured.
 """
+
 from django.test import TestCase
 from wagtail.models import Page, Site
 
@@ -29,6 +30,6 @@ class TestSetupTest(TestCase):
 
     def test_home_models_importable(self):
         """Test that all home models can be imported"""
-        
+
         # If we get here without ImportError, the test passes
         self.assertTrue(True)
