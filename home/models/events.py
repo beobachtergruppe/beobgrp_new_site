@@ -27,6 +27,7 @@ from wagtail.fields import StreamField
 
 from home.models.common import (
     CommonContextMixin,
+    SidebarPromotionMixin,
     gen_body_content,
     create_multi_column_block,
 )
@@ -60,7 +61,7 @@ def _get_default_event_title(start_time, event_title):
     return "Default Title"
 
 
-class SingleEvent(Page):
+class SingleEvent(SidebarPromotionMixin, Page):
     start_time: DateTimeField = DateTimeField()
     event_type: CharField = CharField(choices=EventTypes.choices)
     event_title: CharField = CharField(max_length=140, default="")
@@ -93,6 +94,8 @@ class SingleEvent(Page):
         FieldPanel("abstract", heading="Zusammenfassung"),
         FieldPanel("image", heading="Foto"),
     ]
+
+    promote_panels = SidebarPromotionMixin.promote_panels
 
     # Override the save method to auto-generate title and slug
     def save(self, *args, **kwargs):
@@ -202,7 +205,7 @@ blocks_for_event_body = deepcopy(gen_body_content)
 blocks_for_event_body.append(("event_list", EventListBlock()))  # type: ignore
 
 
-class EventPage(CommonContextMixin, Page):
+class EventPage(CommonContextMixin, SidebarPromotionMixin, Page):
     body = StreamField(
         [
             *blocks_for_event_body,
@@ -215,5 +218,6 @@ class EventPage(CommonContextMixin, Page):
     )
 
     content_panels = Page.content_panels + [FieldPanel("body", heading="Inhalt")]
+    promote_panels = SidebarPromotionMixin.promote_panels
 
     subpage_types = ["home.SingleEvent", "home.EventPage", "home.GalleryPage"]

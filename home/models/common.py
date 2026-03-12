@@ -8,6 +8,8 @@ from django.core.exceptions import ValidationError
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.blocks import PageChooserBlock
 from django.utils.text import slugify
+from django.db import models
+from wagtail.admin.panels.field_panel import FieldPanel
 
 if TYPE_CHECKING:
     from django.http import HttpRequest
@@ -261,6 +263,17 @@ class CommonContextMixin:
             .order_by("start_time")[:2]
         )
 
+    def _get_sidebar_pages(self):
+        """Get all pages that should be promoted in the sidebar."""
+        from wagtail.models import Page
+
+        return (
+            Page.objects.live()
+            .public()
+            .filter(show_in_sidebar=True)  # type: ignore[attr-defined]
+            .order_by("title")
+        )
+
     def get_anchors(self) -> list[tuple[str, str]]:
         """
         Extract all anchors from this page's StreamField content.
@@ -282,4 +295,49 @@ class CommonContextMixin:
     def get_context(self, request: "HttpRequest", *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)  # type: ignore[misc]
         context["upcoming_events"] = self._get_upcoming_events()
+        context["sidebar_pages"] = self._get_sidebar_pages()
         return context
+
+
+class SidebarPromotionMixin(models.Model):
+    """
+    Abstract mixin model for pages that can be promoted in the sidebar.
+    Adds fields to control whether a page appears in the sidebar and how it's displayed.
+    """
+
+    show_in_sidebar = models.BooleanField(
+        default=False,
+        help_text="If checked, this page will appear in the sidebar with a link.",
+    )
+
+    sidebar_text = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        help_text="Text to display in the sidebar. If empty, the page title will be used.",
+    )
+
+    sidebar_icon = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        help_text="Optional icon image to display in the sidebar next to the link text.",
+    )
+
+    def get_sidebar_text(self) -> str:
+        """Return the sidebar text, defaulting to page title if empty."""
+        return self.sidebar_text or self.title  # type: ignore[attr-defined]
+
+    promote_panels = [
+        FieldPanel("slug"),
+        FieldPanel("seo_title"),
+        FieldPanel("search_description"),
+        FieldPanel("show_in_sidebar", heading="Show in Sidebar"),
+        FieldPanel("sidebar_text", heading="Sidebar Text", help_text="Leave empty to use page title"),
+        FieldPanel("sidebar_icon", heading="Sidebar Icon"),
+    ]
+
+    class Meta:
+        abstract = True

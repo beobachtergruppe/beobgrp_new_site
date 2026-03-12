@@ -4,10 +4,10 @@ from wagtail.models import Page
 from wagtail.admin.panels.field_panel import FieldPanel
 from wagtail.fields import RichTextField
 
-from home.models.common import CommonContextMixin
+from home.models.common import CommonContextMixin, SidebarPromotionMixin
 
 
-class PhotoPage(CommonContextMixin, Page):
+class PhotoPage(CommonContextMixin, SidebarPromotionMixin, Page):
     photo: models.ForeignKey = models.ForeignKey(
         "wagtailimages.Image",
         null=True,
@@ -30,6 +30,8 @@ class PhotoPage(CommonContextMixin, Page):
         FieldPanel("location", heading="Ort"),
     ]
 
+    promote_panels = SidebarPromotionMixin.promote_panels
+
     def get_context(self, request):
         context = super().get_context(request)
         siblings: list[PhotoPage] = list(
@@ -51,7 +53,7 @@ class PhotoPage(CommonContextMixin, Page):
         return context
 
 
-class GalleryPage(CommonContextMixin, Page):
+class GalleryPage(CommonContextMixin, SidebarPromotionMixin, Page):
     description: RichTextField = RichTextField(max_length=800, default="")
     cover_image: models.ForeignKey = models.ForeignKey(
         "wagtailimages.Image",
@@ -66,6 +68,8 @@ class GalleryPage(CommonContextMixin, Page):
         FieldPanel("cover_image", heading="Titelbild"),
     ]
 
+    promote_panels = SidebarPromotionMixin.promote_panels
+
     subpage_types = [PhotoPage]
 
     def get_context(self, request):
@@ -74,12 +78,14 @@ class GalleryPage(CommonContextMixin, Page):
         return context
 
 
-class GalleryIndexPage(CommonContextMixin, Page):
+class GalleryIndexPage(CommonContextMixin, SidebarPromotionMixin, Page):
     description = RichTextField(max_length=800, default="")
 
     content_panels = Page.content_panels + [
         FieldPanel("description", heading="Beschreibung"),
     ]
+
+    promote_panels = SidebarPromotionMixin.promote_panels
 
     subpage_types = [GalleryPage]
 
