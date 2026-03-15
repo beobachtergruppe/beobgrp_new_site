@@ -17,4 +17,4 @@ for arg in "$@"; do
 done
 
 docker exec "$POD_NAME" ./backup.sh && \
-test -n $DJANGO_BACKUP_DIR && find $DJANGO_BACKUP_DIR -maxdepth 1 -mtime +3 \( -name '*.tar' -or -name '*.bin' \) -print -delete
+test -n $DJANGO_BACKUP_DIR && find $DJANGO_BACKUP_DIR -maxdepth 1 -mtime +3 \( -name '*.tar' -or -name '*.bin*' \) -print -delete
