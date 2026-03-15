@@ -265,14 +265,36 @@ class CommonContextMixin:
 
     def _get_sidebar_pages(self):
         """Get all pages that should be promoted in the sidebar."""
-        from wagtail.models import Page
-
-        return (
-            Page.objects.live()
-            .public()
-            .filter(show_in_sidebar=True)  # type: ignore[attr-defined]
-            .order_by("-latest_revision_created_at")
+        from home.models import (
+            HomePage,
+            EventPage,
+            GalleryIndexPage,
+            GalleryPage,
+            PhotoPage,
+            SingleEvent,
         )
+
+        # Collect all pages from all models that have show_in_sidebar=True
+        pages = list(
+            HomePage.objects.live().public().filter(show_in_sidebar=True)
+        ) + list(
+            EventPage.objects.live().public().filter(show_in_sidebar=True)
+        ) + list(
+            GalleryIndexPage.objects.live().public().filter(show_in_sidebar=True)
+        ) + list(
+            GalleryPage.objects.live().public().filter(show_in_sidebar=True)
+        ) + list(
+            PhotoPage.objects.live().public().filter(show_in_sidebar=True)
+        ) + list(
+            SingleEvent.objects.live().public().filter(show_in_sidebar=True)
+        )
+
+        # Sort by latest revision (most recently modified first)
+        pages.sort(
+            key=lambda p: p.latest_revision_created_at or p.first_published_at,
+            reverse=True,
+        )
+        return pages
 
     def get_anchors(self) -> list[tuple[str, str]]:
         """
