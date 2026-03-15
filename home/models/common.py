@@ -271,7 +271,7 @@ class CommonContextMixin:
             Page.objects.live()
             .public()
             .filter(show_in_sidebar=True)  # type: ignore[attr-defined]
-            .order_by("title")
+            .order_by("-latest_revision_created_at")
         )
 
     def get_anchors(self) -> list[tuple[str, str]]:
