@@ -323,14 +323,14 @@ class SidebarPromotionMixin(models.Model):
 
     show_in_sidebar = models.BooleanField(
         default=False,
-        help_text="If checked, this page will appear in the sidebar with a link.",
+        help_text="Wenn aktiviert, wird diese Seite mit einem Link im Seitenbalken angezeigt.",
     )
 
     sidebar_text = models.CharField(
         max_length=255,
         blank=True,
         default="",
-        help_text="Text to display in the sidebar. If empty, the page title will be used.",
+        help_text="Text, der im Seitenbalken angezeigt werden soll. Wenn leer, wird der Seitentitel verwendet.",
     )
 
     sidebar_icon = models.ForeignKey(
@@ -339,7 +339,7 @@ class SidebarPromotionMixin(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
         related_name="+",
-        help_text="Optional icon image to display in the sidebar next to the link text.",
+        help_text="Optionales Symbolbild, das im Seitenbalken neben dem Link-Text angezeigt wird.",
     )
 
     def get_sidebar_text(self) -> str:
@@ -350,9 +350,9 @@ class SidebarPromotionMixin(models.Model):
         FieldPanel("slug"),
         FieldPanel("seo_title"),
         FieldPanel("search_description"),
-        FieldPanel("show_in_sidebar", heading="Show in Sidebar"),
-        FieldPanel("sidebar_text", heading="Sidebar Text", help_text="Leave empty to use page title"),
-        FieldPanel("sidebar_icon", heading="Sidebar Icon"),
+        FieldPanel("show_in_sidebar", heading="Im Seitenbalken anzeigen"),
+        FieldPanel("sidebar_text", heading="Seitenbalken-Text", help_text="Leer lassen, um den Seitentitel zu verwenden"),
+        FieldPanel("sidebar_icon", heading="Seitenbalken-Symbol"),
     ]
 
     class Meta:
