@@ -27,6 +27,7 @@ from wagtail.fields import StreamField
 
 from home.models.common import (
     CommonContextMixin,
+    SidebarPromotionMixin,
     gen_body_content,
     create_multi_column_block,
 )
@@ -202,7 +203,7 @@ blocks_for_event_body = deepcopy(gen_body_content)
 blocks_for_event_body.append(("event_list", EventListBlock()))  # type: ignore
 
 
-class EventPage(CommonContextMixin, Page):
+class EventPage(CommonContextMixin, SidebarPromotionMixin, Page):
     body = StreamField(
         [
             *blocks_for_event_body,
@@ -215,5 +216,6 @@ class EventPage(CommonContextMixin, Page):
     )
 
     content_panels = Page.content_panels + [FieldPanel("body", heading="Inhalt")]
+    promote_panels = SidebarPromotionMixin.promote_panels
 
     subpage_types = ["home.SingleEvent", "home.EventPage", "home.GalleryPage"]
