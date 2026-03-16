@@ -4,7 +4,7 @@ from wagtail.models import Page
 from wagtail.admin.panels.field_panel import FieldPanel
 from wagtail.fields import RichTextField
 
-from home.models.common import CommonContextMixin
+from home.models.common import CommonContextMixin, SidebarPromotionMixin
 
 
 class PhotoPage(CommonContextMixin, Page):
