@@ -270,8 +270,6 @@ class CommonContextMixin:
             EventPage,
             GalleryIndexPage,
             GalleryPage,
-            PhotoPage,
-            SingleEvent,
         )
 
         # Collect all pages from all models that have show_in_sidebar=True
@@ -283,10 +281,6 @@ class CommonContextMixin:
             GalleryIndexPage.objects.live().public().filter(show_in_sidebar=True)
         ) + list(
             GalleryPage.objects.live().public().filter(show_in_sidebar=True)
-        ) + list(
-            PhotoPage.objects.live().public().filter(show_in_sidebar=True)
-        ) + list(
-            SingleEvent.objects.live().public().filter(show_in_sidebar=True)
         )
 
         # Sort by latest revision (most recently modified first)

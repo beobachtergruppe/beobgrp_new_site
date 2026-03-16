@@ -61,7 +61,7 @@ def _get_default_event_title(start_time, event_title):
     return "Default Title"
 
 
-class SingleEvent(SidebarPromotionMixin, Page):
+class SingleEvent(Page):
     start_time: DateTimeField = DateTimeField()
     event_type: CharField = CharField(choices=EventTypes.choices)
     event_title: CharField = CharField(max_length=140, default="")
@@ -94,8 +94,6 @@ class SingleEvent(SidebarPromotionMixin, Page):
         FieldPanel("abstract", heading="Zusammenfassung"),
         FieldPanel("image", heading="Foto"),
     ]
-
-    promote_panels = SidebarPromotionMixin.promote_panels
 
     # Override the save method to auto-generate title and slug
     def save(self, *args, **kwargs):

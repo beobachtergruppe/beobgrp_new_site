@@ -4,10 +4,10 @@ from wagtail.models import Page
 from wagtail.admin.panels.field_panel import FieldPanel
 from wagtail.fields import RichTextField
 
-from home.models.common import CommonContextMixin, SidebarPromotionMixin
+from home.models.common import CommonContextMixin
 
 
-class PhotoPage(CommonContextMixin, SidebarPromotionMixin, Page):
+class PhotoPage(CommonContextMixin, Page):
     photo: models.ForeignKey = models.ForeignKey(
         "wagtailimages.Image",
         null=True,
@@ -29,8 +29,6 @@ class PhotoPage(CommonContextMixin, SidebarPromotionMixin, Page):
         FieldPanel("time", heading="Uhrzeit"),
         FieldPanel("location", heading="Ort"),
     ]
-
-    promote_panels = SidebarPromotionMixin.promote_panels
 
     def get_context(self, request):
         context = super().get_context(request)
