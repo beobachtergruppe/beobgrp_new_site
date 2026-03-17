@@ -273,14 +273,13 @@ class CommonContextMixin:
         )
 
         # Collect all pages from all models that have show_in_sidebar=True
-        pages = list(
-            HomePage.objects.live().public().filter(show_in_sidebar=True)
-        ) + list(
-            EventPage.objects.live().public().filter(show_in_sidebar=True)
-        ) + list(
-            GalleryIndexPage.objects.live().public().filter(show_in_sidebar=True)
-        ) + list(
-            GalleryPage.objects.live().public().filter(show_in_sidebar=True)
+        pages = (
+            list(HomePage.objects.live().public().filter(show_in_sidebar=True))
+            + list(EventPage.objects.live().public().filter(show_in_sidebar=True))
+            + list(
+                GalleryIndexPage.objects.live().public().filter(show_in_sidebar=True)
+            )
+            + list(GalleryPage.objects.live().public().filter(show_in_sidebar=True))
         )
 
         # Sort by latest revision (most recently modified first)
@@ -351,7 +350,11 @@ class SidebarPromotionMixin(models.Model):
         FieldPanel("seo_title"),
         FieldPanel("search_description"),
         FieldPanel("show_in_sidebar", heading="Im Seitenbalken anzeigen"),
-        FieldPanel("sidebar_text", heading="Seitenbalken-Text", help_text="Leer lassen, um den Seitentitel zu verwenden"),
+        FieldPanel(
+            "sidebar_text",
+            heading="Seitenbalken-Text",
+            help_text="Leer lassen, um den Seitentitel zu verwenden",
+        ),
         FieldPanel("sidebar_icon", heading="Seitenbalken-Symbol"),
     ]
 
