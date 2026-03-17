@@ -8,6 +8,8 @@ from django.core.exceptions import ValidationError
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.blocks import PageChooserBlock
 from django.utils.text import slugify
+from django.db import models
+from wagtail.admin.panels.field_panel import FieldPanel
 
 if TYPE_CHECKING:
     from django.http import HttpRequest
@@ -261,6 +263,32 @@ class CommonContextMixin:
             .order_by("start_time")[:2]
         )
 
+    def _get_sidebar_pages(self):
+        """Get all pages that should be promoted in the sidebar."""
+        from home.models import (
+            HomePage,
+            EventPage,
+            GalleryIndexPage,
+            GalleryPage,
+        )
+
+        # Collect all pages from all models that have show_in_sidebar=True
+        pages = (
+            list(HomePage.objects.live().public().filter(show_in_sidebar=True))
+            + list(EventPage.objects.live().public().filter(show_in_sidebar=True))
+            + list(
+                GalleryIndexPage.objects.live().public().filter(show_in_sidebar=True)
+            )
+            + list(GalleryPage.objects.live().public().filter(show_in_sidebar=True))
+        )
+
+        # Sort by latest revision (most recently modified first)
+        pages.sort(
+            key=lambda p: p.latest_revision_created_at or p.first_published_at,
+            reverse=True,
+        )
+        return pages
+
     def get_anchors(self) -> list[tuple[str, str]]:
         """
         Extract all anchors from this page's StreamField content.
@@ -282,4 +310,53 @@ class CommonContextMixin:
     def get_context(self, request: "HttpRequest", *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)  # type: ignore[misc]
         context["upcoming_events"] = self._get_upcoming_events()
+        context["sidebar_pages"] = self._get_sidebar_pages()
         return context
+
+
+class SidebarPromotionMixin(models.Model):
+    """
+    Abstract mixin model for pages that can be promoted in the sidebar.
+    Adds fields to control whether a page appears in the sidebar and how it's displayed.
+    """
+
+    show_in_sidebar = models.BooleanField(
+        default=False,
+        help_text="Wenn aktiviert, wird diese Seite mit einem Link im Seitenbalken angezeigt.",
+    )
+
+    sidebar_text = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        help_text="Text, der im Seitenbalken angezeigt werden soll. Wenn leer, wird der Seitentitel verwendet.",
+    )
+
+    sidebar_icon = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        help_text="Optionales Symbolbild, das im Seitenbalken neben dem Link-Text angezeigt wird.",
+    )
+
+    def get_sidebar_text(self) -> str:
+        """Return the sidebar text, defaulting to page title if empty."""
+        return self.sidebar_text or self.title  # type: ignore[attr-defined]
+
+    promote_panels = [
+        FieldPanel("slug"),
+        FieldPanel("seo_title"),
+        FieldPanel("search_description"),
+        FieldPanel("show_in_sidebar", heading="Im Seitenbalken anzeigen"),
+        FieldPanel(
+            "sidebar_text",
+            heading="Seitenbalken-Text",
+            help_text="Leer lassen, um den Seitentitel zu verwenden",
+        ),
+        FieldPanel("sidebar_icon", heading="Seitenbalken-Symbol"),
+    ]
+
+    class Meta:
+        abstract = True

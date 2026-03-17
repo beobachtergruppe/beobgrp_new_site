@@ -1,5 +1,6 @@
 from home.models.common import (
     CommonContextMixin,
+    SidebarPromotionMixin,
     gen_body_content,
     create_multi_column_block,
 )
@@ -10,7 +11,7 @@ from wagtail.fields import StreamField
 from wagtail.models import Page
 
 
-class HomePage(CommonContextMixin, Page):
+class HomePage(CommonContextMixin, SidebarPromotionMixin, Page):
     body = StreamField(
         [
             *gen_body_content,
@@ -21,6 +22,8 @@ class HomePage(CommonContextMixin, Page):
         ],
         default=[],
     )
+
     content_panels = Page.content_panels + [FieldPanel("body", heading="Inhalt")]
+    promote_panels = SidebarPromotionMixin.promote_panels
 
     subpage_types = ["home.HomePage", "home.EventPage", "home.GalleryIndexPage"]

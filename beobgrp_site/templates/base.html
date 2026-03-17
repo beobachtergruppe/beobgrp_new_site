@@ -1,4 +1,4 @@
-{% load static wagtailcore_tags navigation_tags wagtailuserbar %}
+{% load static wagtailcore_tags wagtailimages_tags navigation_tags wagtailuserbar %}
 {% load compress %}
 <!DOCTYPE html>
 <html lang="en" class="theme-dark">
@@ -57,6 +57,19 @@
                     {% for event in upcoming_events %}
                         {% include "includes/side_info.html" %}
                     {% endfor %}
+                    {% if sidebar_pages %}
+                        <nav class="sidebar-links">
+                            {% for sidebar_page in sidebar_pages %}
+                                <a class="sidebar-link" href="{% pageurl sidebar_page %}">
+                                    {% if sidebar_page.specific.sidebar_icon %}
+                                        {% image sidebar_page.specific.sidebar_icon original as icon %}
+                                        <img class="sidebar-link-icon" src="{{ icon.url }}" alt="" />
+                                    {% endif %}
+                                    <span>{{ sidebar_page.specific.get_sidebar_text }}</span>
+                                </a>
+                            {% endfor %}
+                        </nav>
+                    {% endif %}
                     {% block sidebar %}{% endblock %}
                 </aside>
                 <main id="main-content" class="content-column">
