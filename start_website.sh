@@ -73,6 +73,11 @@ if [ -z "$WAGTAIL_DB_PASSWORD" ]; then
   exit 1
 fi
 
+if [ -z "$WAGTAIL_EMAIL_PASSWORD" ]; then
+  echo Please define wagtail email password in WAGTAIL_EMAIL_PASSWORD
+  exit 1
+fi
+
 # Check for conflicting options
 if [ "$START_DEV" = true ] && [ "$START_PROD" = true ]; then
   echo "Error: Cannot use both --dev and --prod"

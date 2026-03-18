@@ -222,3 +222,17 @@ COMPRESS_ENABLED = True
 # In development (DEBUG=True), use online compression so SCSS compiles automatically
 # In production, use offline (pre-compiled) assets
 COMPRESS_OFFLINE = not DEBUG
+
+# Email configuration
+# https://docs.djangoproject.com/en/stable/topics/email/
+EMAIL_BACKEND = (
+    "django.core.mail.backends.console.EmailBackend" if DEBUG else "django.core.mail.backends.smtp.EmailBackend"
+)
+EMAIL_HOST = "mail.beobachtergruppe.de"
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False  # Port 465 uses implicit SSL
+EMAIL_HOST_USER = "website@beobachtergruppe.de"
+EMAIL_HOST_PASSWORD = os.environ.get("WAGTAIL_EMAIL_PASSWORD","")
+DEFAULT_FROM_EMAIL = "website@beobachtergruppe.de"
+SERVER_EMAIL = "website@beobachtergruppe.de"
+ADMINS = [("Admin", "admin@beobachtergruppe.de")]
