@@ -58,17 +58,9 @@
                         {% include "includes/side_info.html" %}
                     {% endfor %}
                     {% if sidebar_pages %}
-                        <nav class="sidebar-links">
-                            {% for sidebar_page in sidebar_pages %}
-                                <a class="sidebar-link" href="{% pageurl sidebar_page %}">
-                                    {% if sidebar_page.specific.sidebar_icon %}
-                                        {% image sidebar_page.specific.sidebar_icon original as icon %}
-                                        <img class="sidebar-link-icon" src="{{ icon.url }}" alt="" />
-                                    {% endif %}
-                                    <span>{{ sidebar_page.specific.get_sidebar_text }}</span>
-                                </a>
-                            {% endfor %}
-                        </nav>
+                        {% for sidebar_page in sidebar_pages %}
+                            {% include "includes/side_page.html" %}
+                        {% endfor %}
                     {% endif %}
                     {% block sidebar %}{% endblock %}
                 </aside>
