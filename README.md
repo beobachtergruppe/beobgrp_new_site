@@ -172,6 +172,7 @@ The same Docker image is used for both development and production modes running 
 
 Set the following required environment variables:
 - `WAGTAIL_DB_PASSWORD`: Database password for the wagtail user
+- `WAGTAIL_EMAIL_PASSWORD`: SMTP password for email notifications (the email address is configured in Django settings)
 - `DJANGO_BACKUP_DIR`: Directory path for storing backups (optional, defaults to `../beobgrp_site_backup`)
 - `DOCKER_REGISTRY`: Docker registry URL (optional, defaults to `localhost:5000`)
 
