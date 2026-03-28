@@ -22,8 +22,24 @@
             </a>
         {% endif %}
     </div>
-    <figure class="image">
-        {% image page.photo original class="is-fluid" %}
+    
+    <figure class="media-container">
+        {% if page.is_video %}
+            <video controls width="100%" {% if page.autoplay %}autoplay{% endif %} {% if page.loop %}loop{% endif %}>
+                <source src="{{ page.get_media_url }}" type="video/mp4">
+                <source src="{{ page.get_media_url }}" type="video/webm">
+                Ihr Browser unterstützt das Video-Element nicht.
+            </video>
+        {% elif page.is_gif %}
+            <img src="{{ page.get_media_url }}" alt="{{ page.media_alt_text|default:page.title }}" class="is-fluid" />
+        {% elif page.image %}
+            {% image page.image original alt=page.media_alt_text|default:page.title class="is-fluid" %}
+        {% elif page.photo %}
+            {% image page.photo original class="is-fluid" %}
+        {% else %}
+            <p>Kein Medien verfügbar</p>
+        {% endif %}
+        
         <figcaption>
             {{ page.description|richtext }}
             <p>Autor: {{ page.author }}</p>

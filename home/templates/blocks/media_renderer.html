@@ -1,0 +1,44 @@
+{% load wagtailimages_tags %}
+
+{% comment %}
+This template is included in media_with_caption.html to render the appropriate media type.
+It handles images, animated GIFs, and videos.
+{% endcomment %}
+
+{% if value.media_type == 'video' %}
+    {% if value.video %}
+        <video 
+            controls 
+            width="100%" 
+            class="media-video"
+            {% if value.autoplay == 'true' %}autoplay{% endif %}
+            {% if value.loop == 'true' %}loop{% endif %}
+        >
+            <source src="{{ value.video.url }}" type="video/mp4">
+            <source src="{{ value.video.url }}" type="video/webm">
+            <source src="{{ value.video.url }}" type="video/ogg">
+            Ihr Browser unterstützt das Video-Element nicht.
+        </video>
+    {% else %}
+        <p class="error-message">Keine Videodatei ausgewählt.</p>
+    {% endif %}
+
+{% elif value.media_type == 'gif' %}
+    {% if value.image %}
+        <img 
+            src="{% image_url value.image original %}" 
+            alt="{{ value.media_alt_text|default:value.image.title }}" 
+            class="media-gif is-fullwidth"
+        />
+    {% else %}
+        <p class="error-message">Keine GIF-Datei ausgewählt.</p>
+    {% endif %}
+
+{% else %}
+    {% comment %} Default to image {% endcomment %}
+    {% if value.image %}
+        {% image value.image original alt=value.media_alt_text|default:value.image.title class="media-image is-fullwidth" %}
+    {% else %}
+        <p class="error-message">Keine Bilddatei ausgewählt.</p>
+    {% endif %}
+{% endif %}

@@ -6,6 +6,7 @@ from wagtail.blocks.field_block import RichTextBlock, CharBlock, URLBlock, Choic
 from wagtail.blocks.struct_block import StructBlock, StructBlockValidationError
 from django.core.exceptions import ValidationError
 from wagtail.images.blocks import ImageChooserBlock
+from wagtail.documents.blocks import DocumentChooserBlock
 from wagtail.blocks import PageChooserBlock
 from django.utils.text import slugify
 from django.db import models
@@ -135,6 +136,89 @@ class ImageWithCaptionBlock(StructBlock):
         template = "blocks/image_with_caption.html"
 
 
+class MediaWithCaptionBlock(StructBlock):
+    """
+    A flexible media block that supports images, animated GIFs, and videos with captions.
+    """
+    
+    media_type = ChoiceBlock(
+        choices=[
+            ("image", "Bild"),
+            ("gif", "Animiertes GIF"),
+            ("video", "Video"),
+        ],
+        default="image",
+        label="Medientyp",
+        help_text="Wählen Sie den Typ des Mediums aus",
+    )
+    
+    image = ImageChooserBlock(
+        required=False,
+        label="Bild oder GIF",
+        help_text="Wählen Sie ein Bild oder eine GIF-Datei",
+    )
+    
+    video = DocumentChooserBlock(
+        required=False,
+        label="Videodatei",
+        help_text="Wählen Sie eine Videodatei (MP4, WebM, Ogg)",
+    )
+    
+    media_alt_text = CharBlock(
+        required=False,
+        max_length=255,
+        label="Alt-Text",
+        help_text="Beschreibung für Barrierefreiheit (wird nicht angezeigt, aber von Screenreadern gelesen)",
+    )
+    
+    caption = RichTextBlock(
+        required=False,
+        label="Bildunterschrift",
+        help_text="Optionaler Text zur Beschreibung des Mediums",
+    )
+    
+    caption_position = ChoiceBlock(
+        choices=[
+            ("top", "Oben"),
+            ("bottom", "Unten"),
+            ("left", "Links"),
+            ("right", "Rechts"),
+        ],
+        default="bottom",
+        label="Position der Bildunterschrift",
+    )
+    
+    link = LinkBlock(
+        label="Optional Link",
+        help_text="Optionaler Link für das Medien (interne Seite oder externe URL)",
+    )
+    
+    autoplay = ChoiceBlock(
+        choices=[
+            ("true", "Ja - Video und GIF starten automatisch"),
+            ("false", "Nein - Benutzer muss abspielen"),
+        ],
+        default="false",
+        label="Autoplay",
+        help_text="Nur für Videos und animierte GIFs",
+    )
+    
+    loop = ChoiceBlock(
+        choices=[
+            ("true", "Ja - Wiederholen"),
+            ("false", "Nein - Einmal abspielen"),
+        ],
+        default="true",
+        label="Schleife",
+        help_text="Nur für Videos und animierte GIFs",
+    )
+
+    class Meta:  # type: ignore[misc]
+        icon = "media"
+        label = "Medien mit Bildunterschrift (Bilder, GIF, Video)"
+        template = "blocks/media_with_caption.html"
+
+
 def create_multi_column_block(content_blocks=None):
     """
     Factory function to create a MultiColumnBlock class with configurable content blocks.
@@ -243,6 +327,7 @@ gen_body_content: list[Tuple[str, Block]] = [
     ),
     ("image", ImageChooserBlock()),
     ("image_with_caption", ImageWithCaptionBlock()),
+    ("media_with_caption", MediaWithCaptionBlock()),
 ]
 
 
