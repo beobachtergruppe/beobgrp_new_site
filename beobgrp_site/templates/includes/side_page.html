@@ -1,0 +1,10 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+<div class="eventbox">
+    <a href="{% pageurl sidebar_page %}">
+        {% if sidebar_page.specific.sidebar_icon %}
+            {% image sidebar_page.specific.sidebar_icon original as icon %}
+            <img class="sidebar-link-icon" src="{{ icon.url }}" alt="" style="height: 1.5em;" />
+        {% endif %}
+        <span>{{ sidebar_page.specific.get_sidebar_text }}</span>
+    </a>
+</div>
