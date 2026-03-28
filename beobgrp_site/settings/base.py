@@ -232,7 +232,23 @@ EMAIL_HOST = "mail.beobachtergruppe.de"
 EMAIL_PORT = 465
 EMAIL_USE_TLS = False  # Port 465 uses implicit SSL
 EMAIL_HOST_USER = "website@beobachtergruppe.de"
-EMAIL_HOST_PASSWORD = os.environ.get("WAGTAIL_EMAIL_PASSWORD","")
+EMAIL_HOST_PASSWORD = os.environ.get("WAGTAIL_EMAIL_PASSWORD", "")
 DEFAULT_FROM_EMAIL = "website@beobachtergruppe.de"
 SERVER_EMAIL = "website@beobachtergruppe.de"
 ADMINS = [("Admin", "admin@beobachtergruppe.de")]
+
+# Wagtail notification settings
+# https://docs.wagtail.org/en/stable/reference/settings.html#email-notifications
+WAGTAILADMIN_NOTIFICATION_FROM_EMAIL = "website@beobachtergruppe.de"
+WAGTAILADMIN_NOTIFICATION_USE_HTML = True
+WAGTAILADMIN_NOTIFICATION_INCLUDE_SUPERUSERS = True
+
+# User and workflow settings
+# https://docs.wagtail.org/en/stable/reference/settings.html#user-management
+WAGTAIL_PASSWORD_RESET_ENABLED = True
+WAGTAIL_PASSWORD_MANAGEMENT_ENABLED = True
+
+# Workflow/moderation settings
+# https://docs.wagtail.org/en/stable/reference/settings.html#workflow
+WAGTAIL_WORKFLOW_ENABLED = True
+WAGTAIL_WORKFLOW_REQUIRE_REAPPROVAL_ON_EDIT = True
