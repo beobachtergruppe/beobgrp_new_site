@@ -230,7 +230,7 @@ EMAIL_BACKEND = (
 )
 EMAIL_HOST = "mail.beobachtergruppe.de"
 EMAIL_PORT = 465
-EMAIL_USE_TLS = False  # Port 465 uses implicit SSL
+EMAIL_USE_SSL = True  # Port 465 uses implicit SSL (direct SSL connection)
 EMAIL_HOST_USER = "website@beobachtergruppe.de"
 EMAIL_HOST_PASSWORD = os.environ.get("WAGTAIL_EMAIL_PASSWORD", "")
 DEFAULT_FROM_EMAIL = "website@beobachtergruppe.de"
