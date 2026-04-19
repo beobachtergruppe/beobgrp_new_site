@@ -7,16 +7,14 @@ It handles images, animated GIFs, and videos.
 
 {% if value.media_type == 'video' %}
     {% if value.video %}
-        <video 
-            controls 
-            width="100%" 
+        <video
+            src="{{ value.video.url }}"
+            controls
+            width="100%"
             class="media-video"
             {% if value.autoplay == 'true' %}autoplay{% endif %}
             {% if value.loop == 'true' %}loop{% endif %}
         >
-            <source src="{{ value.video.url }}" type="video/mp4">
-            <source src="{{ value.video.url }}" type="video/webm">
-            <source src="{{ value.video.url }}" type="video/ogg">
             Ihr Browser unterstützt das Video-Element nicht.
         </video>
     {% else %}
@@ -25,9 +23,9 @@ It handles images, animated GIFs, and videos.
 
 {% elif value.media_type == 'gif' %}
     {% if value.image %}
-        <img 
-            src="{% image_url value.image original %}" 
-            alt="{{ value.media_alt_text|default:value.image.title }}" 
+        <img
+            src="{% image_url value.image original %}"
+            alt="{{ value.media_alt_text|default:value.image.title }}"
             class="media-gif is-fullwidth"
         />
     {% else %}
