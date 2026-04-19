@@ -4,6 +4,7 @@
 
 import django.db.models.deletion
 import home.models.common
+import home.models.gallery
 import wagtail.fields
 from django.db import migrations, models
 
@@ -36,6 +37,7 @@ class Migration(migrations.Migration):
                     help_text='Videodatei (MP4, WebM, Ogg) oder animiertes GIF',
                     null=True,
                     upload_to='videos/%Y/%m/',
+                    validators=[home.models.gallery.validate_media_file],
                 )),
                 ('media_type', models.CharField(
                     choices=[('gif', 'Animiertes GIF'), ('video', 'Videodatei')],
@@ -108,7 +110,7 @@ class Migration(migrations.Migration):
                     10: ('wagtail.blocks.URLBlock', (), {'help_text': 'Geben Sie eine vollständige URL ein (z.B. https://example.com)', 'label': 'Externe URL', 'required': False}),
                     11: ('wagtail.blocks.StructBlock', [[('link_type', 8), ('internal_page', 9), ('external_url', 10)]], {'help_text': 'Optionaler Link für das Bild (interne Seite oder externe URL)', 'label': 'Optional Link'}),
                     12: ('wagtail.blocks.StructBlock', [[('image', 5), ('caption', 6), ('caption_position', 7), ('link', 11)]], {}),
-                    13: ('wagtail.documents.blocks.DocumentChooserBlock', (), {'help_text': 'Video (MP4, WebM, Ogg) oder animiertes GIF', 'label': 'Datei'}),
+                    13: ('home.models.common.VideoDocumentChooserBlock', (), {'help_text': 'Video (MP4, WebM, Ogg) oder animiertes GIF', 'label': 'Datei'}),
                     14: ('wagtail.blocks.ChoiceBlock', [], {'choices': [('gif', 'Animiertes GIF'), ('video', 'Videodatei')], 'label': 'Medientyp'}),
                     15: ('wagtail.blocks.CharBlock', (), {'help_text': 'Beschreibung für Barrierefreiheit (wird nicht angezeigt, aber von Screenreadern gelesen)', 'label': 'Alt-Text', 'max_length': 255, 'required': False}),
                     16: ('wagtail.blocks.RichTextBlock', (), {'label': 'Beschriftung', 'required': False}),
@@ -156,7 +158,7 @@ class Migration(migrations.Migration):
                     10: ('wagtail.blocks.URLBlock', (), {'help_text': 'Geben Sie eine vollständige URL ein (z.B. https://example.com)', 'label': 'Externe URL', 'required': False}),
                     11: ('wagtail.blocks.StructBlock', [[('link_type', 8), ('internal_page', 9), ('external_url', 10)]], {'help_text': 'Optionaler Link für das Bild (interne Seite oder externe URL)', 'label': 'Optional Link'}),
                     12: ('wagtail.blocks.StructBlock', [[('image', 5), ('caption', 6), ('caption_position', 7), ('link', 11)]], {}),
-                    13: ('wagtail.documents.blocks.DocumentChooserBlock', (), {'help_text': 'Video (MP4, WebM, Ogg) oder animiertes GIF', 'label': 'Datei'}),
+                    13: ('home.models.common.VideoDocumentChooserBlock', (), {'help_text': 'Video (MP4, WebM, Ogg) oder animiertes GIF', 'label': 'Datei'}),
                     14: ('wagtail.blocks.ChoiceBlock', [], {'choices': [('gif', 'Animiertes GIF'), ('video', 'Videodatei')], 'label': 'Medientyp'}),
                     15: ('wagtail.blocks.CharBlock', (), {'help_text': 'Beschreibung für Barrierefreiheit (wird nicht angezeigt, aber von Screenreadern gelesen)', 'label': 'Alt-Text', 'max_length': 255, 'required': False}),
                     16: ('wagtail.blocks.RichTextBlock', (), {'label': 'Beschriftung', 'required': False}),

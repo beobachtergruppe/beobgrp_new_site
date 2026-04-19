@@ -139,6 +139,19 @@ class VideoPage(CommonContextMixin, Page):
         FieldPanel("location", heading="Ort"),
     ]
 
+    def clean(self):
+        super().clean()
+        if self.media_file and self.media_type:
+            is_gif = self.media_file.name.lower().endswith(".gif")
+            if is_gif and self.media_type != "gif":
+                raise ValidationError(
+                    {"media_type": "Die hochgeladene Datei ist ein GIF. Bitte wähle 'Animiertes GIF' als Medientyp."}
+                )
+            if not is_gif and self.media_type == "gif":
+                raise ValidationError(
+                    {"media_type": "Die hochgeladene Datei ist kein GIF. Bitte wähle 'Videodatei' als Medientyp."}
+                )
+
     def is_gif(self) -> bool:
         return self.media_type == "gif" and bool(self.media_file)
 

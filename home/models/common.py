@@ -1,13 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Tuple
 
+from django import forms
+from django.core.exceptions import ValidationError
 from wagtail.blocks import Block, StreamBlock
 from wagtail.blocks.field_block import RichTextBlock, CharBlock, URLBlock, ChoiceBlock
 from wagtail.blocks.struct_block import StructBlock, StructBlockValidationError
-from django.core.exceptions import ValidationError
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.documents.blocks import DocumentChooserBlock
-from django.forms import ValidationError as FormValidationError
 from wagtail.blocks import PageChooserBlock
 from django.utils.text import slugify
 from django.db import models
@@ -30,11 +30,12 @@ class VideoDocumentChooserBlock(DocumentChooserBlock):
         if document is not None:
             name = document.file.name.lower()
             if not any(name.endswith(ext) for ext in self.ALLOWED_EXTENSIONS):
-                raise FormValidationError(
+                raise forms.ValidationError(
                     "Nur GIF- und Videodateien sind erlaubt (GIF, MP4, WebM, Ogg). "
                     f"Die Datei '{document.title}' hat ein ungültiges Format."
                 )
         return document
+
 
 
 def generate_anchor_id(text: str) -> str:
@@ -229,7 +230,7 @@ class VideoWithCaptionBlock(StructBlock):
             if is_gif and media_type != "gif":
                 raise StructBlockValidationError(
                     block_errors={
-                        "media_type": FormValidationError(
+                        "media_type": forms.ValidationError(
                             "Die hochgeladene Datei ist ein GIF. Bitte wähle 'Animiertes GIF' als Medientyp."
                         )
                     }
@@ -237,7 +238,7 @@ class VideoWithCaptionBlock(StructBlock):
             if not is_gif and media_type == "gif":
                 raise StructBlockValidationError(
                     block_errors={
-                        "media_type": FormValidationError(
+                        "media_type": forms.ValidationError(
                             "Die hochgeladene Datei ist kein GIF. Bitte wähle 'Videodatei' als Medientyp."
                         )
                     }
