@@ -25,11 +25,11 @@
     
     <figure class="media-container">
         {% if page.is_video %}
-            <video src="{{ page.get_media_url }}" controls width="100%" class="media-video">
+            <video src="{{ page.get_media_url }}" controls class="media-video">
                 Ihr Browser unterstützt das Video-Element nicht.
             </video>
         {% elif page.is_gif %}
-            <img src="{{ page.get_media_url }}" alt="{{ page.media_alt_text|default:page.title }}" class="is-fluid media-gif" />
+            <img src="{{ page.get_media_url }}" alt="{{ page.media_alt_text|default:page.title }}" class="media-gif" />
         {% else %}
             <p>Kein Medien verfügbar</p>
         {% endif %}

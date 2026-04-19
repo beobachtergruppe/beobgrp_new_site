@@ -519,3 +519,17 @@ $title-bottom-padding: 0.2em;
     }
   }
 }
+
+// PhotoPage / VideoPage full-width media container
+// Ensures GIFs and videos scale to fill the column width just like
+// Wagtail-rendered images (which have explicit pixel dimensions and thus
+// scale down via Bulma's global max-width:100%). Without width:100% a small
+// GIF renders at its native size instead of filling the column.
+.media-container {
+  img,
+  video {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
