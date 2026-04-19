@@ -198,7 +198,9 @@ WHITENOISE_AUTOREFRESH = DEBUG
 
 WAGTAIL_SITE_NAME = "beobgrp_site"
 
-WAGTAILIMAGES_IMAGE_MODEL = "home.CustomImage"
+# Reject GIF uploads in the Wagtail image library via form validation only.
+# GIFs/animations belong in VideoPage, not the static image library.
+WAGTAILIMAGES_IMAGE_FORM_BASE = "home.forms.NoGifImageForm"
 
 # Search
 # https://docs.wagtail.org/en/stable/topics/search/backends.html
