@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.fields import DateField, CharField, TimeField
 from wagtail.models import Page
@@ -5,6 +6,18 @@ from wagtail.admin.panels.field_panel import FieldPanel
 from wagtail.fields import RichTextField
 
 from home.models.common import CommonContextMixin, SidebarPromotionMixin
+
+ALLOWED_MEDIA_EXTENSIONS = (".gif", ".mp4", ".webm", ".ogg", ".ogv")
+
+
+def validate_media_file(file):
+    """Accept only GIF and common video formats; reject all other files."""
+    name = file.name.lower()
+    if not any(name.endswith(ext) for ext in ALLOWED_MEDIA_EXTENSIONS):
+        raise ValidationError(
+            f"Nur GIF- und Videodateien sind erlaubt (GIF, MP4, WebM, Ogg). "
+            f"Die hochgeladene Datei '{file.name}' wird nicht unterstützt."
+        )
 
 
 class PhotoPage(CommonContextMixin, Page):
@@ -91,6 +104,7 @@ class VideoPage(CommonContextMixin, Page):
         null=True,
         blank=True,
         help_text="Videodatei (MP4, WebM, Ogg) oder animiertes GIF",
+        validators=[validate_media_file],
     )
     media_type = models.CharField(
         max_length=10,
@@ -111,7 +125,11 @@ class VideoPage(CommonContextMixin, Page):
     location: CharField = CharField(max_length=255, default="", blank=True)
 
     content_panels = Page.content_panels + [
-        FieldPanel("media_file", heading="Videodatei oder animiertes GIF"),
+        FieldPanel(
+            "media_file",
+            heading="Videodatei oder animiertes GIF",
+            attrs={"accept": ".gif,.mp4,.webm,.ogg,.ogv,image/gif,video/mp4,video/webm,video/ogg"},
+        ),
         FieldPanel("media_type", heading="Medientyp"),
         FieldPanel("media_alt_text", heading="Alt-Text für Barrierefreiheit"),
         FieldPanel("description", heading="Beschreibung"),

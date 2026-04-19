@@ -7,6 +7,7 @@ from wagtail.blocks.struct_block import StructBlock, StructBlockValidationError
 from django.core.exceptions import ValidationError
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.documents.blocks import DocumentChooserBlock
+from django.forms import ValidationError as FormValidationError
 from wagtail.blocks import PageChooserBlock
 from django.utils.text import slugify
 from django.db import models
@@ -14,6 +15,26 @@ from wagtail.admin.panels.field_panel import FieldPanel
 
 if TYPE_CHECKING:
     from django.http import HttpRequest
+
+
+class VideoDocumentChooserBlock(DocumentChooserBlock):
+    """
+    A DocumentChooserBlock restricted to GIF and video file types.
+    Raises a validation error if the chosen document is not a supported format.
+    """
+
+    ALLOWED_EXTENSIONS = (".gif", ".mp4", ".webm", ".ogg", ".ogv")
+
+    def clean(self, value):
+        document = super().clean(value)
+        if document is not None:
+            name = document.file.name.lower()
+            if not any(name.endswith(ext) for ext in self.ALLOWED_EXTENSIONS):
+                raise FormValidationError(
+                    "Nur GIF- und Videodateien sind erlaubt (GIF, MP4, WebM, Ogg). "
+                    f"Die Datei '{document.title}' hat ein ungültiges Format."
+                )
+        return document
 
 
 def generate_anchor_id(text: str) -> str:
@@ -147,7 +168,7 @@ class VideoWithCaptionBlock(StructBlock):
         ("video", "Videodatei"),
     ]
 
-    media_file = DocumentChooserBlock(
+    media_file = VideoDocumentChooserBlock(
         label="Datei",
         help_text="Video (MP4, WebM, Ogg) oder animiertes GIF",
     )
@@ -198,6 +219,30 @@ class VideoWithCaptionBlock(StructBlock):
         label="Schleife",
         help_text="Nur für Videos und animierte GIFs",
     )
+
+    def clean(self, value):
+        result = super().clean(value)
+        document = result.get("media_file")
+        media_type = result.get("media_type")
+        if document is not None and media_type is not None:
+            is_gif = document.file.name.lower().endswith(".gif")
+            if is_gif and media_type != "gif":
+                raise StructBlockValidationError(
+                    block_errors={
+                        "media_type": FormValidationError(
+                            "Die hochgeladene Datei ist ein GIF. Bitte wähle 'Animiertes GIF' als Medientyp."
+                        )
+                    }
+                )
+            if not is_gif and media_type == "gif":
+                raise StructBlockValidationError(
+                    block_errors={
+                        "media_type": FormValidationError(
+                            "Die hochgeladene Datei ist kein GIF. Bitte wähle 'Videodatei' als Medientyp."
+                        )
+                    }
+                )
+        return result
 
     class Meta:  # type: ignore[misc]
         icon = "media"
