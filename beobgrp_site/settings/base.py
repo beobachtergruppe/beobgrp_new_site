@@ -198,6 +198,8 @@ WHITENOISE_AUTOREFRESH = DEBUG
 
 WAGTAIL_SITE_NAME = "beobgrp_site"
 
+WAGTAILIMAGES_IMAGE_MODEL = "home.CustomImage"
+
 # Search
 # https://docs.wagtail.org/en/stable/topics/search/backends.html
 WAGTAILSEARCH_BACKENDS = {

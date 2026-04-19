@@ -5,7 +5,6 @@ from wagtail.admin.panels.field_panel import FieldPanel
 from wagtail.fields import RichTextField
 
 from home.models.common import CommonContextMixin, SidebarPromotionMixin
-from home.models.media import MediaMixin
 
 
 class PhotoPage(CommonContextMixin, Page):
@@ -77,12 +76,34 @@ class PhotoPage(CommonContextMixin, Page):
         return context
 
 
-class VideoPage(MediaMixin, CommonContextMixin, Page):
+class VideoPage(CommonContextMixin, Page):
     """
     A gallery page for displaying animated GIFs and videos.
-    Supports GIF and video media types.
     """
-    
+
+    MEDIA_TYPE_CHOICES = [
+        ("gif", "Animiertes GIF"),
+        ("video", "Videodatei"),
+    ]
+
+    media_file = models.FileField(
+        upload_to="videos/%Y/%m/",
+        null=True,
+        blank=True,
+        help_text="Videodatei (MP4, WebM, Ogg) oder animiertes GIF",
+    )
+    media_type = models.CharField(
+        max_length=10,
+        choices=MEDIA_TYPE_CHOICES,
+        default="video",
+        help_text="Typ des Mediums",
+    )
+    media_alt_text = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        help_text="Beschreibung für Barrierefreiheit",
+    )
     description: RichTextField = RichTextField(max_length=800, default="", blank=True)
     author: CharField = CharField(max_length=120, default="", blank=True)
     date: DateField = DateField()
@@ -90,8 +111,7 @@ class VideoPage(MediaMixin, CommonContextMixin, Page):
     location: CharField = CharField(max_length=255, default="", blank=True)
 
     content_panels = Page.content_panels + [
-        FieldPanel("image", heading="Animiertes GIF"),
-        FieldPanel("video", heading="Videodatei"),
+        FieldPanel("media_file", heading="Videodatei oder animiertes GIF"),
         FieldPanel("media_type", heading="Medientyp"),
         FieldPanel("media_alt_text", heading="Alt-Text für Barrierefreiheit"),
         FieldPanel("description", heading="Beschreibung"),
@@ -100,6 +120,15 @@ class VideoPage(MediaMixin, CommonContextMixin, Page):
         FieldPanel("time", heading="Uhrzeit"),
         FieldPanel("location", heading="Ort"),
     ]
+
+    def is_gif(self) -> bool:
+        return self.media_type == "gif" and bool(self.media_file)
+
+    def is_video(self) -> bool:
+        return self.media_type == "video" and bool(self.media_file)
+
+    def get_media_url(self):
+        return self.media_file.url if self.media_file else None
 
     def _get_gallery_siblings(self):
         """Get all gallery items (PhotoPage and VideoPage) ordered by date."""

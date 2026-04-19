@@ -1,38 +1,37 @@
-{% load wagtailimages_tags %}
 {% load wagtailcore_tags %}
 
-<div class="block-media-with-caption media-caption-{{ value.caption_position }}">
+<div class="block-video-with-caption video-caption-{{ value.caption_position }}">
     {% comment %} Only render link if both link_type AND the corresponding URL exist {% endcomment %}
     {% if value.link.link_type == 'internal' and value.link.internal_page %}
-        <a href="{{ value.link.internal_page.url }}" class="media-link">
+        <a href="{{ value.link.internal_page.url }}" class="video-link">
     {% elif value.link.link_type == 'external' and value.link.external_url %}
-        <a href="{{ value.link.external_url }}" target="_blank" rel="noopener" class="media-link">
+        <a href="{{ value.link.external_url }}" target="_blank" rel="noopener" class="video-link">
     {% endif %}
-    
+
     {% if value.caption_position == 'top' and value.caption %}
-        <div class="media-caption caption-top">
+        <div class="video-caption caption-top">
             {% include_block value.caption %}
         </div>
     {% endif %}
-    
+
     {% if value.caption_position == 'left' or value.caption_position == 'right' %}
         <div class="columns is-mobile is-gapless">
             {% if value.caption_position == 'left' and value.caption %}
                 <div class="column is-two-thirds-mobile is-three-quarters-tablet is-seven-eighths-desktop">
-                    <div class="media-caption caption-left">
+                    <div class="video-caption caption-left">
                         {% include_block value.caption %}
                     </div>
                 </div>
                 <div class="column is-one-third-mobile is-one-quarter-tablet is-one-eighth-desktop">
-                    {% include "blocks/media_renderer.html" %}
+                    {% include "blocks/video_renderer.html" %}
                 </div>
             {% else %}
                 <div class="column is-one-third-mobile is-one-quarter-tablet is-one-eighth-desktop">
-                    {% include "blocks/media_renderer.html" %}
+                    {% include "blocks/video_renderer.html" %}
                 </div>
                 {% if value.caption_position == 'right' and value.caption %}
                     <div class="column is-two-thirds-mobile is-three-quarters-tablet is-seven-eighths-desktop">
-                        <div class="media-caption caption-right">
+                        <div class="video-caption caption-right">
                             {% include_block value.caption %}
                         </div>
                     </div>
@@ -40,17 +39,17 @@
             {% endif %}
         </div>
     {% else %}
-        <div class="media-wrapper">
-            {% include "blocks/media_renderer.html" %}
+        <div class="video-wrapper">
+            {% include "blocks/video_renderer.html" %}
         </div>
     {% endif %}
-    
+
     {% if value.caption_position == 'bottom' and value.caption %}
-        <div class="media-caption caption-bottom">
+        <div class="video-caption caption-bottom">
             {% include_block value.caption %}
         </div>
     {% endif %}
-    
+
     {% comment %} Close the link tag if one was opened {% endcomment %}
     {% if value.link.link_type == 'internal' and value.link.internal_page %}
         </a>

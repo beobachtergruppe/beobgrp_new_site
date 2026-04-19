@@ -136,47 +136,36 @@ class ImageWithCaptionBlock(StructBlock):
         template = "blocks/image_with_caption.html"
 
 
-class MediaWithCaptionBlock(StructBlock):
+class VideoWithCaptionBlock(StructBlock):
     """
-    A flexible media block that supports images, animated GIFs, and videos with captions.
+    A block for displaying animated GIFs and videos with captions.
+    Images are handled separately by ImageWithCaptionBlock.
     """
-    
+
+    MEDIA_TYPE_CHOICES = [
+        ("gif", "Animiertes GIF"),
+        ("video", "Videodatei"),
+    ]
+
+    media_file = DocumentChooserBlock(
+        label="Datei",
+        help_text="Video (MP4, WebM, Ogg) oder animiertes GIF",
+    )
     media_type = ChoiceBlock(
-        choices=[
-            ("image", "Bild"),
-            ("gif", "Animiertes GIF"),
-            ("video", "Video"),
-        ],
-        default="image",
+        choices=MEDIA_TYPE_CHOICES,
+        default="video",
         label="Medientyp",
-        help_text="Wählen Sie den Typ des Mediums aus",
     )
-    
-    image = ImageChooserBlock(
-        required=False,
-        label="Bild oder GIF",
-        help_text="Wählen Sie ein Bild oder eine GIF-Datei",
-    )
-    
-    video = DocumentChooserBlock(
-        required=False,
-        label="Videodatei",
-        help_text="Wählen Sie eine Videodatei (MP4, WebM, Ogg)",
-    )
-    
     media_alt_text = CharBlock(
         required=False,
         max_length=255,
         label="Alt-Text",
         help_text="Beschreibung für Barrierefreiheit (wird nicht angezeigt, aber von Screenreadern gelesen)",
     )
-    
     caption = RichTextBlock(
         required=False,
-        label="Bildunterschrift",
-        help_text="Optionaler Text zur Beschreibung des Mediums",
+        label="Beschriftung",
     )
-    
     caption_position = ChoiceBlock(
         choices=[
             ("top", "Oben"),
@@ -185,28 +174,25 @@ class MediaWithCaptionBlock(StructBlock):
             ("right", "Rechts"),
         ],
         default="bottom",
-        label="Position der Bildunterschrift",
+        label="Position der Beschriftung",
     )
-    
     link = LinkBlock(
-        label="Optional Link",
-        help_text="Optionaler Link für das Medien (interne Seite oder externe URL)",
+        label="Optionaler Link",
+        help_text="Optionaler Link für das Medium (interne Seite oder externe URL)",
     )
-    
     autoplay = ChoiceBlock(
         choices=[
-            ("true", "Ja - Video und GIF starten automatisch"),
-            ("false", "Nein - Benutzer muss abspielen"),
+            ("true", "Ja"),
+            ("false", "Nein"),
         ],
         default="false",
         label="Autoplay",
         help_text="Nur für Videos und animierte GIFs",
     )
-    
     loop = ChoiceBlock(
         choices=[
-            ("true", "Ja - Wiederholen"),
-            ("false", "Nein - Einmal abspielen"),
+            ("true", "Ja"),
+            ("false", "Nein"),
         ],
         default="true",
         label="Schleife",
@@ -215,8 +201,8 @@ class MediaWithCaptionBlock(StructBlock):
 
     class Meta:  # type: ignore[misc]
         icon = "media"
-        label = "Medien mit Bildunterschrift (Bilder, GIF, Video)"
-        template = "blocks/media_with_caption.html"
+        label = "Video / Animiertes GIF mit Beschriftung"
+        template = "blocks/video_with_caption.html"
 
 
 def create_multi_column_block(content_blocks=None):
@@ -327,7 +313,7 @@ gen_body_content: list[Tuple[str, Block]] = [
     ),
     ("image", ImageChooserBlock()),
     ("image_with_caption", ImageWithCaptionBlock()),
-    ("media_with_caption", MediaWithCaptionBlock()),
+    ("video_with_caption", VideoWithCaptionBlock()),
 ]
 
 
