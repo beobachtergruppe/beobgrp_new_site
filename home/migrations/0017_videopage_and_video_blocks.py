@@ -1,6 +1,6 @@
-# Squashed from migrations 0017–0021.
-# Net result: VideoPage model (final fields), PhotoPage.photo FK fix,
-# and updated StreamFields (video_with_caption block). No CustomImage table.
+# Squashed from migrations 0017–0021 + document-chooser change for VideoPage.
+# Net result: VideoPage model (final fields, media_file as Document FK),
+# PhotoPage.photo FK fix, and updated StreamFields (video_with_caption block).
 
 import django.db.models.deletion
 import home.models.common
@@ -14,6 +14,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('home', '0016_remove_photopage_show_in_sidebar_and_more'),
         ('wagtailcore', '0096_referenceindex_referenceindex_source_object_and_more'),
+        ('wagtaildocs', '0014_alter_document_file_size'),
         ('wagtailimages', '0027_image_description'),
     ]
 
@@ -32,12 +33,13 @@ class Migration(migrations.Migration):
                     serialize=False,
                     to='wagtailcore.page',
                 )),
-                ('media_file', models.FileField(
+                ('media_file', models.ForeignKey(
                     blank=True,
-                    help_text='Videodatei (MP4, WebM, Ogg) oder animiertes GIF',
+                    help_text='Videodatei (MP4, WebM, Ogg) oder animiertes GIF – aus der Dokumentenbibliothek wählen',
                     null=True,
-                    upload_to='videos/%Y/%m/',
-                    validators=[home.models.gallery.validate_media_file],
+                    on_delete=django.db.models.deletion.SET_NULL,
+                    related_name='+',
+                    to='wagtaildocs.document',
                 )),
                 ('media_type', models.CharField(
                     choices=[('gif', 'Animiertes GIF'), ('video', 'Videodatei')],

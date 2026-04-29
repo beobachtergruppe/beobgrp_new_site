@@ -11,7 +11,7 @@ ALLOWED_MEDIA_EXTENSIONS = (".gif", ".mp4", ".webm", ".ogg", ".ogv")
 
 
 def validate_media_file(file):
-    """Accept only GIF and common video formats; reject all other files."""
+    """Kept for migration compatibility. Accept only GIF and common video formats."""
     name = file.name.lower()
     if not any(name.endswith(ext) for ext in ALLOWED_MEDIA_EXTENSIONS):
         raise ValidationError(
@@ -99,12 +99,13 @@ class VideoPage(CommonContextMixin, Page):
         ("video", "Videodatei"),
     ]
 
-    media_file = models.FileField(
-        upload_to="videos/%Y/%m/",
+    media_file = models.ForeignKey(
+        "wagtaildocs.Document",
         null=True,
         blank=True,
-        help_text="Videodatei (MP4, WebM, Ogg) oder animiertes GIF",
-        validators=[validate_media_file],
+        on_delete=models.SET_NULL,
+        related_name="+",
+        help_text="Videodatei (MP4, WebM, Ogg) oder animiertes GIF – aus der Dokumentenbibliothek wählen",
     )
     media_type = models.CharField(
         max_length=10,
@@ -125,11 +126,7 @@ class VideoPage(CommonContextMixin, Page):
     location: CharField = CharField(max_length=255, default="", blank=True)
 
     content_panels = Page.content_panels + [
-        FieldPanel(
-            "media_file",
-            heading="Videodatei oder animiertes GIF",
-            attrs={"accept": ".gif,.mp4,.webm,.ogg,.ogv,image/gif,video/mp4,video/webm,video/ogg"},
-        ),
+        FieldPanel("media_file", heading="Videodatei oder animiertes GIF"),
         FieldPanel("media_type", heading="Medientyp"),
         FieldPanel("media_alt_text", heading="Alt-Text für Barrierefreiheit"),
         FieldPanel("description", heading="Beschreibung"),
@@ -142,14 +139,19 @@ class VideoPage(CommonContextMixin, Page):
     def clean(self):
         super().clean()
         if self.media_file and self.media_type:
-            is_gif = self.media_file.name.lower().endswith(".gif")
+            name = self.media_file.file.name.lower()
+            if not any(name.endswith(ext) for ext in ALLOWED_MEDIA_EXTENSIONS):
+                raise ValidationError(
+                    {"media_file": "Nur GIF- und Videodateien sind erlaubt (GIF, MP4, WebM, Ogg)."}
+                )
+            is_gif = name.endswith(".gif")
             if is_gif and self.media_type != "gif":
                 raise ValidationError(
-                    {"media_type": "Die hochgeladene Datei ist ein GIF. Bitte wähle 'Animiertes GIF' als Medientyp."}
+                    {"media_type": "Die gewählte Datei ist ein GIF. Bitte wähle 'Animiertes GIF' als Medientyp."}
                 )
             if not is_gif and self.media_type == "gif":
                 raise ValidationError(
-                    {"media_type": "Die hochgeladene Datei ist kein GIF. Bitte wähle 'Videodatei' als Medientyp."}
+                    {"media_type": "Die gewählte Datei ist kein GIF. Bitte wähle 'Videodatei' als Medientyp."}
                 )
 
     def is_gif(self) -> bool:
