@@ -1,0 +1,27 @@
+{% comment %}
+Renders a video or animated GIF from a VideoWithCaptionBlock value.
+value.media_file is a Wagtail Document (DocumentChooserBlock).
+value.media_type is either 'video' or 'gif'.
+{% endcomment %}
+
+{% if value.media_file %}
+    {% if value.media_type == 'gif' %}
+        <img
+            src="{{ value.media_file.url }}"
+            alt="{{ value.media_alt_text|default:value.media_file.title }}"
+            class="media-gif is-fullwidth"
+        />
+    {% else %}
+        <video
+            src="{{ value.media_file.url }}"
+            controls
+            class="media-video is-fullwidth"
+            {% if value.autoplay == 'true' %}autoplay{% endif %}
+            {% if value.loop == 'true' %}loop{% endif %}
+        >
+            Ihr Browser unterstützt das Video-Element nicht.
+        </video>
+    {% endif %}
+{% else %}
+    <p class="error-message">Keine Datei ausgewählt.</p>
+{% endif %}

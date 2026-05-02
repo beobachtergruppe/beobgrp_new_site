@@ -1,11 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Tuple
 
+from django import forms
+from django.core.exceptions import ValidationError
 from wagtail.blocks import Block, StreamBlock
 from wagtail.blocks.field_block import RichTextBlock, CharBlock, URLBlock, ChoiceBlock
 from wagtail.blocks.struct_block import StructBlock, StructBlockValidationError
-from django.core.exceptions import ValidationError
 from wagtail.images.blocks import ImageChooserBlock
+from wagtail.documents.blocks import DocumentChooserBlock
 from wagtail.blocks import PageChooserBlock
 from django.utils.text import slugify
 from django.db import models
@@ -13,6 +15,27 @@ from wagtail.admin.panels.field_panel import FieldPanel
 
 if TYPE_CHECKING:
     from django.http import HttpRequest
+
+
+class VideoDocumentChooserBlock(DocumentChooserBlock):
+    """
+    A DocumentChooserBlock restricted to GIF and video file types.
+    Raises a validation error if the chosen document is not a supported format.
+    """
+
+    ALLOWED_EXTENSIONS = (".gif", ".mp4", ".webm", ".ogg", ".ogv")
+
+    def clean(self, value):
+        document = super().clean(value)
+        if document is not None:
+            name = document.file.name.lower()
+            if not any(name.endswith(ext) for ext in self.ALLOWED_EXTENSIONS):
+                raise forms.ValidationError(
+                    "Nur GIF- und Videodateien sind erlaubt (GIF, MP4, WebM, Ogg). "
+                    f"Die Datei '{document.title}' hat ein ungültiges Format."
+                )
+        return document
+
 
 
 def generate_anchor_id(text: str) -> str:
@@ -135,6 +158,99 @@ class ImageWithCaptionBlock(StructBlock):
         template = "blocks/image_with_caption.html"
 
 
+class VideoWithCaptionBlock(StructBlock):
+    """
+    A block for displaying animated GIFs and videos with captions.
+    Images are handled separately by ImageWithCaptionBlock.
+    """
+
+    MEDIA_TYPE_CHOICES = [
+        ("gif", "Animiertes GIF"),
+        ("video", "Videodatei"),
+    ]
+
+    media_file = VideoDocumentChooserBlock(
+        label="Datei",
+        help_text="Video (MP4, WebM, Ogg) oder animiertes GIF",
+    )
+    media_type = ChoiceBlock(
+        choices=MEDIA_TYPE_CHOICES,
+        default="video",
+        label="Medientyp",
+    )
+    media_alt_text = CharBlock(
+        required=False,
+        max_length=255,
+        label="Alt-Text",
+        help_text="Beschreibung für Barrierefreiheit (wird nicht angezeigt, aber von Screenreadern gelesen)",
+    )
+    caption = RichTextBlock(
+        required=False,
+        label="Beschriftung",
+    )
+    caption_position = ChoiceBlock(
+        choices=[
+            ("top", "Oben"),
+            ("bottom", "Unten"),
+            ("left", "Links"),
+            ("right", "Rechts"),
+        ],
+        default="bottom",
+        label="Position der Beschriftung",
+    )
+    link = LinkBlock(
+        label="Optionaler Link",
+        help_text="Optionaler Link für das Medium (interne Seite oder externe URL)",
+    )
+    autoplay = ChoiceBlock(
+        choices=[
+            ("true", "Ja"),
+            ("false", "Nein"),
+        ],
+        default="false",
+        label="Autoplay",
+        help_text="Nur für Videos und animierte GIFs",
+    )
+    loop = ChoiceBlock(
+        choices=[
+            ("true", "Ja"),
+            ("false", "Nein"),
+        ],
+        default="true",
+        label="Schleife",
+        help_text="Nur für Videos und animierte GIFs",
+    )
+
+    def clean(self, value):
+        result = super().clean(value)
+        document = result.get("media_file")
+        media_type = result.get("media_type")
+        if document is not None and media_type is not None:
+            is_gif = document.file.name.lower().endswith(".gif")
+            if is_gif and media_type != "gif":
+                raise StructBlockValidationError(
+                    block_errors={
+                        "media_type": forms.ValidationError(
+                            "Die hochgeladene Datei ist ein GIF. Bitte wähle 'Animiertes GIF' als Medientyp."
+                        )
+                    }
+                )
+            if not is_gif and media_type == "gif":
+                raise StructBlockValidationError(
+                    block_errors={
+                        "media_type": forms.ValidationError(
+                            "Die hochgeladene Datei ist kein GIF. Bitte wähle 'Videodatei' als Medientyp."
+                        )
+                    }
+                )
+        return result
+
+    class Meta:  # type: ignore[misc]
+        icon = "media"
+        label = "Video / Animiertes GIF mit Beschriftung"
+        template = "blocks/video_with_caption.html"
+
+
 def create_multi_column_block(content_blocks=None):
     """
     Factory function to create a MultiColumnBlock class with configurable content blocks.
@@ -243,6 +359,7 @@ gen_body_content: list[Tuple[str, Block]] = [
     ),
     ("image", ImageChooserBlock()),
     ("image_with_caption", ImageWithCaptionBlock()),
+    ("video_with_caption", VideoWithCaptionBlock()),
 ]
 
 

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static wagtailcore_tags wagtailimages_tags %}
 
-{% block body_class %}template-homepage{% endblock %}
+{% block body_class %}template-video-page{% endblock %}
 
 {% block extra_css %}
 
@@ -24,10 +24,14 @@
     </div>
     
     <figure class="media-container">
-        {% if page.photo %}
-            {% image page.photo original class="is-fluid" %}
+        {% if page.is_video %}
+            <video src="{{ page.get_media_url }}" controls class="media-video">
+                Ihr Browser unterstützt das Video-Element nicht.
+            </video>
+        {% elif page.is_gif %}
+            <img src="{{ page.get_media_url }}" alt="{{ page.media_alt_text|default:page.title }}" class="media-gif" />
         {% else %}
-            <p>Kein Foto verfügbar</p>
+            <p>Kein Medien verfügbar</p>
         {% endif %}
         
         <figcaption>
@@ -36,7 +40,6 @@
             <p>Ort: {{ page.location }}</p>
             <p>Datum: {{ page.date }} {{ page.time|default_if_none:"" }}</p>
         </figcaption>
-    </figure>
+    </figure>   
 
 {% endblock content %}
-
