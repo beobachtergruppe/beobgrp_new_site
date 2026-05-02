@@ -22,8 +22,8 @@
                         }
                     </style>
                     <div class="card" id="event-{{ event.web_id }}">
-                        <div class="card-header columns {{ event.warning_class }}">
-                            {% if event.status %}
+                        <div class="card-header columns {{ event.cancelled|yesno:'not-available,' }}">
+                            {% if event.cancelled %}
                                 <span class="column is-text-col">{{ event.status|upper }}! </span>
                             {% endif %}
                             <span class="column is-text-col">{{ event.event_type }}</span>

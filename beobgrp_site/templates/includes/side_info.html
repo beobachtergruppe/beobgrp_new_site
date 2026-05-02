@@ -1,13 +1,16 @@
-<div class="eventbox {{ event.warning_class }}">
+{% load static %}
+<div class="eventbox {{ event.cancelled|yesno:'not-available,' }}">
     <p>
-        {% if event.status %}
+        {% if event.cancelled %}
             <b>{{ event.status|upper }}!:</b>
             <div class="strikethrough">
         {% endif %}
         {{ event.event_type }}: <b><a href="{{ event.get_parent.get_url }}#event-{{ event.web_id }}">{{ event.event_title }}</a></b> am
         <b>{{ event.start_time|date:"D" }} {{ event.start_time|date:"d.m, H:i" }} Uhr</b>
-        {% if event.status %}
+        {% if event.cancelled %}
             </div>
+        {% elif event.booked_out %}
+            <b><img src="{% static 'images/Paomedia_small-n-flat_sign-warning.svg' %}" alt="" style="height:1em; vertical-align:middle; margin-right:0.25em;"> AUSGEBUCHT!</b>
         {% endif %}
     </p>
 </div>
