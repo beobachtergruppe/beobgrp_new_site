@@ -13,18 +13,24 @@
     {{ page.description|richtext }}
     <hr/>
     <div class="columns is-multiline">
-        {% for photo_page in photos %}
+        {% for item in photos %}
             <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
-                <a href="{% pageurl photo_page %}">
+                <a href="{% pageurl item %}">
                     <div class="card">
                         <div class="card-image">
-                            {% image photo_page.photo original class="is-fullwidth" %}
+                            {% with thumb=item.get_thumbnail %}
+                                {% if thumb %}
+                                    {% image thumb original class="is-fullwidth" %}
+                                {% else %}
+                                    <span class="icon is-large"><img src="{% static 'icons/play.svg' %}" alt="Video"/></span>
+                                {% endif %}
+                            {% endwith %}
                         </div>
                         <div class="card-content">
-                            <p>{{ photo_page.title }}</p>
+                            <p>{{ item.title }}</p>
                         </div>
                     </div>
-                </a>                   
+                </a>
             </div>
         {% endfor %}
     </div>

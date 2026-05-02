@@ -50,6 +50,9 @@ class PhotoPage(CommonContextMixin, Page):
         FieldPanel("location", heading="Ort"),
     ]
 
+    def get_thumbnail(self):
+        return self.photo
+
     def _get_gallery_siblings(self):
         """Get all gallery items (PhotoPage and VideoPage) ordered by date."""
         parent = self.get_parent()
@@ -99,6 +102,14 @@ class VideoPage(CommonContextMixin, Page):
         ("video", "Videodatei"),
     ]
 
+    thumbnail = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        help_text="Vorschaubild für die Galerie-Übersicht",
+    )
     media_file = models.ForeignKey(
         "wagtaildocs.Document",
         null=True,
@@ -126,6 +137,7 @@ class VideoPage(CommonContextMixin, Page):
     location: CharField = CharField(max_length=255, default="", blank=True)
 
     content_panels = Page.content_panels + [
+        FieldPanel("thumbnail", heading="Vorschaubild (für Galerie-Übersicht)"),
         FieldPanel("media_file", heading="Videodatei oder animiertes GIF"),
         FieldPanel("media_type", heading="Medientyp"),
         FieldPanel("media_alt_text", heading="Alt-Text für Barrierefreiheit"),
@@ -153,6 +165,9 @@ class VideoPage(CommonContextMixin, Page):
                 raise ValidationError(
                     {"media_type": "Die gewählte Datei ist kein GIF. Bitte wähle 'Videodatei' als Medientyp."}
                 )
+
+    def get_thumbnail(self):
+        return self.thumbnail
 
     def is_gif(self) -> bool:
         return self.media_type == "gif" and bool(self.media_file)

@@ -41,6 +41,14 @@ class Migration(migrations.Migration):
                     related_name='+',
                     to='wagtaildocs.document',
                 )),
+                ('thumbnail', models.ForeignKey(
+                    blank=True,
+                    help_text='Vorschaubild für die Galerie-Übersicht',
+                    null=True,
+                    on_delete=django.db.models.deletion.SET_NULL,
+                    related_name='+',
+                    to='wagtailimages.image',
+                )),
                 ('media_type', models.CharField(
                     choices=[('gif', 'Animiertes GIF'), ('video', 'Videodatei')],
                     default='video',
