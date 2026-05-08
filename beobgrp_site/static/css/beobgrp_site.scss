@@ -81,21 +81,21 @@ span[id^="block-"] {
   border-radius: 0.5rem !important
 }
 
-.block-paragraph {
+.w-block-paragraph {
   @include block-heading-spacing;
   background-color: $content-background-color;
   overflow: hidden;
   display: flow-root
 }
 
-.block-image {
+.w-block-image {
   @include block-heading-spacing;
   background-color: $content-background-color;
   overflow: hidden;
   display: flow-root
 }
 
-.block-image-with-caption {
+.w-block-image-with-caption {
   @include block-heading-spacing;
   background-color: $content-background-color;
   overflow: hidden;
@@ -109,7 +109,7 @@ span[id^="block-"] {
 
 $title-bottom-padding: 0.2em;
 
-.block-h1 {
+.w-block-h1 {
   @extend .title;
   @extend .is-3;
   @include block-heading-spacing;
@@ -117,7 +117,7 @@ $title-bottom-padding: 0.2em;
   margin-top: 2rem !important; // Custom top margin if needed
 }
 
-.block-h2 {
+.w-block-h2 {
   @extend .title;
   @extend .is-4;
   @include block-heading-spacing;
@@ -125,7 +125,7 @@ $title-bottom-padding: 0.2em;
   margin-top: 2rem !important;
 }
 
-.block-h3 {
+.w-block-h3 {
   @extend .title;
   @extend .is-5;
   @include block-heading-spacing;
@@ -133,7 +133,7 @@ $title-bottom-padding: 0.2em;
   margin-top: 1rem !important;
 }
 
-.block-h4 {
+.w-block-h4 {
   @extend .title;
   @extend .is-6;
   font-style: bold;
@@ -142,7 +142,7 @@ $title-bottom-padding: 0.2em;
   margin-top: 1rem !important;
 }
 
-.block-h5 {
+.w-block-h5 {
   @extend .title;
   @extend .is-6;
   @include block-heading-spacing;

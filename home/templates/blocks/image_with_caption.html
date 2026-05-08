@@ -1,7 +1,7 @@
 {% load wagtailimages_tags %}
 {% load wagtailcore_tags %}
 
-<div class="block-image-with-caption image-caption-{{ value.caption_position }}">
+<div class="w-block-image-with-caption image-caption-{{ value.caption_position }}">
     {% comment %} Only render link if both link_type AND the corresponding URL exist {% endcomment %}
     {% if value.link.link_type == 'internal' and value.link.internal_page %}
         <a href="{{ value.link.internal_page.url }}" class="image-link">
