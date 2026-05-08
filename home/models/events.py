@@ -45,12 +45,20 @@ class EventTypes(TextChoices):
 
 class SingleEventForm(WagtailAdminPageForm):
     def clean(self):
+        # Provide a temporary placeholder so Wagtail's title-required validation passes
+        # before we overwrite it with the generated value below.
         if not self.data.get("title"):
             self.data = self.data.copy()
-            self.data["title"] = "Default Placeholder Title"
-            self.data["slug"] = "default-placeholder-slug"
+            self.data["title"] = "placeholder"
+            self.data["slug"] = "placeholder"
 
         cleaned_data = super().clean()
+
+        start_time = cleaned_data.get("start_time")
+        event_title = cleaned_data.get("event_title", "")
+        generated_title = _get_default_event_title(start_time, event_title)
+        cleaned_data["title"] = generated_title
+        cleaned_data["slug"] = slugify(generated_title)
         return cleaned_data
 
 
@@ -79,10 +87,7 @@ class SingleEvent(Page):
     booked_out: BooleanField = BooleanField(default=False)
     needs_reservation: BooleanField = BooleanField(default=True)
 
-    def __post_init__(self):
-        self.title.editable = False
-
-    content_panels = Page.content_panels + [
+    content_panels = [
         FieldPanel("event_type", heading="Art der Veranstaltung"),
         FieldPanel("event_title", heading="Titel"),
         FieldPanel("needs_reservation", heading="Reservierung erforderlich"),
@@ -95,7 +100,15 @@ class SingleEvent(Page):
         FieldPanel("image", heading="Foto"),
     ]
 
-    # Override the save method to auto-generate title and slug
+    def clean(self):
+        # Called by _post_clean() after all form values are applied to the instance.
+        # At this point self.start_time already has the newly submitted value, so the
+        # generated title and slug always reflect the current data.
+        self.title = _get_default_event_title(self.start_time, self.event_title)
+        self.slug = slugify(self.title)
+        super().clean()
+
+    # Keep save() as an additional safety net (e.g. programmatic saves).
     def save(self, *args, **kwargs):
         self.title = _get_default_event_title(self.start_time, self.event_title)
         self.slug = slugify(self.title)
