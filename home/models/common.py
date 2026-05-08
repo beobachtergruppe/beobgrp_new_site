@@ -442,6 +442,11 @@ class SidebarPromotionMixin(models.Model):
         help_text="Wenn aktiviert, wird diese Seite mit einem Link im Seitenbalken angezeigt.",
     )
 
+    show_sidebar_on_mobile = models.BooleanField(
+        default=False,
+        help_text="Wenn aktiviert, wird der Seitenbalken auf mobilen Geräten oben auf der Seite angezeigt.",
+    )
+
     sidebar_text = models.CharField(
         max_length=255,
         blank=True,
@@ -467,6 +472,7 @@ class SidebarPromotionMixin(models.Model):
         FieldPanel("seo_title"),
         FieldPanel("search_description"),
         FieldPanel("show_in_sidebar", heading="Im Seitenbalken anzeigen"),
+        FieldPanel("show_sidebar_on_mobile", heading="Seitenbalken auf mobilen Geräten anzeigen"),
         FieldPanel(
             "sidebar_text",
             heading="Seitenbalken-Text",
