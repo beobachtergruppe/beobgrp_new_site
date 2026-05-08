@@ -52,7 +52,7 @@
         {# Main Layout #}
         <div class="container mt-3 is-fluid">
             <div class="columns">
-                <aside class="aside-column is-one-fifth">
+                <aside class="aside-column is-one-fifth{% if not page.show_sidebar_on_mobile %} is-hidden-mobile{% endif %}">
                     <h4>Aktuelles:</h4>
                     {% for event in upcoming_events %}
                         {% include "includes/side_info.html" %}
