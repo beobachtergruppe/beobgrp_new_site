@@ -45,37 +45,83 @@ class EventTypes(TextChoices):
 
 class SingleEventForm(WagtailAdminPageForm):
     def clean(self):
-        # Provide a temporary placeholder so Wagtail's title-required validation passes
-        # before we overwrite it with the generated value below.
-        if not self.data.get("title"):
-            self.data = self.data.copy()
-            self.data["title"] = "placeholder"
-            self.data["slug"] = "placeholder"
-
+        # Step 1: Handle OBSERVE event default title before any validation
+        event_type = self.data.get("event_type")
+        event_title = self.data.get("event_title", "")
+        
+        if event_type == EventTypes.OBSERVE and not event_title:
+            event_title = _get_default_event_title(event_type)
+            # Update form data so super().clean() sees the default title
+            if not self.data.get("event_title"):
+                self.data = self.data.copy()
+                self.data["event_title"] = event_title
+        
+        # Step 2: Generate and set title/slug BEFORE calling super().clean()
+        # This ensures Wagtail's slug validation sees a valid slug
+        start_time = self.data.get("start_time")
+        if start_time and event_title:
+            try:
+                generated_title = _get_page_title(start_time, event_title)
+                if not self.data.get("title"):
+                    self.data = self.data.copy()
+                    self.data["title"] = generated_title
+                    self.data["slug"] = slugify(generated_title)
+            except ValueError:
+                # If generation fails, provide fallback so Wagtail validation doesn't fail
+                if not self.data.get("slug"):
+                    self.data = self.data.copy()
+                    self.data["slug"] = "event"
+        else:
+            # Ensure slug is set even if we can't generate title yet
+            if not self.data.get("slug"):
+                self.data = self.data.copy()
+                self.data["slug"] = "event"
+        
+        # Step 3: Now call super().clean() with valid title/slug in place
         cleaned_data = super().clean()
-
-        start_time = cleaned_data.get("start_time")
+        
+        # Step 4: Perform custom validation on cleaned data
+        event_type = cleaned_data.get("event_type")
         event_title = cleaned_data.get("event_title", "")
-        generated_title = _get_default_event_title(start_time, event_title)
-        cleaned_data["title"] = generated_title
-        cleaned_data["slug"] = slugify(generated_title)
+        referent = cleaned_data.get("referent", "")
+        abstract = cleaned_data.get("abstract", "")
+        
+        # For non-OBSERVE events, title, referent, and abstract are required
+        if event_type != EventTypes.OBSERVE:
+            if not event_title:
+                self.add_error("event_title", "Titel ist erforderlich für diesen Veranstaltungstyp.")
+            if not referent:
+                self.add_error("referent", "Referent ist erforderlich für diesen Veranstaltungstyp.")
+            if not abstract:
+                self.add_error("abstract", "Zusammenfassung ist erforderlich für diesen Veranstaltungstyp.")
+        
         return cleaned_data
 
 
-def _get_default_event_title(start_time, event_title):
-    if start_time and event_title:
-        formatted_start_time = localtime(start_time).strftime("%Y-%m-%d %H:%M")
-        return f"{formatted_start_time} - {event_title}"
-    return "Default Title"
+def _get_page_title(start_time, event_title):
+    if not start_time:
+        raise ValueError("start_time is required to generate page title")
+    if not event_title:
+        raise ValueError("event_title is required to generate page title")
+    
+    formatted_start_time = localtime(start_time).strftime("%Y-%m-%d %H:%M")
+    return f"{formatted_start_time} - {event_title}"
+
+
+def _get_default_event_title(event_type):
+    """Get the default event title for a specific event type."""
+    if event_type == EventTypes.OBSERVE:
+        return "Beobachtungsabend"
+    return ""
 
 
 class SingleEvent(Page):
     start_time: DateTimeField = DateTimeField()
     event_type: CharField = CharField(choices=EventTypes.choices)
-    event_title: CharField = CharField(max_length=140, default="")
+    event_title: CharField = CharField(max_length=140, default="", blank=True)
     location: CharField = CharField(max_length=120, default="Deutsches Museum")
-    referent: CharField = CharField(max_length=120, default="")
-    abstract: RichTextField = RichTextField(max_length=800, default="")
+    referent: CharField = CharField(max_length=120, default="", blank=True)
+    abstract: RichTextField = RichTextField(max_length=800, default="", blank=True)
     image: models.ForeignKey = models.ForeignKey(
         "wagtailimages.Image",
         null=True,
@@ -89,14 +135,14 @@ class SingleEvent(Page):
 
     content_panels = [
         FieldPanel("event_type", heading="Art der Veranstaltung"),
-        FieldPanel("event_title", heading="Titel"),
+        FieldPanel("event_title", heading="Titel (optional für Beobachtungsabend)"),
         FieldPanel("needs_reservation", heading="Reservierung erforderlich"),
         FieldPanel("cancelled", heading="Abgesagt"),
         FieldPanel("booked_out", heading="Ausgebucht"),
         FieldPanel("start_time", heading="Zeit"),
         FieldPanel("location", heading="Ort"),
-        FieldPanel("referent", heading="Referent"),
-        FieldPanel("abstract", heading="Zusammenfassung"),
+        FieldPanel("referent", heading="Referent (optional für Beobachtungsabend)"),
+        FieldPanel("abstract", heading="Zusammenfassung (optional für Beobachtungsabend)"),
         FieldPanel("image", heading="Foto"),
     ]
 
@@ -104,14 +150,22 @@ class SingleEvent(Page):
         # Called by _post_clean() after all form values are applied to the instance.
         # At this point self.start_time already has the newly submitted value, so the
         # generated title and slug always reflect the current data.
-        self.title = _get_default_event_title(self.start_time, self.event_title)
-        self.slug = slugify(self.title)
+        try:
+            self.title = _get_page_title(self.start_time, self.event_title)
+            self.slug = slugify(self.title)
+        except ValueError as e:
+            logger.error(f"Cannot clean SingleEvent: {e}")
+            raise
         super().clean()
 
     # Keep save() as an additional safety net (e.g. programmatic saves).
     def save(self, *args, **kwargs):
-        self.title = _get_default_event_title(self.start_time, self.event_title)
-        self.slug = slugify(self.title)
+        try:
+            self.title = _get_page_title(self.start_time, self.event_title)
+            self.slug = slugify(self.title)
+        except ValueError as e:
+            logger.error(f"Cannot save SingleEvent: {e}")
+            raise
         super().save(*args, **kwargs)
 
     @cached_property
@@ -148,27 +202,75 @@ class SingleEvent(Page):
 
     @cached_property
     def reservation_mailto_link(self) -> str:
+        # Build body based on whether event has a real title or just the default
+        # Use detailed format only for events with custom titles (not auto-assigned defaults)
+        has_custom_title = self.event_title and self.event_title != _get_default_event_title(self.event_type)
+        
+        if has_custom_title:
+            # Detailed format for events with titles (Vortrag, Ausflug, etc.)
+            referent_line = (
+                f"  {self.referent}\n"
+                if self.referent and self.event_type in [
+                    EventTypes.TALK,
+                    EventTypes.HYBRID,
+                    EventTypes.ONLINE,
+                ]
+                else ""
+            )
+            
+            location_line = (
+                f"  Ort: {self.location}\n"
+                if self.location and self.event_type in [
+                    EventTypes.TALK,
+                    EventTypes.HYBRID,
+                    EventTypes.OBSERVE,
+                    EventTypes.EXCURSION,
+                ]
+                else ""
+            )
+            
+            body = textwrap.dedent(f"""
+                Liebe Beobachtergruppe,
+                
+                bitte um Anmeldung zum folgenden {self.event_type}:
+                
+                  {self.event_title}
+                {referent_line}{location_line}
+                am {self.start_time:%A, den %d.%m.%y} um {self.start_time:%H:%M} Uhr
+                
+                Name, Vorname: ...
+                Anzahl Personen: ...
+                
+                Mit freundlichen Grüßen
+                ...
+            """).strip()
+        else:
+            # Simple inline format for events without custom titles (e.g., Beobachtungsabend)
+            location_str = f"im {self.location}" if self.location else ""
+            body = textwrap.dedent(f"""
+                Liebe Beobachtergruppe,
+                
+                bitte um Anmeldung zum {self.event_type} {location_str} am {self.start_time:%A, den %d.%m.%y} um {self.start_time:%H:%M} Uhr.
+                
+                Name, Vorname: ...
+                Anzahl Personen: ...
+                
+                Mit freundlichen Grüßen
+                ...
+            """).strip()
+        
+        # Build subject with event type
+        subject_prefix = f"{self.event_type} am {self.start_time:%d.%m.%y}"
+        subject = (
+            f"Anmeldung für {subject_prefix} ({self.event_title})"
+            if has_custom_title
+            else f"Anmeldung für {subject_prefix}"
+        )
+        
         return create_email_link(
             email_address="reservierung@beobachtergruppe.de",
-            subject=f"Anmeldung für den Vortrag am {self.start_time:%d.%m.%y} ({self.event_title})",
-            body=textwrap.dedent(
-                f"""
-                  Liebe Beobachtergruppe,
-                  
-                  bitte um Anmeldung zum folgenden Vortrag:
-                  
-                    {self.event_title}
-                    {self.referent}
-                  
-                    am {self.start_time:%A, den %d.%m.%y} um {self.start_time:%H:%M} Uhr
-                   
-                  Name, Vorname: ... 
-                  Anzahl Personen: ...
-                  
-                  Mit freundlichen Grüßen
-                  ...
-            """
-            ),
+            subject=subject,
+            body=body,
         )
 
     base_form_class = SingleEventForm
