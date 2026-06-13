@@ -82,3 +82,21 @@ class SingleEventSimpleTests(TestCase):
         self.assertTrue(hasattr(event, "needs_reservation"))
         self.assertTrue(hasattr(event, "cancelled"))
         self.assertTrue(hasattr(event, "booked_out"))
+
+    def test_first_reservation_date(self):
+        """Test that first_reservation_date is 4 weeks before start_time."""
+        # Create a date 10 weeks in the future
+        start_time = make_aware(datetime.now() + timedelta(weeks=10))
+        event = SingleEvent(
+            title="Test Event",
+            slug="test-event",
+            event_title="Test Event",
+            start_time=start_time,
+            event_type=EventTypes.TALK,
+            referent="Speaker",
+            abstract=RichText("Abstract"),
+        )
+        
+        # first_reservation_date should be 4 weeks before start_time
+        expected_date = (start_time.date()) - timedelta(weeks=4)
+        self.assertEqual(event.first_reservation_date, expected_date)

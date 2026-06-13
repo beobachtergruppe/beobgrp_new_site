@@ -18,7 +18,8 @@ import logging
 from copy import deepcopy
 
 from django.db.models import TextChoices
-from django.utils.timezone import localtime, now
+from django.utils.timezone import localtime, now, make_aware, is_naive
+from django.utils.dateparse import parse_datetime
 from wagtail.admin.forms.pages import WagtailAdminPageForm
 from wagtail.blocks.field_block import MultipleChoiceBlock
 from wagtail.blocks.struct_block import StructBlock
@@ -43,7 +44,26 @@ class EventTypes(TextChoices):
     EXCURSION = "Ausflug", "Ausflug"
 
 
+# Form field constraints (must not exceed DB model max_length values)
+EVENT_TITLE_MAX_LENGTH = 80   # DB max_length: 140
+ABSTRACT_MAX_LENGTH = 600     # DB max_length: 800
+
+# Ensure form constraints don't exceed DB model constraints
+assert EVENT_TITLE_MAX_LENGTH <= 140, "EVENT_TITLE_MAX_LENGTH must not exceed DB model max_length (140)"
+assert ABSTRACT_MAX_LENGTH <= 800, "ABSTRACT_MAX_LENGTH must not exceed DB model max_length (800)"
+
 class SingleEventForm(WagtailAdminPageForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Add max_length to form fields to show character counter in admin
+        if 'event_title' in self.fields:
+            self.fields['event_title'].max_length = EVENT_TITLE_MAX_LENGTH
+        if 'abstract' in self.fields:
+            self.fields['abstract'].max_length = ABSTRACT_MAX_LENGTH
+            # RichTextArea stores max_length in widget.options for the JS character counter
+            if hasattr(self.fields['abstract'].widget, 'options'):
+                self.fields['abstract'].widget.options['max_length'] = ABSTRACT_MAX_LENGTH
+    
     def clean(self):
         # Step 1: Handle OBSERVE event default title before any validation
         event_type = self.data.get("event_type")
@@ -86,6 +106,14 @@ class SingleEventForm(WagtailAdminPageForm):
         referent = cleaned_data.get("referent", "")
         abstract = cleaned_data.get("abstract", "")
         
+        # Validate event_title length (character limit for new/updated titles)
+        if event_title and len(event_title) > EVENT_TITLE_MAX_LENGTH:
+            self.add_error("event_title", f"Titel darf maximal {EVENT_TITLE_MAX_LENGTH} Zeichen lang sein.")
+        
+        # Validate abstract length (character limit for new/updated abstracts)
+        if abstract and len(abstract) > ABSTRACT_MAX_LENGTH:
+            self.add_error("abstract", f"Zusammenfassung darf maximal {ABSTRACT_MAX_LENGTH} Zeichen lang sein.")
+        
         # For non-OBSERVE events, title, referent, and abstract are required
         if event_type != EventTypes.OBSERVE:
             if not event_title:
@@ -103,6 +131,13 @@ def _get_page_title(start_time, event_title):
         raise ValueError("start_time is required to generate page title")
     if not event_title:
         raise ValueError("event_title is required to generate page title")
+    
+    if isinstance(start_time, str):
+        start_time = parse_datetime(start_time)
+        if start_time is None:
+            raise ValueError(f"Cannot parse start_time string")
+    if is_naive(start_time):
+        start_time = make_aware(start_time)
     
     formatted_start_time = localtime(start_time).strftime("%Y-%m-%d %H:%M")
     return f"{formatted_start_time} - {event_title}"
@@ -135,14 +170,14 @@ class SingleEvent(Page):
 
     content_panels = [
         FieldPanel("event_type", heading="Art der Veranstaltung"),
-        FieldPanel("event_title", heading="Titel (optional für Beobachtungsabend)"),
+        FieldPanel("start_time", heading="Zeit"),
+        FieldPanel("event_title", heading="Titel (optional für Beobachtungsabend)", help_text=f"Max. {EVENT_TITLE_MAX_LENGTH} Zeichen"),
         FieldPanel("needs_reservation", heading="Reservierung erforderlich"),
         FieldPanel("cancelled", heading="Abgesagt"),
         FieldPanel("booked_out", heading="Ausgebucht"),
-        FieldPanel("start_time", heading="Zeit"),
-        FieldPanel("location", heading="Ort"),
-        FieldPanel("referent", heading="Referent (optional für Beobachtungsabend)"),
-        FieldPanel("abstract", heading="Zusammenfassung (optional für Beobachtungsabend)"),
+        FieldPanel("location", heading="Ort", help_text=f"Max. 120 Zeichen"),
+        FieldPanel("referent", heading="Referent (optional für Beobachtungsabend)", help_text=f"Max. 120 Zeichen"),
+        FieldPanel("abstract", heading="Zusammenfassung (optional für Beobachtungsabend)", help_text=f"Max. {ABSTRACT_MAX_LENGTH} Zeichen"),
         FieldPanel("image", heading="Foto"),
     ]
 
@@ -175,7 +210,7 @@ class SingleEvent(Page):
 
     @cached_property
     def first_reservation_date(self) -> date:
-        return self.start_time.date() - timedelta(weeks=4)
+        return localtime(self.start_time).date() - timedelta(weeks=4)
 
     @cached_property
     def is_reservable(self) -> bool:
