@@ -5,7 +5,7 @@ Simplified tests for Gallery models
 from django.test import TestCase
 from wagtail.rich_text import RichText
 
-from home.models import GalleryIndexPage, GalleryPage, PhotoPage
+from home.models import GalleryIndexPage, GalleryPage, PhotoPage, VideoPage
 
 
 class GallerySimpleTests(TestCase):
@@ -35,10 +35,12 @@ class GallerySimpleTests(TestCase):
         self.assertEqual(gallery.title, "Test Gallery")
 
     def test_gallery_page_subpage_types(self):
-        """Test that GalleryPage can have PhotoPage as child."""
+        """Test that GalleryPage can have PhotoPage and VideoPage as children."""
         # subpage_types is a list of classes, not strings
-        self.assertEqual(len(GalleryPage.subpage_types), 1)
-        self.assertEqual(GalleryPage.subpage_types[0].__name__, "PhotoPage")
+        self.assertEqual(len(GalleryPage.subpage_types), 2)
+        subpage_type_names = [t.__name__ for t in GalleryPage.subpage_types]
+        self.assertIn("PhotoPage", subpage_type_names)
+        self.assertIn("VideoPage", subpage_type_names)
 
     def test_photo_page_exists(self):
         """Test that PhotoPage model can be instantiated."""
