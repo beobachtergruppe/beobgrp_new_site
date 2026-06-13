@@ -5,7 +5,7 @@ Simplified tests for Gallery models
 from django.test import TestCase
 from wagtail.rich_text import RichText
 
-from home.models import GalleryIndexPage, GalleryPage, PhotoPage, VideoPage
+from home.models import GalleryIndexPage, GalleryPage, PhotoPage
 
 
 class GallerySimpleTests(TestCase):

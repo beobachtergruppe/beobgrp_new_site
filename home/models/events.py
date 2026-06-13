@@ -63,11 +63,15 @@ class SingleEventForm(WagtailAdminPageForm):
             # RichTextArea stores max_length in widget.options for the JS character counter
             if hasattr(self.fields['abstract'].widget, 'options'):
                 self.fields['abstract'].widget.options['max_length'] = ABSTRACT_MAX_LENGTH
+        # Make slug not required at the field level; we generate it in clean()
+        if 'slug' in self.fields:
+            self.fields['slug'].required = False
     
     def clean(self):
         # Step 1: Handle OBSERVE event default title before any validation
         event_type = self.data.get("event_type")
         event_title = self.data.get("event_title", "")
+        start_time = self.data.get("start_time")
         
         if event_type == EventTypes.OBSERVE and not event_title:
             event_title = _get_default_event_title(event_type)
@@ -78,29 +82,59 @@ class SingleEventForm(WagtailAdminPageForm):
         
         # Step 2: Generate and set title/slug BEFORE calling super().clean()
         # This ensures Wagtail's slug validation sees a valid slug
-        start_time = self.data.get("start_time")
+        generated_slug = None
         if start_time and event_title:
             try:
                 generated_title = _get_page_title(start_time, event_title)
+                generated_slug = slugify(generated_title)
                 if not self.data.get("title"):
                     self.data = self.data.copy()
                     self.data["title"] = generated_title
-                    self.data["slug"] = slugify(generated_title)
-            except ValueError:
+                    self.data["slug"] = generated_slug
+            except ValueError as e:
                 # If generation fails, provide fallback so Wagtail validation doesn't fail
                 if not self.data.get("slug"):
                     self.data = self.data.copy()
                     self.data["slug"] = "event"
-        else:
-            # Ensure slug is set even if we can't generate title yet
-            if not self.data.get("slug"):
-                self.data = self.data.copy()
+                    generated_slug = "event"
+        
+        # Always ensure slug is set (for OBSERVE events especially)
+        if not self.data.get("slug"):
+            self.data = self.data.copy()
+            # For OBSERVE events with start_time, try to create a meaningful slug
+            if event_type == EventTypes.OBSERVE and start_time:
+                try:
+                    if isinstance(start_time, str):
+                        dt = parse_datetime(start_time)
+                        if dt and is_naive(dt):
+                            dt = make_aware(dt)
+                        if dt:
+                            slug_base = localtime(dt).strftime("%Y-%m-%d")
+                            generated_slug = slugify(f"{slug_base}-beobachtungsabend")
+                            self.data["slug"] = generated_slug
+                        else:
+                            self.data["slug"] = "beobachtungsabend"
+                            generated_slug = "beobachtungsabend"
+                    else:
+                        self.data["slug"] = "beobachtungsabend"
+                        generated_slug = "beobachtungsabend"
+                except Exception:
+                    self.data["slug"] = "beobachtungsabend"
+                    generated_slug = "beobachtungsabend"
+            else:
                 self.data["slug"] = "event"
+                generated_slug = "event"
+        else:
+            generated_slug = self.data.get("slug")
         
         # Step 3: Now call super().clean() with valid title/slug in place
         cleaned_data = super().clean()
         
-        # Step 4: Perform custom validation on cleaned data
+        # Step 4: Ensure slug is in cleaned_data (set unconditionally so it always persists)
+        if generated_slug:
+            cleaned_data["slug"] = generated_slug
+        
+        # Step 5: Perform custom validation on cleaned data
         event_type = cleaned_data.get("event_type")
         event_title = cleaned_data.get("event_title", "")
         referent = cleaned_data.get("referent", "")
@@ -186,7 +220,12 @@ class SingleEvent(Page):
         # At this point self.start_time already has the newly submitted value, so the
         # generated title and slug always reflect the current data.
         try:
-            self.title = _get_page_title(self.start_time, self.event_title)
+            # For OBSERVE events, use default title if event_title is empty
+            event_title = self.event_title
+            if self.event_type == EventTypes.OBSERVE and not event_title:
+                event_title = _get_default_event_title(EventTypes.OBSERVE)
+            
+            self.title = _get_page_title(self.start_time, event_title)
             self.slug = slugify(self.title)
         except ValueError as e:
             logger.error(f"Cannot clean SingleEvent: {e}")
@@ -196,7 +235,12 @@ class SingleEvent(Page):
     # Keep save() as an additional safety net (e.g. programmatic saves).
     def save(self, *args, **kwargs):
         try:
-            self.title = _get_page_title(self.start_time, self.event_title)
+            # For OBSERVE events, use default title if event_title is empty
+            event_title = self.event_title
+            if self.event_type == EventTypes.OBSERVE and not event_title:
+                event_title = _get_default_event_title(EventTypes.OBSERVE)
+            
+            self.title = _get_page_title(self.start_time, event_title)
             self.slug = slugify(self.title)
         except ValueError as e:
             logger.error(f"Cannot save SingleEvent: {e}")
