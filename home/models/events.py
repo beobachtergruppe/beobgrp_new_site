@@ -18,7 +18,8 @@ import logging
 from copy import deepcopy
 
 from django.db.models import TextChoices
-from django.utils.timezone import localtime, now
+from django.utils.timezone import localtime, now, make_aware, is_naive
+from django.utils.dateparse import parse_datetime
 from wagtail.admin.forms.pages import WagtailAdminPageForm
 from wagtail.blocks.field_block import MultipleChoiceBlock
 from wagtail.blocks.struct_block import StructBlock
@@ -43,39 +44,153 @@ class EventTypes(TextChoices):
     EXCURSION = "Ausflug", "Ausflug"
 
 
+# Form field constraints (must not exceed DB model max_length values)
+EVENT_TITLE_MAX_LENGTH = 80   # DB max_length: 140
+ABSTRACT_MAX_LENGTH = 600     # DB max_length: 800
+
+# Ensure form constraints don't exceed DB model constraints
+assert EVENT_TITLE_MAX_LENGTH <= 140, "EVENT_TITLE_MAX_LENGTH must not exceed DB model max_length (140)"
+assert ABSTRACT_MAX_LENGTH <= 800, "ABSTRACT_MAX_LENGTH must not exceed DB model max_length (800)"
+
 class SingleEventForm(WagtailAdminPageForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Add max_length to form fields to show character counter in admin
+        if 'event_title' in self.fields:
+            self.fields['event_title'].max_length = EVENT_TITLE_MAX_LENGTH
+        if 'abstract' in self.fields:
+            self.fields['abstract'].max_length = ABSTRACT_MAX_LENGTH
+            # RichTextArea stores max_length in widget.options for the JS character counter
+            if hasattr(self.fields['abstract'].widget, 'options'):
+                self.fields['abstract'].widget.options['max_length'] = ABSTRACT_MAX_LENGTH
+        # Make slug not required at the field level; we generate it in clean()
+        if 'slug' in self.fields:
+            self.fields['slug'].required = False
+    
     def clean(self):
-        # Provide a temporary placeholder so Wagtail's title-required validation passes
-        # before we overwrite it with the generated value below.
-        if not self.data.get("title"):
+        # Step 1: Handle OBSERVE event default title before any validation
+        event_type = self.data.get("event_type")
+        event_title = self.data.get("event_title", "")
+        start_time = self.data.get("start_time")
+        
+        if event_type == EventTypes.OBSERVE and not event_title:
+            event_title = _get_default_event_title(event_type)
+            # Update form data so super().clean() sees the default title
+            if not self.data.get("event_title"):
+                self.data = self.data.copy()
+                self.data["event_title"] = event_title
+        
+        # Step 2: Generate and set title/slug BEFORE calling super().clean()
+        # This ensures Wagtail's slug validation sees a valid slug
+        generated_slug = None
+        if start_time and event_title:
+            try:
+                generated_title = _get_page_title(start_time, event_title)
+                generated_slug = slugify(generated_title)
+                if not self.data.get("title"):
+                    self.data = self.data.copy()
+                    self.data["title"] = generated_title
+                    self.data["slug"] = generated_slug
+            except ValueError as e:
+                # If generation fails, provide fallback so Wagtail validation doesn't fail
+                if not self.data.get("slug"):
+                    self.data = self.data.copy()
+                    self.data["slug"] = "event"
+                    generated_slug = "event"
+        
+        # Always ensure slug is set (for OBSERVE events especially)
+        if not self.data.get("slug"):
             self.data = self.data.copy()
-            self.data["title"] = "placeholder"
-            self.data["slug"] = "placeholder"
-
+            # For OBSERVE events with start_time, try to create a meaningful slug
+            if event_type == EventTypes.OBSERVE and start_time:
+                try:
+                    if isinstance(start_time, str):
+                        dt = parse_datetime(start_time)
+                        if dt and is_naive(dt):
+                            dt = make_aware(dt)
+                        if dt:
+                            slug_base = localtime(dt).strftime("%Y-%m-%d")
+                            generated_slug = slugify(f"{slug_base}-beobachtungsabend")
+                            self.data["slug"] = generated_slug
+                        else:
+                            self.data["slug"] = "beobachtungsabend"
+                            generated_slug = "beobachtungsabend"
+                    else:
+                        self.data["slug"] = "beobachtungsabend"
+                        generated_slug = "beobachtungsabend"
+                except Exception:
+                    self.data["slug"] = "beobachtungsabend"
+                    generated_slug = "beobachtungsabend"
+            else:
+                self.data["slug"] = "event"
+                generated_slug = "event"
+        else:
+            generated_slug = self.data.get("slug")
+        
+        # Step 3: Now call super().clean() with valid title/slug in place
         cleaned_data = super().clean()
-
-        start_time = cleaned_data.get("start_time")
+        
+        # Step 4: Ensure slug is in cleaned_data (set unconditionally so it always persists)
+        if generated_slug:
+            cleaned_data["slug"] = generated_slug
+        
+        # Step 5: Perform custom validation on cleaned data
+        event_type = cleaned_data.get("event_type")
         event_title = cleaned_data.get("event_title", "")
-        generated_title = _get_default_event_title(start_time, event_title)
-        cleaned_data["title"] = generated_title
-        cleaned_data["slug"] = slugify(generated_title)
+        referent = cleaned_data.get("referent", "")
+        abstract = cleaned_data.get("abstract", "")
+        
+        # Validate event_title length (character limit for new/updated titles)
+        if event_title and len(event_title) > EVENT_TITLE_MAX_LENGTH:
+            self.add_error("event_title", f"Titel darf maximal {EVENT_TITLE_MAX_LENGTH} Zeichen lang sein.")
+        
+        # Validate abstract length (character limit for new/updated abstracts)
+        if abstract and len(abstract) > ABSTRACT_MAX_LENGTH:
+            self.add_error("abstract", f"Zusammenfassung darf maximal {ABSTRACT_MAX_LENGTH} Zeichen lang sein.")
+        
+        # For non-OBSERVE events, title, referent, and abstract are required
+        if event_type != EventTypes.OBSERVE:
+            if not event_title:
+                self.add_error("event_title", "Titel ist erforderlich für diesen Veranstaltungstyp.")
+            if not referent:
+                self.add_error("referent", "Referent ist erforderlich für diesen Veranstaltungstyp.")
+            if not abstract:
+                self.add_error("abstract", "Zusammenfassung ist erforderlich für diesen Veranstaltungstyp.")
+        
         return cleaned_data
 
 
-def _get_default_event_title(start_time, event_title):
-    if start_time and event_title:
-        formatted_start_time = localtime(start_time).strftime("%Y-%m-%d %H:%M")
-        return f"{formatted_start_time} - {event_title}"
-    return "Default Title"
+def _get_page_title(start_time, event_title):
+    if not start_time:
+        raise ValueError("start_time is required to generate page title")
+    if not event_title:
+        raise ValueError("event_title is required to generate page title")
+    
+    if isinstance(start_time, str):
+        start_time = parse_datetime(start_time)
+        if start_time is None:
+            raise ValueError(f"Cannot parse start_time string")
+    if is_naive(start_time):
+        start_time = make_aware(start_time)
+    
+    formatted_start_time = localtime(start_time).strftime("%Y-%m-%d %H:%M")
+    return f"{formatted_start_time} - {event_title}"
+
+
+def _get_default_event_title(event_type):
+    """Get the default event title for a specific event type."""
+    if event_type == EventTypes.OBSERVE:
+        return "Beobachtungsabend"
+    return ""
 
 
 class SingleEvent(Page):
     start_time: DateTimeField = DateTimeField()
     event_type: CharField = CharField(choices=EventTypes.choices)
-    event_title: CharField = CharField(max_length=140, default="")
+    event_title: CharField = CharField(max_length=140, default="", blank=True)
     location: CharField = CharField(max_length=120, default="Deutsches Museum")
-    referent: CharField = CharField(max_length=120, default="")
-    abstract: RichTextField = RichTextField(max_length=800, default="")
+    referent: CharField = CharField(max_length=120, default="", blank=True)
+    abstract: RichTextField = RichTextField(max_length=800, default="", blank=True)
     image: models.ForeignKey = models.ForeignKey(
         "wagtailimages.Image",
         null=True,
@@ -89,14 +204,14 @@ class SingleEvent(Page):
 
     content_panels = [
         FieldPanel("event_type", heading="Art der Veranstaltung"),
-        FieldPanel("event_title", heading="Titel"),
+        FieldPanel("start_time", heading="Zeit"),
+        FieldPanel("event_title", heading="Titel (optional für Beobachtungsabend)", help_text=f"Max. {EVENT_TITLE_MAX_LENGTH} Zeichen"),
         FieldPanel("needs_reservation", heading="Reservierung erforderlich"),
         FieldPanel("cancelled", heading="Abgesagt"),
         FieldPanel("booked_out", heading="Ausgebucht"),
-        FieldPanel("start_time", heading="Zeit"),
-        FieldPanel("location", heading="Ort"),
-        FieldPanel("referent", heading="Referent"),
-        FieldPanel("abstract", heading="Zusammenfassung"),
+        FieldPanel("location", heading="Ort", help_text=f"Max. 120 Zeichen"),
+        FieldPanel("referent", heading="Referent (optional für Beobachtungsabend)", help_text=f"Max. 120 Zeichen"),
+        FieldPanel("abstract", heading="Zusammenfassung (optional für Beobachtungsabend)", help_text=f"Max. {ABSTRACT_MAX_LENGTH} Zeichen"),
         FieldPanel("image", heading="Foto"),
     ]
 
@@ -104,14 +219,32 @@ class SingleEvent(Page):
         # Called by _post_clean() after all form values are applied to the instance.
         # At this point self.start_time already has the newly submitted value, so the
         # generated title and slug always reflect the current data.
-        self.title = _get_default_event_title(self.start_time, self.event_title)
-        self.slug = slugify(self.title)
+        try:
+            # For OBSERVE events, use default title if event_title is empty
+            event_title = self.event_title
+            if self.event_type == EventTypes.OBSERVE and not event_title:
+                event_title = _get_default_event_title(EventTypes.OBSERVE)
+            
+            self.title = _get_page_title(self.start_time, event_title)
+            self.slug = slugify(self.title)
+        except ValueError as e:
+            logger.error(f"Cannot clean SingleEvent: {e}")
+            raise
         super().clean()
 
     # Keep save() as an additional safety net (e.g. programmatic saves).
     def save(self, *args, **kwargs):
-        self.title = _get_default_event_title(self.start_time, self.event_title)
-        self.slug = slugify(self.title)
+        try:
+            # For OBSERVE events, use default title if event_title is empty
+            event_title = self.event_title
+            if self.event_type == EventTypes.OBSERVE and not event_title:
+                event_title = _get_default_event_title(EventTypes.OBSERVE)
+            
+            self.title = _get_page_title(self.start_time, event_title)
+            self.slug = slugify(self.title)
+        except ValueError as e:
+            logger.error(f"Cannot save SingleEvent: {e}")
+            raise
         super().save(*args, **kwargs)
 
     @cached_property
@@ -121,7 +254,7 @@ class SingleEvent(Page):
 
     @cached_property
     def first_reservation_date(self) -> date:
-        return self.start_time.date() - timedelta(weeks=4)
+        return localtime(self.start_time).date() - timedelta(weeks=4)
 
     @cached_property
     def is_reservable(self) -> bool:
@@ -148,27 +281,75 @@ class SingleEvent(Page):
 
     @cached_property
     def reservation_mailto_link(self) -> str:
+        # Build body based on whether event has a real title or just the default
+        # Use detailed format only for events with custom titles (not auto-assigned defaults)
+        has_custom_title = self.event_title and self.event_title != _get_default_event_title(self.event_type)
+        
+        if has_custom_title:
+            # Detailed format for events with titles (Vortrag, Ausflug, etc.)
+            referent_line = (
+                f"  {self.referent}\n"
+                if self.referent and self.event_type in [
+                    EventTypes.TALK,
+                    EventTypes.HYBRID,
+                    EventTypes.ONLINE,
+                ]
+                else ""
+            )
+            
+            location_line = (
+                f"  Ort: {self.location}\n"
+                if self.location and self.event_type in [
+                    EventTypes.TALK,
+                    EventTypes.HYBRID,
+                    EventTypes.OBSERVE,
+                    EventTypes.EXCURSION,
+                ]
+                else ""
+            )
+            
+            body = textwrap.dedent(f"""
+                Liebe Beobachtergruppe,
+                
+                bitte um Anmeldung zum folgenden {self.event_type}:
+                
+                  {self.event_title}
+                {referent_line}{location_line}
+                am {self.start_time:%A, den %d.%m.%y} um {self.start_time:%H:%M} Uhr
+                
+                Name, Vorname: ...
+                Anzahl Personen: ...
+                
+                Mit freundlichen Grüßen
+                ...
+            """).strip()
+        else:
+            # Simple inline format for events without custom titles (e.g., Beobachtungsabend)
+            location_str = f"im {self.location}" if self.location else ""
+            body = textwrap.dedent(f"""
+                Liebe Beobachtergruppe,
+                
+                bitte um Anmeldung zum {self.event_type} {location_str} am {self.start_time:%A, den %d.%m.%y} um {self.start_time:%H:%M} Uhr.
+                
+                Name, Vorname: ...
+                Anzahl Personen: ...
+                
+                Mit freundlichen Grüßen
+                ...
+            """).strip()
+        
+        # Build subject with event type
+        subject_prefix = f"{self.event_type} am {self.start_time:%d.%m.%y}"
+        subject = (
+            f"Anmeldung für {subject_prefix} ({self.event_title})"
+            if has_custom_title
+            else f"Anmeldung für {subject_prefix}"
+        )
+        
         return create_email_link(
             email_address="reservierung@beobachtergruppe.de",
-            subject=f"Anmeldung für den Vortrag am {self.start_time:%d.%m.%y} ({self.event_title})",
-            body=textwrap.dedent(
-                f"""
-                  Liebe Beobachtergruppe,
-                  
-                  bitte um Anmeldung zum folgenden Vortrag:
-                  
-                    {self.event_title}
-                    {self.referent}
-                  
-                    am {self.start_time:%A, den %d.%m.%y} um {self.start_time:%H:%M} Uhr
-                   
-                  Name, Vorname: ... 
-                  Anzahl Personen: ...
-                  
-                  Mit freundlichen Grüßen
-                  ...
-            """
-            ),
+            subject=subject,
+            body=body,
         )
 
     base_form_class = SingleEventForm
