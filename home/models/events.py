@@ -13,11 +13,13 @@ import hashlib
 import textwrap
 from datetime import date, timedelta
 from functools import cached_property
+from html import unescape
 
 import logging
 from copy import deepcopy
 
 from django.db.models import TextChoices
+from django.utils.html import strip_tags
 from django.utils.timezone import localtime, now, make_aware, is_naive
 from django.utils.dateparse import parse_datetime
 from wagtail.admin.forms.pages import WagtailAdminPageForm
@@ -34,6 +36,12 @@ from home.models.common import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def _get_rich_text_plain_text(value) -> str:
+    if not value:
+        return ""
+    return unescape(strip_tags(str(value))).replace("\xa0", " ").strip()
 
 
 class EventTypes(TextChoices):
@@ -91,7 +99,7 @@ class SingleEventForm(WagtailAdminPageForm):
                     self.data = self.data.copy()
                     self.data["title"] = generated_title
                     self.data["slug"] = generated_slug
-            except ValueError as e:
+            except ValueError:
                 # If generation fails, provide fallback so Wagtail validation doesn't fail
                 if not self.data.get("slug"):
                     self.data = self.data.copy()
@@ -139,13 +147,14 @@ class SingleEventForm(WagtailAdminPageForm):
         event_title = cleaned_data.get("event_title", "")
         referent = cleaned_data.get("referent", "")
         abstract = cleaned_data.get("abstract", "")
+        abstract_plain_text = _get_rich_text_plain_text(abstract)
         
         # Validate event_title length (character limit for new/updated titles)
         if event_title and len(event_title) > EVENT_TITLE_MAX_LENGTH:
             self.add_error("event_title", f"Titel darf maximal {EVENT_TITLE_MAX_LENGTH} Zeichen lang sein.")
         
         # Validate abstract length (character limit for new/updated abstracts)
-        if abstract and len(abstract) > ABSTRACT_MAX_LENGTH:
+        if abstract_plain_text and len(abstract_plain_text) > ABSTRACT_MAX_LENGTH:
             self.add_error("abstract", f"Zusammenfassung darf maximal {ABSTRACT_MAX_LENGTH} Zeichen lang sein.")
         
         # For non-OBSERVE events, title, referent, and abstract are required
@@ -154,7 +163,7 @@ class SingleEventForm(WagtailAdminPageForm):
                 self.add_error("event_title", "Titel ist erforderlich für diesen Veranstaltungstyp.")
             if not referent:
                 self.add_error("referent", "Referent ist erforderlich für diesen Veranstaltungstyp.")
-            if not abstract:
+            if not abstract_plain_text:
                 self.add_error("abstract", "Zusammenfassung ist erforderlich für diesen Veranstaltungstyp.")
         
         return cleaned_data
@@ -169,7 +178,7 @@ def _get_page_title(start_time, event_title):
     if isinstance(start_time, str):
         start_time = parse_datetime(start_time)
         if start_time is None:
-            raise ValueError(f"Cannot parse start_time string")
+            raise ValueError("Cannot parse start_time string")
     if is_naive(start_time):
         start_time = make_aware(start_time)
     
