@@ -37,7 +37,6 @@ class VideoDocumentChooserBlock(DocumentChooserBlock):
         return document
 
 
-
 def generate_anchor_id(text: str) -> str:
     """
     Generate an anchor ID from text following the 'block-*' convention.
@@ -62,7 +61,7 @@ class HeadingBlock(CharBlock):
         context["anchor_id"] = generate_anchor_id(value)
         return context
 
-    class Meta:  # type: ignore
+    class Meta:  
         template = "blocks/heading_block.html"
 
 
@@ -472,7 +471,10 @@ class SidebarPromotionMixin(models.Model):
         FieldPanel("seo_title"),
         FieldPanel("search_description"),
         FieldPanel("show_in_sidebar", heading="Im Seitenbalken anzeigen"),
-        FieldPanel("show_sidebar_on_mobile", heading="Seitenbalken auf mobilen Geräten anzeigen"),
+        FieldPanel(
+            "show_sidebar_on_mobile",
+            heading="Seitenbalken auf mobilen Geräten anzeigen",
+        ),
         FieldPanel(
             "sidebar_text",
             heading="Seitenbalken-Text",

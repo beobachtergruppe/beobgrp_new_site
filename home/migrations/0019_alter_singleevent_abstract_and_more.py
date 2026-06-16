@@ -5,25 +5,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('home', '0018_add_show_sidebar_on_mobile'),
+        ("home", "0018_add_show_sidebar_on_mobile"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='singleevent',
-            name='abstract',
-            field=wagtail.fields.RichTextField(blank=True, default='', max_length=800),
+            model_name="singleevent",
+            name="abstract",
+            field=wagtail.fields.RichTextField(blank=True, default="", max_length=800),
         ),
         migrations.AlterField(
-            model_name='singleevent',
-            name='event_title',
-            field=models.CharField(blank=True, default='', max_length=140),
+            model_name="singleevent",
+            name="event_title",
+            field=models.CharField(blank=True, default="", max_length=140),
         ),
         migrations.AlterField(
-            model_name='singleevent',
-            name='referent',
-            field=models.CharField(blank=True, default='', max_length=120),
+            model_name="singleevent",
+            name="referent",
+            field=models.CharField(blank=True, default="", max_length=120),
         ),
     ]

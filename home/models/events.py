@@ -13,11 +13,13 @@ import hashlib
 import textwrap
 from datetime import date, timedelta
 from functools import cached_property
+from html import unescape
 
 import logging
 from copy import deepcopy
 
 from django.db.models import TextChoices
+from django.utils.html import strip_tags
 from django.utils.timezone import localtime, now, make_aware, is_naive
 from django.utils.dateparse import parse_datetime
 from wagtail.admin.forms.pages import WagtailAdminPageForm
@@ -36,6 +38,12 @@ from home.models.common import (
 logger = logging.getLogger(__name__)
 
 
+def _get_rich_text_plain_text(value: RichTextField) -> str:
+    if not value:
+        return ""
+    return unescape(strip_tags(str(value))).replace("\xa0", " ").strip()
+
+
 class EventTypes(TextChoices):
     TALK = "Vortrag", "Vortrag"
     HYBRID = "Hybride Vortrag", "Hybride Vortrag"
@@ -45,41 +53,48 @@ class EventTypes(TextChoices):
 
 
 # Form field constraints (must not exceed DB model max_length values)
-EVENT_TITLE_MAX_LENGTH = 80   # DB max_length: 140
-ABSTRACT_MAX_LENGTH = 600     # DB max_length: 800
+EVENT_TITLE_MAX_LENGTH = 80  # DB max_length: 140
+ABSTRACT_MAX_LENGTH = 600  # DB max_length: 800
 
 # Ensure form constraints don't exceed DB model constraints
-assert EVENT_TITLE_MAX_LENGTH <= 140, "EVENT_TITLE_MAX_LENGTH must not exceed DB model max_length (140)"
-assert ABSTRACT_MAX_LENGTH <= 800, "ABSTRACT_MAX_LENGTH must not exceed DB model max_length (800)"
+assert EVENT_TITLE_MAX_LENGTH <= 140, (
+    "EVENT_TITLE_MAX_LENGTH must not exceed DB model max_length (140)"
+)
+assert ABSTRACT_MAX_LENGTH <= 800, (
+    "ABSTRACT_MAX_LENGTH must not exceed DB model max_length (800)"
+)
+
 
 class SingleEventForm(WagtailAdminPageForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Add max_length to form fields to show character counter in admin
-        if 'event_title' in self.fields:
-            self.fields['event_title'].max_length = EVENT_TITLE_MAX_LENGTH
-        if 'abstract' in self.fields:
-            self.fields['abstract'].max_length = ABSTRACT_MAX_LENGTH
+        if "event_title" in self.fields:
+            self.fields["event_title"].max_length = EVENT_TITLE_MAX_LENGTH
+        if "abstract" in self.fields:
+            self.fields["abstract"].max_length = ABSTRACT_MAX_LENGTH
             # RichTextArea stores max_length in widget.options for the JS character counter
-            if hasattr(self.fields['abstract'].widget, 'options'):
-                self.fields['abstract'].widget.options['max_length'] = ABSTRACT_MAX_LENGTH
+            if hasattr(self.fields["abstract"].widget, "options"):
+                self.fields["abstract"].widget.options["max_length"] = (
+                    ABSTRACT_MAX_LENGTH
+                )
         # Make slug not required at the field level; we generate it in clean()
-        if 'slug' in self.fields:
-            self.fields['slug'].required = False
-    
+        if "slug" in self.fields:
+            self.fields["slug"].required = False
+
     def clean(self):
         # Step 1: Handle OBSERVE event default title before any validation
         event_type = self.data.get("event_type")
         event_title = self.data.get("event_title", "")
         start_time = self.data.get("start_time")
-        
+
         if event_type == EventTypes.OBSERVE and not event_title:
             event_title = _get_default_event_title(event_type)
             # Update form data so super().clean() sees the default title
             if not self.data.get("event_title"):
                 self.data = self.data.copy()
                 self.data["event_title"] = event_title
-        
+
         # Step 2: Generate and set title/slug BEFORE calling super().clean()
         # This ensures Wagtail's slug validation sees a valid slug
         generated_slug = None
@@ -91,13 +106,13 @@ class SingleEventForm(WagtailAdminPageForm):
                     self.data = self.data.copy()
                     self.data["title"] = generated_title
                     self.data["slug"] = generated_slug
-            except ValueError as e:
+            except ValueError:
                 # If generation fails, provide fallback so Wagtail validation doesn't fail
                 if not self.data.get("slug"):
                     self.data = self.data.copy()
                     self.data["slug"] = "event"
                     generated_slug = "event"
-        
+
         # Always ensure slug is set (for OBSERVE events especially)
         if not self.data.get("slug"):
             self.data = self.data.copy()
@@ -126,37 +141,53 @@ class SingleEventForm(WagtailAdminPageForm):
                 generated_slug = "event"
         else:
             generated_slug = self.data.get("slug")
-        
+
         # Step 3: Now call super().clean() with valid title/slug in place
         cleaned_data = super().clean()
-        
+
         # Step 4: Ensure slug is in cleaned_data (set unconditionally so it always persists)
         if generated_slug:
             cleaned_data["slug"] = generated_slug
-        
+
         # Step 5: Perform custom validation on cleaned data
         event_type = cleaned_data.get("event_type")
         event_title = cleaned_data.get("event_title", "")
         referent = cleaned_data.get("referent", "")
         abstract = cleaned_data.get("abstract", "")
-        
+        abstract_plain_text = _get_rich_text_plain_text(abstract)
+
         # Validate event_title length (character limit for new/updated titles)
         if event_title and len(event_title) > EVENT_TITLE_MAX_LENGTH:
-            self.add_error("event_title", f"Titel darf maximal {EVENT_TITLE_MAX_LENGTH} Zeichen lang sein.")
-        
+            self.add_error(
+                "event_title",
+                f"Titel darf maximal {EVENT_TITLE_MAX_LENGTH} Zeichen lang sein.",
+            )
+
         # Validate abstract length (character limit for new/updated abstracts)
-        if abstract and len(abstract) > ABSTRACT_MAX_LENGTH:
-            self.add_error("abstract", f"Zusammenfassung darf maximal {ABSTRACT_MAX_LENGTH} Zeichen lang sein.")
-        
+        if abstract_plain_text and len(abstract_plain_text) > ABSTRACT_MAX_LENGTH:
+            self.add_error(
+                "abstract",
+                f"Zusammenfassung darf maximal {ABSTRACT_MAX_LENGTH} Zeichen lang sein.",
+            )
+
         # For non-OBSERVE events, title, referent, and abstract are required
         if event_type != EventTypes.OBSERVE:
             if not event_title:
-                self.add_error("event_title", "Titel ist erforderlich für diesen Veranstaltungstyp.")
+                self.add_error(
+                    "event_title",
+                    "Titel ist erforderlich für diesen Veranstaltungstyp.",
+                )
             if not referent:
-                self.add_error("referent", "Referent ist erforderlich für diesen Veranstaltungstyp.")
-            if not abstract:
-                self.add_error("abstract", "Zusammenfassung ist erforderlich für diesen Veranstaltungstyp.")
-        
+                self.add_error(
+                    "referent",
+                    "Referent ist erforderlich für diesen Veranstaltungstyp.",
+                )
+            if not abstract_plain_text:
+                self.add_error(
+                    "abstract",
+                    "Zusammenfassung ist erforderlich für diesen Veranstaltungstyp.",
+                )
+
         return cleaned_data
 
 
@@ -165,14 +196,14 @@ def _get_page_title(start_time, event_title):
         raise ValueError("start_time is required to generate page title")
     if not event_title:
         raise ValueError("event_title is required to generate page title")
-    
+
     if isinstance(start_time, str):
         start_time = parse_datetime(start_time)
         if start_time is None:
-            raise ValueError(f"Cannot parse start_time string")
+            raise ValueError("Cannot parse start_time string")
     if is_naive(start_time):
         start_time = make_aware(start_time)
-    
+
     formatted_start_time = localtime(start_time).strftime("%Y-%m-%d %H:%M")
     return f"{formatted_start_time} - {event_title}"
 
@@ -205,13 +236,25 @@ class SingleEvent(Page):
     content_panels = [
         FieldPanel("event_type", heading="Art der Veranstaltung"),
         FieldPanel("start_time", heading="Zeit"),
-        FieldPanel("event_title", heading="Titel (optional für Beobachtungsabend)", help_text=f"Max. {EVENT_TITLE_MAX_LENGTH} Zeichen"),
+        FieldPanel(
+            "event_title",
+            heading="Titel (optional für Beobachtungsabend)",
+            help_text=f"Max. {EVENT_TITLE_MAX_LENGTH} Zeichen",
+        ),
         FieldPanel("needs_reservation", heading="Reservierung erforderlich"),
         FieldPanel("cancelled", heading="Abgesagt"),
         FieldPanel("booked_out", heading="Ausgebucht"),
-        FieldPanel("location", heading="Ort", help_text=f"Max. 120 Zeichen"),
-        FieldPanel("referent", heading="Referent (optional für Beobachtungsabend)", help_text=f"Max. 120 Zeichen"),
-        FieldPanel("abstract", heading="Zusammenfassung (optional für Beobachtungsabend)", help_text=f"Max. {ABSTRACT_MAX_LENGTH} Zeichen"),
+        FieldPanel("location", heading="Ort", help_text="Max. 120 Zeichen"),
+        FieldPanel(
+            "referent",
+            heading="Referent (optional für Beobachtungsabend)",
+            help_text="Max. 120 Zeichen",
+        ),
+        FieldPanel(
+            "abstract",
+            heading="Zusammenfassung (optional für Beobachtungsabend)",
+            help_text=f"Max. {ABSTRACT_MAX_LENGTH} Zeichen",
+        ),
         FieldPanel("image", heading="Foto"),
     ]
 
@@ -224,7 +267,7 @@ class SingleEvent(Page):
             event_title = self.event_title
             if self.event_type == EventTypes.OBSERVE and not event_title:
                 event_title = _get_default_event_title(EventTypes.OBSERVE)
-            
+
             self.title = _get_page_title(self.start_time, event_title)
             self.slug = slugify(self.title)
         except ValueError as e:
@@ -239,7 +282,7 @@ class SingleEvent(Page):
             event_title = self.event_title
             if self.event_type == EventTypes.OBSERVE and not event_title:
                 event_title = _get_default_event_title(EventTypes.OBSERVE)
-            
+
             self.title = _get_page_title(self.start_time, event_title)
             self.slug = slugify(self.title)
         except ValueError as e:
@@ -283,23 +326,30 @@ class SingleEvent(Page):
     def reservation_mailto_link(self) -> str:
         # Build body based on whether event has a real title or just the default
         # Use detailed format only for events with custom titles (not auto-assigned defaults)
-        has_custom_title = self.event_title and self.event_title != _get_default_event_title(self.event_type)
-        
+        has_custom_title = (
+            self.event_title
+            and self.event_title != _get_default_event_title(self.event_type)
+        )
+
         if has_custom_title:
             # Detailed format for events with titles (Vortrag, Ausflug, etc.)
             referent_line = (
                 f"  {self.referent}\n"
-                if self.referent and self.event_type in [
+                if self.referent
+                and self.event_type
+                in [
                     EventTypes.TALK,
                     EventTypes.HYBRID,
                     EventTypes.ONLINE,
                 ]
                 else ""
             )
-            
+
             location_line = (
                 f"  Ort: {self.location}\n"
-                if self.location and self.event_type in [
+                if self.location
+                and self.event_type
+                in [
                     EventTypes.TALK,
                     EventTypes.HYBRID,
                     EventTypes.OBSERVE,
@@ -307,7 +357,7 @@ class SingleEvent(Page):
                 ]
                 else ""
             )
-            
+
             body = textwrap.dedent(f"""
                 Liebe Beobachtergruppe,
                 
@@ -337,7 +387,7 @@ class SingleEvent(Page):
                 Mit freundlichen Grüßen
                 ...
             """).strip()
-        
+
         # Build subject with event type
         subject_prefix = f"{self.event_type} am {self.start_time:%d.%m.%y}"
         subject = (
@@ -345,7 +395,7 @@ class SingleEvent(Page):
             if has_custom_title
             else f"Anmeldung für {subject_prefix}"
         )
-        
+
         return create_email_link(
             email_address="reservierung@beobachtergruppe.de",
             subject=subject,
@@ -394,7 +444,7 @@ class EventListBlock(StructBlock):
 
 
 blocks_for_event_body = deepcopy(gen_body_content)
-blocks_for_event_body.append(("event_list", EventListBlock()))  # type: ignore
+blocks_for_event_body.append(("event_list", EventListBlock()))
 
 
 class EventPage(CommonContextMixin, SidebarPromotionMixin, Page):

@@ -8,6 +8,7 @@ from django.utils.timezone import make_aware
 from wagtail.rich_text import RichText
 
 from home.models import EventPage, SingleEvent, EventTypes
+from home.models.events import _get_rich_text_plain_text
 
 
 class EventPageSimpleTests(TestCase):
@@ -96,7 +97,20 @@ class SingleEventSimpleTests(TestCase):
             referent="Speaker",
             abstract=RichText("Abstract"),
         )
-        
+
         # first_reservation_date should be 4 weeks before start_time
         expected_date = (start_time.date()) - timedelta(weeks=4)
         self.assertEqual(event.first_reservation_date, expected_date)
+
+    def test_rich_text_plain_text_length_ignores_markup(self):
+        """Test that rich text length checks are based on visible text."""
+        rich_text = "<p>" + ("a" * 576) + "</p>"
+
+        plain_text = _get_rich_text_plain_text(rich_text)
+
+        self.assertEqual(len(rich_text), 583)
+        self.assertEqual(len(plain_text), 576)
+
+    def test_rich_text_plain_text_treats_markup_only_as_empty(self):
+        """Test that markup-only rich text does not count as content."""
+        self.assertEqual(_get_rich_text_plain_text("<p><br></p>"), "")

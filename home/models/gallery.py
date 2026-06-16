@@ -24,7 +24,7 @@ class PhotoPage(CommonContextMixin, Page):
     """
     A gallery page for displaying static photos.
     """
-    
+
     # Keep the old ForeignKey for backward compatibility with Wagtail Image library
     photo: models.ForeignKey = models.ForeignKey(
         "wagtailimages.Image",
@@ -34,7 +34,7 @@ class PhotoPage(CommonContextMixin, Page):
         related_name="+",
         help_text="Wagtail-Bild",
     )
-    
+
     description: RichTextField = RichTextField(max_length=800, default="", blank=True)
     author: CharField = CharField(max_length=120, default="", blank=True)
     date: DateField = DateField()
@@ -58,19 +58,17 @@ class PhotoPage(CommonContextMixin, Page):
         parent = self.get_parent()
         photos = PhotoPage.objects.child_of(parent).live().order_by("-date")
         videos = VideoPage.objects.child_of(parent).live().order_by("-date")
-        
+
         # Combine and sort by date
         all_items = sorted(
-            list(photos) + list(videos),
-            key=lambda x: x.date,
-            reverse=True
+            list(photos) + list(videos), key=lambda x: x.date, reverse=True
         )
         return all_items
 
     def get_context(self, request):
         context = super().get_context(request)
         siblings = self._get_gallery_siblings()
-        
+
         try:
             self_index = siblings.index(self)
             if len(siblings) > 1:
@@ -88,7 +86,7 @@ class PhotoPage(CommonContextMixin, Page):
         except ValueError:
             context["previous"] = None
             context["next"] = None
-        
+
         return context
 
 
@@ -154,16 +152,22 @@ class VideoPage(CommonContextMixin, Page):
             name = self.media_file.file.name.lower()
             if not any(name.endswith(ext) for ext in ALLOWED_MEDIA_EXTENSIONS):
                 raise ValidationError(
-                    {"media_file": "Nur GIF- und Videodateien sind erlaubt (GIF, MP4, WebM, Ogg)."}
+                    {
+                        "media_file": "Nur GIF- und Videodateien sind erlaubt (GIF, MP4, WebM, Ogg)."
+                    }
                 )
             is_gif = name.endswith(".gif")
             if is_gif and self.media_type != "gif":
                 raise ValidationError(
-                    {"media_type": "Die gewählte Datei ist ein GIF. Bitte wähle 'Animiertes GIF' als Medientyp."}
+                    {
+                        "media_type": "Die gewählte Datei ist ein GIF. Bitte wähle 'Animiertes GIF' als Medientyp."
+                    }
                 )
             if not is_gif and self.media_type == "gif":
                 raise ValidationError(
-                    {"media_type": "Die gewählte Datei ist kein GIF. Bitte wähle 'Videodatei' als Medientyp."}
+                    {
+                        "media_type": "Die gewählte Datei ist kein GIF. Bitte wähle 'Videodatei' als Medientyp."
+                    }
                 )
 
     def get_thumbnail(self):
@@ -183,19 +187,17 @@ class VideoPage(CommonContextMixin, Page):
         parent = self.get_parent()
         photos = PhotoPage.objects.child_of(parent).live().order_by("-date")
         videos = VideoPage.objects.child_of(parent).live().order_by("-date")
-        
+
         # Combine and sort by date
         all_items = sorted(
-            list(photos) + list(videos),
-            key=lambda x: x.date,
-            reverse=True
+            list(photos) + list(videos), key=lambda x: x.date, reverse=True
         )
         return all_items
 
     def get_context(self, request):
         context = super().get_context(request)
         siblings = self._get_gallery_siblings()
-        
+
         try:
             self_index = siblings.index(self)
             if len(siblings) > 1:
@@ -213,7 +215,7 @@ class VideoPage(CommonContextMixin, Page):
         except ValueError:
             context["previous"] = None
             context["next"] = None
-        
+
         return context
 
 
@@ -240,12 +242,10 @@ class GalleryPage(CommonContextMixin, SidebarPromotionMixin, Page):
         context = super().get_context(request)
         photos = PhotoPage.objects.child_of(self).live().order_by("-date")
         videos = VideoPage.objects.child_of(self).live().order_by("-date")
-        
+
         # Combine and sort by date
         all_items = sorted(
-            list(photos) + list(videos),
-            key=lambda x: x.date,
-            reverse=True
+            list(photos) + list(videos), key=lambda x: x.date, reverse=True
         )
         context["photos"] = all_items
         return context
