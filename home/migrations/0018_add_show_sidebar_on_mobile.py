@@ -4,30 +4,41 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('home', '0017_videopage_and_video_blocks'),
+        ("home", "0017_videopage_and_video_blocks"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='eventpage',
-            name='show_sidebar_on_mobile',
-            field=models.BooleanField(default=False, help_text='Wenn aktiviert, wird der Seitenbalken auf mobilen Geräten oben auf der Seite angezeigt.'),
+            model_name="eventpage",
+            name="show_sidebar_on_mobile",
+            field=models.BooleanField(
+                default=False,
+                help_text="Wenn aktiviert, wird der Seitenbalken auf mobilen Geräten oben auf der Seite angezeigt.",
+            ),
         ),
         migrations.AddField(
-            model_name='galleryindexpage',
-            name='show_sidebar_on_mobile',
-            field=models.BooleanField(default=False, help_text='Wenn aktiviert, wird der Seitenbalken auf mobilen Geräten oben auf der Seite angezeigt.'),
+            model_name="galleryindexpage",
+            name="show_sidebar_on_mobile",
+            field=models.BooleanField(
+                default=False,
+                help_text="Wenn aktiviert, wird der Seitenbalken auf mobilen Geräten oben auf der Seite angezeigt.",
+            ),
         ),
         migrations.AddField(
-            model_name='gallerypage',
-            name='show_sidebar_on_mobile',
-            field=models.BooleanField(default=False, help_text='Wenn aktiviert, wird der Seitenbalken auf mobilen Geräten oben auf der Seite angezeigt.'),
+            model_name="gallerypage",
+            name="show_sidebar_on_mobile",
+            field=models.BooleanField(
+                default=False,
+                help_text="Wenn aktiviert, wird der Seitenbalken auf mobilen Geräten oben auf der Seite angezeigt.",
+            ),
         ),
         migrations.AddField(
-            model_name='homepage',
-            name='show_sidebar_on_mobile',
-            field=models.BooleanField(default=False, help_text='Wenn aktiviert, wird der Seitenbalken auf mobilen Geräten oben auf der Seite angezeigt.'),
+            model_name="homepage",
+            name="show_sidebar_on_mobile",
+            field=models.BooleanField(
+                default=False,
+                help_text="Wenn aktiviert, wird der Seitenbalken auf mobilen Geräten oben auf der Seite angezeigt.",
+            ),
         ),
     ]

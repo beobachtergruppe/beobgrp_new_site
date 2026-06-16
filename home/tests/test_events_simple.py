@@ -97,7 +97,7 @@ class SingleEventSimpleTests(TestCase):
             referent="Speaker",
             abstract=RichText("Abstract"),
         )
-        
+
         # first_reservation_date should be 4 weeks before start_time
         expected_date = (start_time.date()) - timedelta(weeks=4)
         self.assertEqual(event.first_reservation_date, expected_date)

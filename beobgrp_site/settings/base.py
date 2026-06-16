@@ -230,7 +230,9 @@ COMPRESS_OFFLINE = not DEBUG
 # Email configuration
 # https://docs.djangoproject.com/en/stable/topics/email/
 EMAIL_BACKEND = (
-    "django.core.mail.backends.console.EmailBackend" if DEBUG else "django.core.mail.backends.smtp.EmailBackend"
+    "django.core.mail.backends.console.EmailBackend"
+    if DEBUG
+    else "django.core.mail.backends.smtp.EmailBackend"
 )
 EMAIL_HOST = "mail.beobachtergruppe.de"
 EMAIL_PORT = 465
