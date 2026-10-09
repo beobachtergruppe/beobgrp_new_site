@@ -23,11 +23,19 @@
                     </div>
                 </div>
                 <div class="column is-one-third-mobile is-one-quarter-tablet is-one-eighth-desktop">
-                    {% include "blocks/video_renderer.html" %}
+                    <div class="columns is-mobile is-gapless">
+                        <div class="column is-{% if value.relative_size == '1/2' %}half{% elif value.relative_size == '1/4' %}one-quarter{% else %}full{% endif %}">
+                            {% include "blocks/video_renderer.html" %}
+                        </div>
+                    </div>
                 </div>
             {% else %}
                 <div class="column is-one-third-mobile is-one-quarter-tablet is-one-eighth-desktop">
-                    {% include "blocks/video_renderer.html" %}
+                    <div class="columns is-mobile is-gapless">
+                        <div class="column is-{% if value.relative_size == '1/2' %}half{% elif value.relative_size == '1/4' %}one-quarter{% else %}full{% endif %}">
+                            {% include "blocks/video_renderer.html" %}
+                        </div>
+                    </div>
                 </div>
                 {% if value.caption_position == 'right' and value.caption %}
                     <div class="column is-two-thirds-mobile is-three-quarters-tablet is-seven-eighths-desktop">
@@ -39,8 +47,12 @@
             {% endif %}
         </div>
     {% else %}
-        <div class="video-wrapper">
-            {% include "blocks/video_renderer.html" %}
+        <div class="columns is-mobile is-gapless">
+            <div class="column is-{% if value.relative_size == '1/2' %}half{% elif value.relative_size == '1/4' %}one-quarter{% else %}full{% endif %}">
+                <div class="video-wrapper">
+                    {% include "blocks/video_renderer.html" %}
+                </div>
+            </div>
         </div>
     {% endif %}
 

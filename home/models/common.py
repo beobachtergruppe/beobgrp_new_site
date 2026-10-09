@@ -146,6 +146,16 @@ class ImageWithCaptionBlock(StructBlock):
         default="bottom",
         label="Position der Bildunterschrift",
     )
+    relative_size = ChoiceBlock(
+        choices=[
+            ("1", "100 %"),
+            ("1/2", "50 %"),
+            ("1/4", "25 %"),
+        ],
+        default="1",
+        label="Relative Größe",
+    )
+
     link = LinkBlock(
         label="Optional Link",
         help_text="Optionaler Link für das Bild (interne Seite oder externe URL)",
@@ -196,6 +206,15 @@ class VideoWithCaptionBlock(StructBlock):
         ],
         default="bottom",
         label="Position der Beschriftung",
+    )
+    relative_size = ChoiceBlock(
+        choices=[
+            ("1", "100 %"),
+            ("1/2", "50 %"),
+            ("1/4", "25 %"),
+        ],
+        default="1",
+        label="Relative Größe",
     )
     link = LinkBlock(
         label="Optionaler Link",
