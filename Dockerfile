@@ -81,9 +81,14 @@ RUN pip install -r /requirements.txt
 # Use /app folder as a directory where the source code is stored.
 WORKDIR /app
 
+# Debian's bundled Node.js 18 is too old for current sass (requires Node >= 20.19),
+# so use Node 22 from the official image instead.
+COPY --from=node:22-bookworm-slim /usr/local/ /usr/local/
+
 # Install bulma & sass, compile CSS, then clean up
-RUN npm init -y && \
-    npm install --global sass && \
+RUN node --version && \
+    npm init -y && \
+    npm install --global sass@1.105.1 && \
     npm install bulma@1.0.4
 
 # Copy the source code of the project into the container.
