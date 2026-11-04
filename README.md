@@ -19,6 +19,7 @@ A good entrypoint for getting to know wagtail better is this page: [Wagtail gett
   - [Python Environment Setup](#python-environment-setup)
   - [Database Setup](#database-setup)
   - [Dart Sass Installation](#dart-sass-installation)
+  - [VS Code Debugging](#vs-code-debugging)
 - [Production Setup (Docker Compose)](#production-setup-docker-compose)
   - [Overview](#overview)
   - [Environment Variables](#environment-variables)
@@ -55,36 +56,79 @@ This section describes how to setup a local development environment to run the w
 
 ### Prerequisites
 
-- Python 3.12
-- PostgreSQL 16 ([Download](https://www.postgresql.org/download/))
-- Node.js and npm (for Dart Sass compilation)
-- Git
-- VS Code (recommended)
+Install these exact versions:
+
+| Component | Version |
+|---|---|
+| Python | 3.15.2 (with the `venv` module) |
+| pip | 26.3 |
+| PostgreSQL server | 16 |
+| PostgreSQL client | 16.15 |
+| Node.js | 18.20.4 |
+| npm | 9.2.0 |
+| Dart Sass | 1.99.0 |
+| Bulma | 1.0.4 |
+| gunicorn | 26.2.0 |
+
+Follow the steps for your distribution (Ubuntu 22.04 or 24.04, or Debian 12).
+
+**1. Python 3.15.2 with `venv`**
+
+Ubuntu 22.04 and 24.04 (deadsnakes PPA):
+```bash
+sudo apt update
+sudo apt install software-properties-common
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt update
+sudo apt install python3.15 python3.15-venv python3.15-dev
+```
+
+Debian 12: Python 3.15 is not in the bookworm repositories. Install a 3.15.2 build, for example with pyenv (`pyenv install 3.15.2`), and make sure `python3.15` points to it.
+
+**2. Build dependencies**
+
+Ubuntu 22.04 and 24.04:
+```bash
+sudo apt install build-essential libpq-dev libjpeg-turbo8-dev zlib1g-dev libwebp-dev pkg-config lsb-release curl ca-certificates
+```
+Debian 12: use `libjpeg62-turbo-dev` instead of `libjpeg-turbo8-dev`.
+
+**3. PostgreSQL 16 server and client**
+
+Use the PostgreSQL apt repository, which works on Ubuntu 22.04, Ubuntu 24.04, and Debian 12. Then check that `psql --version` reports 16.x:
+```bash
+sudo install -d /usr/share/postgresql-common/pgdg
+sudo curl -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc --fail https://www.postgresql.org/media/keys/ACCC4CF8.asc
+echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+sudo apt update
+sudo apt install postgresql-16 postgresql-client-16
+```
+Install Git and VS Code (recommended) as well.
+
+Node.js, npm, Dart Sass and Bulma are described in [Dart Sass Installation](#dart-sass-installation) below.
 
 ### Database Configuration (Linux)
 
-PostgreSQL needs to be configured to allow the wagtail user to connect with password authentication.
+Allow the `postgres` user to log in over the local socket without a password, so you can create the `wagtail` role and database later:
 
-1. Edit `pg_hba.conf` to enable password authentication:
+1. Edit `pg_hba.conf`:
    ```bash
    sudo nano /etc/postgresql/16/main/pg_hba.conf
    ```
-   Ensure you have a line like this for local connections:
+   Change the existing `local all postgres peer` line to:
    ```
-   local   all   all   scram-sha-256
-   ```
-   Or for peer authentication (allows `postgres` user without password):
-   ```
-   local   all   postgres   peer
-   local   all   all        scram-sha-256
+   local   all   postgres   trust
    ```
 
-2. Restart PostgreSQL to apply changes:
+2. Restart PostgreSQL to apply the change:
    ```bash
    sudo systemctl restart postgresql
    ```
 
-For more details on PostgreSQL authentication, see the [official documentation](https://www.postgresql.org/docs/16/auth-pg-hba-conf.html).
+3. Check that this works without a password prompt:
+   ```bash
+   psql -U postgres -c "SELECT current_user;"
+   ```
 
 ### Clone the Repository
 
@@ -97,10 +141,11 @@ git clone git@github.com:beobachtergruppe/beobgrp_new_site.git
 
 ```bash
 cd beobgrp_new_site
-virtualenv venv
+python3.15 -m venv venv
 source venv/bin/activate
-pip install --upgrade pip
+pip install "pip==26.3"
 pip install -r requirements.txt
+pip install "gunicorn==26.2.0"
 ```
 
 ### Database Setup
@@ -111,34 +156,62 @@ export WAGTAIL_DB_PASSWORD="your_password"
 ```
 Create the role and database:
 ```bash
-sudo -u postgres psql -c "CREATE USER wagtail WITH PASSWORD '$WAGTAIL_DB_PASSWORD';"
-sudo -u postgres createdb beobgrp_site
-sudo -u postgres psql -c "ALTER DATABASE beobgrp_site OWNER TO wagtail;"
+psql -U postgres -c "CREATE USER wagtail WITH PASSWORD '$WAGTAIL_DB_PASSWORD';"
+psql -U postgres -c "CREATE DATABASE beobgrp_site OWNER wagtail;"
 ```
 
-Run migrations:
+#### Restore an existing backup (recommended)
+
+To work with the current website data, restore the latest database and media backup with `restore.sh`. Put the backup files in a directory and point `DJANGO_BACKUP_DIR` to it (default: `../beobgrp_site_backup`, next to the project). Then, from the project root with the venv activated:
+
+```bash
+source venv/bin/activate
+export WAGTAIL_DB_PASSWORD="your_password"
+export DJANGO_BACKUP_DIR=/path/to/backup
+export WAGTAIL_DB_HOST=localhost        # default if not set
+./restore.sh
+```
+
+`restore.sh` runs these steps in order:
+1. Drops and recreates the `public` schema of `beobgrp_site`. **All existing data in this local database is lost.**
+2. Restores the database backup with `manage.py dbrestore`.
+3. Restores the media files with `manage.py mediarestore` (into `media/`, or `DJANGO_MEDIA_DIR` if set).
+4. Runs `manage.py migrate`.
+
+Never point `restore.sh` at the production database.
+
+#### Empty database (no backup)
+
+If you don't have a backup, create the tables for an empty site:
 ```bash
 ./manage.py migrate
 ```
 
 ### Dart Sass Installation
 
-This project uses Dart Sass to compile SCSS files. Install it globally via npm:
+Node.js, npm, Dart Sass and Bulma must be these exact versions: Node.js 18.20.4, npm 9.2.0, Sass 1.99.0 and Bulma 1.0.4. Sass 1.100+ requires Node.js 20.19+, so keep Sass at 1.99.0 while using Node.js 18.
+
+Ubuntu's `nodejs` package does not provide 18.20.4 (22.04 ships Node.js 12, 24.04 ships 18.19.1), so install Node.js with nvm, which does not need `sudo`:
 ```bash
-sudo npm install --global sass
-npm install bulma@1.0.4
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.41.0/install.sh | bash
+# open a new terminal, or run: source ~/.bashrc
+nvm install 18.20.4
+nvm use 18.20.4
+nvm alias default 18.20.4
+npm install --global npm@9.2.0
+npm install --global sass@1.99.0
+sass --version
+```
+`sass --version` must print `1.99.0`.
+
+Then install the project's Bulma version from [package.json](/home/jdj/private/projecten/websites/beobgrp_new_site/package.json) in the project directory:
+```bash
+npm install
 ```
 
 Then compile and compress the CSS/JS assets:
 ```bash
 ./manage.py compress
-```
-
-Optionally restore backup data:
-```bash
-export DJANGO_BACKUP_DIR=/your/backup/dir
-./manage.py dbrestore
-./manage.py mediarestore
 ```
 
 Collect static files:
@@ -151,6 +224,20 @@ Start the development server:
 ./manage.py runserver 8001
 ```
 Visit: http://localhost:8001
+
+### VS Code Debugging
+
+The repository contains a launch configuration, `Run Django Server`, in [.vscode/launch.json](/home/jdj/private/projecten/websites/beobgrp_new_site/.vscode/launch.json). It runs `manage.py runserver 8001` with `PRODUCTION_VERSION=false`, so breakpoints work and the server reloads on code changes.
+
+1. Install the VS Code Python extension (`ms-python.python`), which includes the debugger.
+2. Select the virtual environment interpreter: `Ctrl+Shift+P` → `Python: Select Interpreter` → `venv/bin/python`.
+3. Make sure the environment variables are visible to VS Code. VS Code only inherits variables from the shell it was started in, so start it from a terminal where you exported them:
+   ```bash
+   export WAGTAIL_DB_PASSWORD="your_password"
+   code /path/to/beobgrp_new_site
+   ```
+   The debugged server needs `WAGTAIL_DB_PASSWORD` to connect to PostgreSQL. Dart Sass must also be on the `PATH`, because the development SCSS compilation calls `sass`.
+4. Open the Run and Debug view, choose `Run Django Server`, and press `F5`.
 
 ---
 
