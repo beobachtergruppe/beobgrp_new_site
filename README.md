@@ -55,7 +55,7 @@ This section describes how to setup a local development environment to run the w
 
 ### Prerequisites
 
-- Python 3.12
+- Python 3.15
 - PostgreSQL 16 ([Download](https://www.postgresql.org/download/))
 - Node.js and npm (for Dart Sass compilation)
 - Git
@@ -123,9 +123,9 @@ Run migrations:
 
 ### Dart Sass Installation
 
-This project uses Dart Sass to compile SCSS files. Install it globally via npm:
+This project uses Dart Sass to compile SCSS files. Install the pinned version globally via npm (Sass 1.100+ requires Node.js 20.19+, while Node.js 18 is supported up to Sass 1.99.0):
 ```bash
-sudo npm install --global sass
+sudo npm install --global sass@1.99.0
 npm install bulma@1.0.4
 ```
 
