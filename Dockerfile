@@ -2,7 +2,7 @@
 # docker run -v /path/to/local/db.sqlite3:/app/db.sqlite3 -p 8000:8000 your_image_name
 
 # Use an official Python runtime based on Debian bookworm as a parent image.
-FROM python:3.14.3-bookworm
+FROM python:3.15.2-bookworm
 
 # Get the database password from the build argument
 ENV WAGTAIL_DB_PASSWORD=${WAGTAIL_DB_PASSWORD}
@@ -43,29 +43,31 @@ EXPOSE 8000 8001
 ENV PYTHONUNBUFFERED=1
 
 # Install system packages required by Wagtail and Django.
+# Package versions are pinned to major.minor in Debian bookworm (Debian 12), so security updates still apply.
 RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-recommends \
-    build-essential \
-    libpq-dev \
-    libjpeg62-turbo-dev \
-    zlib1g-dev \
-    libwebp-dev \
-    pkg-config \
-    python3-dev \
-    lsb-release \
-    npm \
-    curl \
-    ca-certificates \
-    gosu
+    build-essential=12.9* \
+    libpq-dev=15.19* \
+    libjpeg62-turbo-dev=1:2.1* \
+    zlib1g-dev=1:1.2* \
+    libwebp-dev=1.2* \
+    pkg-config=1.8* \
+    python3-dev=3.11* \
+    lsb-release=12.0* \
+    nodejs=18.20* \
+    npm=9.2* \
+    curl=7.88* \
+    ca-certificates=2025* \
+    gosu=1.14*
 
 # Install Postgres 16 from a dedicated repository
 COPY dpdg.list /etc/apt/sources.list.d/
 RUN install -d /usr/share/postgresql-common/pgdg && \
     curl -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc --fail https://www.postgresql.org/media/keys/ACCC4CF8.asc && \
     apt-get update && \
-    apt-get install -y postgresql-client-16
+    apt-get install -y postgresql-client-16=16.15*
 
 # Install the german locale
-RUN apt-get update && apt-get install -y locales \
+RUN apt-get update && apt-get install -y locales=2.36* \
     && sed -i '/de_DE.UTF-8/s/^# //g' /etc/locale.gen \
     && locale-gen de_DE.UTF-8
 ENV LANG=de_DE.UTF-8
@@ -73,22 +75,17 @@ ENV LANGUAGE=de_DE:de
 ENV LC_ALL=de_DE.UTF-8
 
 # Install Python dependencies
-RUN pip install --upgrade pip
-RUN pip install "gunicorn==23.0.0"
+RUN pip install "pip==26.3"
+RUN pip install "gunicorn==26.2.0"
 COPY requirements.txt /
 RUN pip install -r /requirements.txt
 
 # Use /app folder as a directory where the source code is stored.
 WORKDIR /app
 
-# Debian's bundled Node.js 18 is too old for current sass (requires Node >= 20.19),
-# so use Node 22 from the official image instead.
-COPY --from=node:22-bookworm-slim /usr/local/ /usr/local/
-
 # Install bulma & sass, compile CSS, then clean up
-RUN node --version && \
-    npm init -y && \
-    npm install --global sass@1.105.1 && \
+RUN npm init -y && \
+    npm install --global sass@1.99.0 && \
     npm install bulma@1.0.4
 
 # Copy the source code of the project into the container.
@@ -111,6 +108,7 @@ RUN apt-get update && apt-get purge -y --auto-remove \
     libwebp-dev \
     pkg-config \
     python3-dev \
+    nodejs \
     npm && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
