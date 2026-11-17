@@ -4,7 +4,11 @@ Simplified tests for common blocks
 
 from django.test import TestCase
 
-from home.models.common import LinkBlock, ImageWithCaptionBlock
+from home.models.common import (
+    ImageWithCaptionBlock,
+    LinkBlock,
+    VideoWithCaptionBlock,
+)
 
 
 class LinkBlockSimpleTests(TestCase):
@@ -34,3 +38,14 @@ class ImageWithCaptionBlockSimpleTests(TestCase):
         block = ImageWithCaptionBlock()
         self.assertIn("image", block.child_blocks)
         self.assertIn("caption", block.child_blocks)
+
+    def test_relative_size_choices_default_to_full_size(self):
+        """Image and video caption blocks expose the same relative size options."""
+        for block_class in (ImageWithCaptionBlock, VideoWithCaptionBlock):
+            with self.subTest(block=block_class.__name__):
+                relative_size = block_class().child_blocks["relative_size"]
+                self.assertEqual(relative_size.get_default(), "1")
+                self.assertEqual(
+                    [value for value, _label in relative_size.field.choices],
+                    ["1", "1/2", "1/4"],
+                )
