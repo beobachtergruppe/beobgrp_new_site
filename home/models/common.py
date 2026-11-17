@@ -154,6 +154,7 @@ class ImageWithCaptionBlock(StructBlock):
         ],
         default="1",
         label="Relative Größe",
+        help_text="Die relative Größe gilt nur auf Desktop-Geräten. Auf mobilen Geräten wird die volle verfügbare Breite genutzt.",
     )
 
     link = LinkBlock(
@@ -215,6 +216,7 @@ class VideoWithCaptionBlock(StructBlock):
         ],
         default="1",
         label="Relative Größe",
+        help_text="Die relative Größe gilt nur auf Desktop-Geräten. Auf mobilen Geräten wird die volle verfügbare Breite genutzt.",
     )
     link = LinkBlock(
         label="Optionaler Link",

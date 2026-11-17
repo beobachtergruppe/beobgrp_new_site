@@ -25,7 +25,7 @@
                 </div>
                 <div class="column is-one-third-mobile is-one-quarter-tablet is-one-eighth-desktop">
                     <div class="columns is-mobile is-gapless">
-                        <div class="column is-{% if value.relative_size == '1/2' %}half{% elif value.relative_size == '1/4' %}one-quarter{% else %}full{% endif %}">
+                        <div class="column{% if value.relative_size == '1/2' %} is-half-desktop{% elif value.relative_size == '1/4' %} is-one-quarter-desktop{% endif %}">
                             {% if value.image %}
                                 {% image value.image original alt=value.image.title class="is-fullwidth" %}
                             {% endif %}
@@ -35,7 +35,7 @@
             {% else %}
                 <div class="column is-one-third-mobile is-one-quarter-tablet is-one-eighth-desktop">
                     <div class="columns is-mobile is-gapless">
-                        <div class="column is-{% if value.relative_size == '1/2' %}half{% elif value.relative_size == '1/4' %}one-quarter{% else %}full{% endif %}">
+                        <div class="column{% if value.relative_size == '1/2' %} is-half-desktop{% elif value.relative_size == '1/4' %} is-one-quarter-desktop{% endif %}">
                             {% if value.image %}
                                 {% image value.image original alt=value.image.title class="is-fullwidth" %}
                             {% endif %}
@@ -53,7 +53,7 @@
         </div>
     {% else %}
         <div class="columns is-mobile is-gapless">
-            <div class="column is-{% if value.relative_size == '1/2' %}half{% elif value.relative_size == '1/4' %}one-quarter{% else %}full{% endif %}">
+            <div class="column{% if value.relative_size == '1/2' %} is-half-desktop{% elif value.relative_size == '1/4' %} is-one-quarter-desktop{% endif %}">
                 <div class="image-wrapper">
                     {% if value.image %}
                         {% image value.image original alt=value.image.title class="is-fullwidth" %}
