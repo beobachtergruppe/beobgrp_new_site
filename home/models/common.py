@@ -1,17 +1,25 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Tuple
+
+from html import unescape
+from typing import TYPE_CHECKING
 
 from django import forms
 from django.core.exceptions import ValidationError
-from wagtail.blocks import Block, StreamBlock
-from wagtail.blocks.field_block import RichTextBlock, CharBlock, URLBlock, ChoiceBlock
-from wagtail.blocks.struct_block import StructBlock, StructBlockValidationError
-from wagtail.images.blocks import ImageChooserBlock
-from wagtail.documents.blocks import DocumentChooserBlock
-from wagtail.blocks import PageChooserBlock
-from django.utils.text import slugify
 from django.db import models
+from django.utils.html import strip_tags
+from django.utils.text import slugify
 from wagtail.admin.panels.field_panel import FieldPanel
+from wagtail.blocks import Block, PageChooserBlock, StreamBlock
+from wagtail.blocks.field_block import (
+    CharBlock,
+    ChoiceBlock,
+    IntegerBlock,
+    RichTextBlock,
+    URLBlock,
+)
+from wagtail.blocks.struct_block import StructBlock, StructBlockValidationError
+from wagtail.documents.blocks import DocumentChooserBlock
+from wagtail.images.blocks import ImageChooserBlock
 
 if TYPE_CHECKING:
     from django.http import HttpRequest
@@ -61,7 +69,7 @@ class HeadingBlock(CharBlock):
         context["anchor_id"] = generate_anchor_id(value)
         return context
 
-    class Meta:  
+    class Meta:
         template = "blocks/heading_block.html"
 
 
@@ -271,6 +279,127 @@ class VideoWithCaptionBlock(StructBlock):
         template = "blocks/video_with_caption.html"
 
 
+def _plain_text(value) -> str:
+    if value is None:
+        return ""
+    text = unescape(strip_tags(str(value))).replace("\xa0", " ")
+    return " ".join(text.split())
+
+
+def _first_stream_image(stream_value):
+    for block in stream_value or []:
+        block_type = getattr(block, "block_type", None)
+        value = getattr(block, "value", None)
+        if block_type == "image":
+            return value
+        if block_type == "image_with_caption":
+            image = value.get("image") if value else None
+            if image:
+                return image
+        if block_type == "multi_column":
+            image = _first_stream_image(value.get("content", []) if value else [])
+            if image:
+                return image
+    return None
+
+
+def _stream_text(stream_value) -> str:
+    text_parts = []
+    for block in stream_value or []:
+        block_type = getattr(block, "block_type", None)
+        value = getattr(block, "value", None)
+        if block_type in {"h1", "h2", "h3", "paragraph"}:
+            text = _plain_text(value)
+            if text:
+                text_parts.append(text)
+        elif block_type == "image_with_caption" and value:
+            text = _plain_text(value.get("caption"))
+            if text:
+                text_parts.append(text)
+        elif block_type == "multi_column" and value:
+            text = _stream_text(value.get("content", []))
+            if text:
+                text_parts.append(text)
+    return " ".join(text_parts)
+
+
+def _page_preview_image(page):
+    image = _first_stream_image(getattr(page, "body", None))
+    if image:
+        return image
+    for field_name in ("image", "photo", "thumbnail", "cover_image"):
+        image = getattr(page, field_name, None)
+        if image:
+            return image
+    return None
+
+
+def _page_preview_text(page) -> str:
+    text = _stream_text(getattr(page, "body", None))
+    if text:
+        return text
+    for field_name in ("abstract", "description"):
+        text = _plain_text(getattr(page, field_name, None))
+        if text:
+            return text
+    return ""
+
+
+class BlogListBlock(StructBlock):
+    excerpt_length = IntegerBlock(
+        min_value=1,
+        max_value=200,
+        default=200,
+        label="Anzahl der Zeichen",
+        help_text="Länge des Textauszugs (maximal 200 Zeichen)",
+    )
+
+    def get_context(self, value, parent_context=None):
+        context = super().get_context(value, parent_context)
+        parent_page = parent_context.get("page") if parent_context else None
+        if parent_page is None:
+            context["blog_entries"] = []
+            return context
+
+        from home.models.home_page import HomePage
+
+        try:
+            excerpt_length = int(value.get("excerpt_length", 200))
+        except (AttributeError, TypeError, ValueError):
+            excerpt_length = 200
+        excerpt_length = min(max(excerpt_length, 1), 200)
+
+        child_pages = (
+            HomePage.objects.child_of(parent_page)
+            .live()
+            .public()
+            .order_by("-first_published_at", "-pk")
+        )
+        entries = []
+        for page in child_pages:
+            text = _page_preview_text(page)
+            is_truncated = len(text) > excerpt_length
+            excerpt = text[:excerpt_length].rstrip()
+            if is_truncated:
+                excerpt += "..."
+            entries.append(
+                {
+                    "page": page,
+                    "image": _page_preview_image(page),
+                    "excerpt": excerpt,
+                    "is_truncated": is_truncated,
+                }
+            )
+
+        context["blog_entries"] = entries
+        return context
+
+    class Meta:
+        icon = "list-ul"
+        label = "Blog-Liste"
+        template = "blocks/blog_list_block.html"
+
+
 def create_multi_column_block(content_blocks=None):
     """
     Factory function to create a MultiColumnBlock class with configurable content blocks.
@@ -355,7 +484,7 @@ def create_multi_column_block(content_blocks=None):
     return MultiColumnBlock
 
 
-gen_body_content: list[Tuple[str, Block]] = [
+gen_body_content: list[tuple[str, Block]] = [
     ("h1", HeadingBlock(form_classname="h1", label="Kopfzeile 1")),
     ("h2", HeadingBlock(form_classname="h2", label="Kopfzeile 2")),
     ("h3", HeadingBlock(form_classname="h3", label="Kopfzeile 3")),
@@ -390,8 +519,9 @@ class CommonContextMixin:
     """
 
     def _get_upcoming_events(self):
-        from home.models.events import SingleEvent
         from django.utils.timezone import now
+
+        from home.models.events import SingleEvent
 
         return (
             SingleEvent.objects.live()  # type: ignore[attr-defined]
@@ -403,10 +533,10 @@ class CommonContextMixin:
     def _get_sidebar_pages(self):
         """Get all pages that should be promoted in the sidebar."""
         from home.models import (
-            HomePage,
             EventPage,
             GalleryIndexPage,
             GalleryPage,
+            HomePage,
         )
 
         # Collect all pages from all models that have show_in_sidebar=True
@@ -444,7 +574,7 @@ class CommonContextMixin:
 
         return anchors
 
-    def get_context(self, request: "HttpRequest", *args, **kwargs):
+    def get_context(self, request: HttpRequest, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)  # type: ignore[misc]
         context["upcoming_events"] = self._get_upcoming_events()
         context["sidebar_pages"] = self._get_sidebar_pages()

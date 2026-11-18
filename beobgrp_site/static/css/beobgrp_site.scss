@@ -159,6 +159,53 @@ $title-bottom-padding: 0.2em;
   margin-bottom: 0.5rem; // Add some space between event boxes
 }
 
+.blog-list__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  background-color: $content-column-background-color;
+}
+
+.blog-list__media {
+  flex: 0 0 32%;
+  max-width: 240px;
+  min-width: 0;
+}
+
+.blog-list__image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+
+.blog-list__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.blog-list__header {
+  padding: 0.4rem 0.6rem;
+  background-color: $header-background-color;
+  color: $header-color;
+}
+
+.blog-list__title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.blog-list__excerpt {
+  margin: 0.6rem 0;
+}
+
+.blog-list__read-more {
+  border-radius: 0.25rem;
+}
+
 .not-available {
   background-color: #960000 !important;
   font-weight: bold;

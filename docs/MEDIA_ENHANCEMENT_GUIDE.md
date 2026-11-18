@@ -334,15 +334,17 @@ python manage.py test home
 ### Sample Test Cases
 ```python
 def test_photo_page_is_video(self):
-    photo = PhotoPage(media_type='video')
+    photo = PhotoPage(media_type="video")
     self.assertTrue(photo.is_video())
 
+
 def test_photo_page_is_gif(self):
-    photo = PhotoPage(media_type='gif')
+    photo = PhotoPage(media_type="gif")
     self.assertTrue(photo.is_gif())
 
+
 def test_media_url_returns_correct_file(self):
-    photo = PhotoPage(media_type='image', image=test_image)
+    photo = PhotoPage(media_type="image", image=test_image)
     self.assertEqual(photo.get_media_url(), photo.image.url)
 ```
 

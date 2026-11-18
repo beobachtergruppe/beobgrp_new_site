@@ -1,6 +1,5 @@
-import urllib.parse
-
 import locale
+import urllib.parse
 
 locale.setlocale(locale.LC_TIME, "de_DE.UTF-8")
 

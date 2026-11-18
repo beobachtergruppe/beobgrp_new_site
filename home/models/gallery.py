@@ -1,9 +1,9 @@
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models.fields import DateField, CharField, TimeField
-from wagtail.models import Page
+from django.db.models.fields import CharField, DateField, TimeField
 from wagtail.admin.panels.field_panel import FieldPanel
 from wagtail.fields import RichTextField
+from wagtail.models import Page
 
 from home.models.common import CommonContextMixin, SidebarPromotionMixin
 

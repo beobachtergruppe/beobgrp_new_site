@@ -1,38 +1,31 @@
-from beobgrp_site.utils.email import create_email_link
-
-from django.db.models.fields import BooleanField, CharField, DateTimeField
-from django.db import models
-
-from django.utils.text import slugify
-from wagtail.admin.panels.field_panel import FieldPanel
-from wagtail.fields import RichTextField
-from wagtail.models import Page
-
-
 import hashlib
+import logging
 import textwrap
+from copy import deepcopy
 from datetime import date, timedelta
 from functools import cached_property
 from html import unescape
 
-import logging
-from copy import deepcopy
-
+from django.db import models
 from django.db.models import TextChoices
-from django.utils.html import strip_tags
-from django.utils.timezone import localtime, now, make_aware, is_naive
+from django.db.models.fields import BooleanField, CharField, DateTimeField
 from django.utils.dateparse import parse_datetime
+from django.utils.html import strip_tags
+from django.utils.text import slugify
+from django.utils.timezone import is_naive, localtime, make_aware, now
 from wagtail.admin.forms.pages import WagtailAdminPageForm
+from wagtail.admin.panels.field_panel import FieldPanel
 from wagtail.blocks.field_block import MultipleChoiceBlock
 from wagtail.blocks.struct_block import StructBlock
-from wagtail.fields import StreamField
+from wagtail.fields import RichTextField, StreamField
+from wagtail.models import Page
 
-
+from beobgrp_site.utils.email import create_email_link
 from home.models.common import (
     CommonContextMixin,
     SidebarPromotionMixin,
-    gen_body_content,
     create_multi_column_block,
+    gen_body_content,
 )
 
 logger = logging.getLogger(__name__)

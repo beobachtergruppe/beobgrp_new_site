@@ -1,0 +1,25 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+
+<div class="blog-list">
+    {% for entry in blog_entries %}
+        <article class="blog-list__item">
+            {% if entry.image %}
+                <div class="blog-list__media">
+                    {% image entry.image fill-480x320 class="blog-list__image" %}
+                </div>
+            {% endif %}
+            <div class="blog-list__content">
+                <header class="blog-list__header">
+                    <h2 class="blog-list__title">{{ entry.page.title }}</h2>
+                </header>
+                {% if entry.excerpt %}
+                    <p class="blog-list__excerpt">{{ entry.excerpt }}</p>
+                {% endif %}
+                {% pageurl entry.page as page_url %}
+                <a class="button is-link blog-list__read-more" href="{{ page_url }}">Weiterlesen</a>
+            </div>
+        </article>
+    {% empty %}
+        <p>Keine Beiträge vorhanden</p>
+    {% endfor %}
+</div>

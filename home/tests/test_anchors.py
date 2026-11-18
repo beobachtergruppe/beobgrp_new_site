@@ -6,7 +6,7 @@ from django.test import TestCase
 from wagtail.models import Page
 from wagtail.rich_text import RichText
 
-from home.models import HomePage, EventPage
+from home.models import EventPage, HomePage
 from home.models.common import generate_anchor_id
 
 
