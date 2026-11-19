@@ -67,9 +67,13 @@ class BlogListBlockTests(TestCase):
 
     def test_excerpt_length_is_limited_to_200_characters(self):
         excerpt_length = BlogListBlock().child_blocks["excerpt_length"]
+        sort_by_publication_date = BlogListBlock().child_blocks[
+            "sort_by_publication_date"
+        ]
 
         self.assertEqual(excerpt_length.get_default(), 200)
         self.assertEqual(excerpt_length.field.max_value, 200)
+        self.assertFalse(sort_by_publication_date.get_default())
 
     def test_lists_newest_homepage_children_with_truncated_text(self):
         root_page = Page.get_first_root_node()
@@ -105,10 +109,20 @@ class BlogListBlockTests(TestCase):
         event_page.save()
 
         context = BlogListBlock().get_context(
-            {"excerpt_length": 5}, {"page": parent_page}
+            {"excerpt_length": 5, "sort_by_publication_date": True},
+            {"page": parent_page},
         )
 
         entries = context["blog_entries"]
         self.assertEqual([entry["page"].title for entry in entries], ["Newer", "Older"])
         self.assertEqual(entries[0]["excerpt"], "Newer...")
         self.assertTrue(entries[0]["is_truncated"])
+
+        unsorted_context = BlogListBlock().get_context(
+            {"excerpt_length": 5, "sort_by_publication_date": False},
+            {"page": parent_page},
+        )
+        self.assertEqual(
+            [entry["page"].title for entry in unsorted_context["blog_entries"]],
+            ["Older", "Newer"],
+        )

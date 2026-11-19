@@ -11,6 +11,7 @@ from django.utils.text import slugify
 from wagtail.admin.panels.field_panel import FieldPanel
 from wagtail.blocks import Block, PageChooserBlock, StreamBlock
 from wagtail.blocks.field_block import (
+    BooleanBlock,
     CharBlock,
     ChoiceBlock,
     IntegerBlock,
@@ -346,6 +347,10 @@ def _page_preview_text(page) -> str:
 
 
 class BlogListBlock(StructBlock):
+    sort_by_publication_date = BooleanBlock(
+        default=False,
+        label="Nach Veröffentlichungsdatum sortieren",
+    )
     excerpt_length = IntegerBlock(
         min_value=1,
         max_value=200,
@@ -368,13 +373,15 @@ class BlogListBlock(StructBlock):
         except (AttributeError, TypeError, ValueError):
             excerpt_length = 200
         excerpt_length = min(max(excerpt_length, 1), 200)
+        try:
+            sort_by_publication_date = value.get("sort_by_publication_date", False)
+        except (AttributeError, TypeError):
+            sort_by_publication_date = False
 
-        child_pages = (
-            HomePage.objects.child_of(parent_page)
-            .live()
-            .public()
-            .order_by("-first_published_at", "-pk")
-        )
+        child_pages = HomePage.objects.child_of(parent_page).live().public()
+        if sort_by_publication_date:
+            child_pages = child_pages.order_by("-first_published_at", "-pk")
+
         entries = []
         for page in child_pages:
             text = _page_preview_text(page)
