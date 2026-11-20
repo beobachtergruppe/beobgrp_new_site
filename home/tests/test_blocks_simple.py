@@ -9,6 +9,8 @@ from django.utils import timezone
 from wagtail.models import Page
 
 from home.models import EventPage, HomePage
+from home.models.events import SingleEvent
+from home.models.gallery import GalleryIndexPage, GalleryPage, PhotoPage, VideoPage
 from home.models.common import (
     BlogListBlock,
     ImageWithCaptionBlock,
@@ -58,6 +60,29 @@ class ImageWithCaptionBlockSimpleTests(TestCase):
 
 
 class BlogListBlockTests(TestCase):
+    def test_only_homepage_exposes_publication_date_in_promote_tab(self):
+        self.assertIsNotNone(HomePage._meta.get_field("publication_date"))
+        self.assertIn(
+            "publication_date",
+            {getattr(panel, "field_name", None) for panel in HomePage.promote_panels},
+        )
+
+        other_page_models = (
+            EventPage,
+            GalleryIndexPage,
+            GalleryPage,
+            PhotoPage,
+            VideoPage,
+            SingleEvent,
+        )
+
+        for page_model in other_page_models:
+            with self.subTest(page_model=page_model.__name__):
+                self.assertNotIn(
+                    "publication_date",
+                    {field.name for field in page_model._meta.get_fields()},
+                )
+
     def test_is_available_in_homepage_and_multi_column_streams(self):
         body_block = HomePage._meta.get_field("body").stream_block
         multi_column = body_block.child_blocks["multi_column"]
@@ -67,25 +92,21 @@ class BlogListBlockTests(TestCase):
 
     def test_excerpt_length_is_limited_to_200_characters(self):
         excerpt_length = BlogListBlock().child_blocks["excerpt_length"]
-        sort_by_publication_date = BlogListBlock().child_blocks[
-            "sort_by_publication_date"
-        ]
 
         self.assertEqual(excerpt_length.get_default(), 200)
         self.assertEqual(excerpt_length.field.max_value, 200)
-        self.assertFalse(sort_by_publication_date.get_default())
+        self.assertNotIn("sort_by_publication_date", BlogListBlock().child_blocks)
 
-    def test_lists_newest_homepage_children_with_truncated_text(self):
+    def test_lists_children_by_publication_date_with_fallback_and_truncated_text(self):
         root_page = Page.get_first_root_node()
-        parent_page = root_page.add_child(
-            instance=HomePage(title="Parent", slug="parent")
-        )
+        parent_page = root_page.add_child(instance=HomePage(title="Parent", slug="parent"))
         now = timezone.now()
 
         older_page = HomePage(
             title="Older",
             slug="older",
             body=[("paragraph", "<p>Older story</p>")],
+            publication_date=now.date(),
         )
         parent_page.add_child(instance=older_page)
         older_page.live = True
@@ -109,20 +130,11 @@ class BlogListBlockTests(TestCase):
         event_page.save()
 
         context = BlogListBlock().get_context(
-            {"excerpt_length": 5, "sort_by_publication_date": True},
+            {"excerpt_length": 5},
             {"page": parent_page},
         )
 
         entries = context["blog_entries"]
-        self.assertEqual([entry["page"].title for entry in entries], ["Newer", "Older"])
-        self.assertEqual(entries[0]["excerpt"], "Newer...")
+        self.assertEqual([entry["page"].title for entry in entries], ["Older", "Newer"])
+        self.assertEqual(entries[0]["excerpt"], "Older...")
         self.assertTrue(entries[0]["is_truncated"])
-
-        unsorted_context = BlogListBlock().get_context(
-            {"excerpt_length": 5, "sort_by_publication_date": False},
-            {"page": parent_page},
-        )
-        self.assertEqual(
-            [entry["page"].title for entry in unsorted_context["blog_entries"]],
-            ["Older", "Newer"],
-        )

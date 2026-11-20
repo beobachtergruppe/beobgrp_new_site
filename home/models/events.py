@@ -50,12 +50,8 @@ EVENT_TITLE_MAX_LENGTH = 80  # DB max_length: 140
 ABSTRACT_MAX_LENGTH = 600  # DB max_length: 800
 
 # Ensure form constraints don't exceed DB model constraints
-assert EVENT_TITLE_MAX_LENGTH <= 140, (
-    "EVENT_TITLE_MAX_LENGTH must not exceed DB model max_length (140)"
-)
-assert ABSTRACT_MAX_LENGTH <= 800, (
-    "ABSTRACT_MAX_LENGTH must not exceed DB model max_length (800)"
-)
+assert EVENT_TITLE_MAX_LENGTH <= 140, "EVENT_TITLE_MAX_LENGTH must not exceed DB model max_length (140)"
+assert ABSTRACT_MAX_LENGTH <= 800, "ABSTRACT_MAX_LENGTH must not exceed DB model max_length (800)"
 
 
 class SingleEventForm(WagtailAdminPageForm):
@@ -68,9 +64,7 @@ class SingleEventForm(WagtailAdminPageForm):
             self.fields["abstract"].max_length = ABSTRACT_MAX_LENGTH
             # RichTextArea stores max_length in widget.options for the JS character counter
             if hasattr(self.fields["abstract"].widget, "options"):
-                self.fields["abstract"].widget.options["max_length"] = (
-                    ABSTRACT_MAX_LENGTH
-                )
+                self.fields["abstract"].widget.options["max_length"] = ABSTRACT_MAX_LENGTH
         # Make slug not required at the field level; we generate it in clean()
         if "slug" in self.fields:
             self.fields["slug"].required = False
@@ -319,10 +313,7 @@ class SingleEvent(Page):
     def reservation_mailto_link(self) -> str:
         # Build body based on whether event has a real title or just the default
         # Use detailed format only for events with custom titles (not auto-assigned defaults)
-        has_custom_title = (
-            self.event_title
-            and self.event_title != _get_default_event_title(self.event_type)
-        )
+        has_custom_title = self.event_title and self.event_title != _get_default_event_title(self.event_type)
 
         if has_custom_title:
             # Detailed format for events with titles (Vortrag, Ausflug, etc.)
@@ -418,11 +409,7 @@ class EventListBlock(StructBlock):
             if isinstance(event_types, str):
                 event_types = [event_types]
 
-            events_qs = (
-                SingleEvent.objects.child_of(parent_page)
-                .live()
-                .filter(start_time__gte=now())
-            )
+            events_qs = SingleEvent.objects.child_of(parent_page).live().filter(start_time__gte=now())
             if event_types:
                 events_qs = events_qs.filter(event_type__in=event_types)
             events = events_qs.order_by("start_time")
