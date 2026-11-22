@@ -3,6 +3,7 @@ Simplified tests for common blocks
 """
 
 from datetime import timedelta
+from types import SimpleNamespace
 
 from django.template import Context, Template
 from django.test import TestCase
@@ -17,6 +18,7 @@ from home.models.common import (
     ImageWithCaptionBlock,
     LinkBlock,
     VideoWithCaptionBlock,
+    _page_preview_image,
 )
 
 
@@ -61,6 +63,20 @@ class ImageWithCaptionBlockSimpleTests(TestCase):
 
 
 class BlogListBlockTests(TestCase):
+    def test_sidebar_icon_is_used_for_video_only_blog_preview(self):
+        sidebar_icon = object()
+        page = SimpleNamespace(
+            body=[
+                SimpleNamespace(
+                    block_type="video_with_caption",
+                    value={"media_file": object()},
+                )
+            ],
+            sidebar_icon=sidebar_icon,
+        )
+
+        self.assertIs(_page_preview_image(page), sidebar_icon)
+
     def test_only_homepage_exposes_publication_date_in_promote_tab(self):
         self.assertIsNotNone(HomePage._meta.get_field("publication_date"))
         self.assertIn(

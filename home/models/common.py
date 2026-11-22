@@ -329,7 +329,7 @@ def _page_preview_image(page):
     image = _first_stream_image(getattr(page, "body", None))
     if image:
         return image
-    for field_name in ("image", "photo", "thumbnail", "cover_image"):
+    for field_name in ("image", "photo", "thumbnail", "cover_image", "sidebar_icon"):
         image = getattr(page, field_name, None)
         if image:
             return image
@@ -618,7 +618,7 @@ class SidebarPromotionMixin(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
         related_name="+",
-        help_text="Optionales Symbolbild, das im Seitenbalken neben dem Link-Text angezeigt wird.",
+        help_text="Optionales Symbolbild für den Seitenbalken. Wird auch als Vorschaubild in der Blog-Liste verwendet, wenn die Seite kein eigenes Bild enthält.",
     )
 
     def get_sidebar_text(self) -> str:
