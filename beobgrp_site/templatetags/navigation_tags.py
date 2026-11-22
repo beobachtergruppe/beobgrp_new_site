@@ -1,6 +1,7 @@
-from django import template
 from urllib.parse import urlparse
-from wagtail.models import Site, Page
+
+from django import template
+from wagtail.models import Page, Site
 
 register = template.Library()
 

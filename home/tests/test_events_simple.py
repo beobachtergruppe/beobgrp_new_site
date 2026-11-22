@@ -2,12 +2,13 @@
 Simplified tests for EventPage and SingleEvent models
 """
 
-from django.test import TestCase
 from datetime import datetime, timedelta
+
+from django.test import TestCase
 from django.utils.timezone import make_aware
 from wagtail.rich_text import RichText
 
-from home.models import EventPage, SingleEvent, EventTypes
+from home.models import EventPage, EventTypes, SingleEvent
 from home.models.events import _get_rich_text_plain_text
 
 

@@ -1,38 +1,31 @@
-from beobgrp_site.utils.email import create_email_link
-
-from django.db.models.fields import BooleanField, CharField, DateTimeField
-from django.db import models
-
-from django.utils.text import slugify
-from wagtail.admin.panels.field_panel import FieldPanel
-from wagtail.fields import RichTextField
-from wagtail.models import Page
-
-
 import hashlib
+import logging
 import textwrap
+from copy import deepcopy
 from datetime import date, timedelta
 from functools import cached_property
 from html import unescape
 
-import logging
-from copy import deepcopy
-
+from django.db import models
 from django.db.models import TextChoices
-from django.utils.html import strip_tags
-from django.utils.timezone import localtime, now, make_aware, is_naive
+from django.db.models.fields import BooleanField, CharField, DateTimeField
 from django.utils.dateparse import parse_datetime
+from django.utils.html import strip_tags
+from django.utils.text import slugify
+from django.utils.timezone import is_naive, localtime, make_aware, now
 from wagtail.admin.forms.pages import WagtailAdminPageForm
+from wagtail.admin.panels.field_panel import FieldPanel
 from wagtail.blocks.field_block import MultipleChoiceBlock
 from wagtail.blocks.struct_block import StructBlock
-from wagtail.fields import StreamField
+from wagtail.fields import RichTextField, StreamField
+from wagtail.models import Page
 
-
+from beobgrp_site.utils.email import create_email_link
 from home.models.common import (
     CommonContextMixin,
     SidebarPromotionMixin,
-    gen_body_content,
     create_multi_column_block,
+    gen_body_content,
 )
 
 logger = logging.getLogger(__name__)
@@ -57,12 +50,8 @@ EVENT_TITLE_MAX_LENGTH = 80  # DB max_length: 140
 ABSTRACT_MAX_LENGTH = 600  # DB max_length: 800
 
 # Ensure form constraints don't exceed DB model constraints
-assert EVENT_TITLE_MAX_LENGTH <= 140, (
-    "EVENT_TITLE_MAX_LENGTH must not exceed DB model max_length (140)"
-)
-assert ABSTRACT_MAX_LENGTH <= 800, (
-    "ABSTRACT_MAX_LENGTH must not exceed DB model max_length (800)"
-)
+assert EVENT_TITLE_MAX_LENGTH <= 140, "EVENT_TITLE_MAX_LENGTH must not exceed DB model max_length (140)"
+assert ABSTRACT_MAX_LENGTH <= 800, "ABSTRACT_MAX_LENGTH must not exceed DB model max_length (800)"
 
 
 class SingleEventForm(WagtailAdminPageForm):
@@ -75,9 +64,7 @@ class SingleEventForm(WagtailAdminPageForm):
             self.fields["abstract"].max_length = ABSTRACT_MAX_LENGTH
             # RichTextArea stores max_length in widget.options for the JS character counter
             if hasattr(self.fields["abstract"].widget, "options"):
-                self.fields["abstract"].widget.options["max_length"] = (
-                    ABSTRACT_MAX_LENGTH
-                )
+                self.fields["abstract"].widget.options["max_length"] = ABSTRACT_MAX_LENGTH
         # Make slug not required at the field level; we generate it in clean()
         if "slug" in self.fields:
             self.fields["slug"].required = False
@@ -326,10 +313,7 @@ class SingleEvent(Page):
     def reservation_mailto_link(self) -> str:
         # Build body based on whether event has a real title or just the default
         # Use detailed format only for events with custom titles (not auto-assigned defaults)
-        has_custom_title = (
-            self.event_title
-            and self.event_title != _get_default_event_title(self.event_type)
-        )
+        has_custom_title = self.event_title and self.event_title != _get_default_event_title(self.event_type)
 
         if has_custom_title:
             # Detailed format for events with titles (Vortrag, Ausflug, etc.)
@@ -425,11 +409,7 @@ class EventListBlock(StructBlock):
             if isinstance(event_types, str):
                 event_types = [event_types]
 
-            events_qs = (
-                SingleEvent.objects.child_of(parent_page)
-                .live()
-                .filter(start_time__gte=now())
-            )
+            events_qs = SingleEvent.objects.child_of(parent_page).live().filter(start_time__gte=now())
             if event_types:
                 events_qs = events_qs.filter(event_type__in=event_types)
             events = events_qs.order_by("start_time")

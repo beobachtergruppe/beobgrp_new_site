@@ -1,11 +1,14 @@
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models.fields import DateField, CharField, TimeField
-from wagtail.models import Page
+from django.db.models.fields import CharField, DateField, TimeField
 from wagtail.admin.panels.field_panel import FieldPanel
 from wagtail.fields import RichTextField
+from wagtail.models import Page
 
-from home.models.common import CommonContextMixin, SidebarPromotionMixin
+from home.models.common import (
+    CommonContextMixin,
+    SidebarPromotionMixin,
+)
 
 ALLOWED_MEDIA_EXTENSIONS = (".gif", ".mp4", ".webm", ".ogg", ".ogv")
 
@@ -60,9 +63,7 @@ class PhotoPage(CommonContextMixin, Page):
         videos = VideoPage.objects.child_of(parent).live().order_by("-date")
 
         # Combine and sort by date
-        all_items = sorted(
-            list(photos) + list(videos), key=lambda x: x.date, reverse=True
-        )
+        all_items = sorted(list(photos) + list(videos), key=lambda x: x.date, reverse=True)
         return all_items
 
     def get_context(self, request):
@@ -72,14 +73,8 @@ class PhotoPage(CommonContextMixin, Page):
         try:
             self_index = siblings.index(self)
             if len(siblings) > 1:
-                context["previous"] = (
-                    siblings[self_index - 1] if self_index > 0 else siblings[-1]
-                )
-                context["next"] = (
-                    siblings[self_index + 1]
-                    if self_index < len(siblings) - 1
-                    else siblings[0]
-                )
+                context["previous"] = siblings[self_index - 1] if self_index > 0 else siblings[-1]
+                context["next"] = siblings[self_index + 1] if self_index < len(siblings) - 1 else siblings[0]
             else:
                 context["previous"] = None
                 context["next"] = None
@@ -151,23 +146,15 @@ class VideoPage(CommonContextMixin, Page):
         if self.media_file and self.media_type:
             name = self.media_file.file.name.lower()
             if not any(name.endswith(ext) for ext in ALLOWED_MEDIA_EXTENSIONS):
-                raise ValidationError(
-                    {
-                        "media_file": "Nur GIF- und Videodateien sind erlaubt (GIF, MP4, WebM, Ogg)."
-                    }
-                )
+                raise ValidationError({"media_file": "Nur GIF- und Videodateien sind erlaubt (GIF, MP4, WebM, Ogg)."})
             is_gif = name.endswith(".gif")
             if is_gif and self.media_type != "gif":
                 raise ValidationError(
-                    {
-                        "media_type": "Die gewählte Datei ist ein GIF. Bitte wähle 'Animiertes GIF' als Medientyp."
-                    }
+                    {"media_type": "Die gewählte Datei ist ein GIF. Bitte wähle 'Animiertes GIF' als Medientyp."}
                 )
             if not is_gif and self.media_type == "gif":
                 raise ValidationError(
-                    {
-                        "media_type": "Die gewählte Datei ist kein GIF. Bitte wähle 'Videodatei' als Medientyp."
-                    }
+                    {"media_type": "Die gewählte Datei ist kein GIF. Bitte wähle 'Videodatei' als Medientyp."}
                 )
 
     def get_thumbnail(self):
@@ -189,9 +176,7 @@ class VideoPage(CommonContextMixin, Page):
         videos = VideoPage.objects.child_of(parent).live().order_by("-date")
 
         # Combine and sort by date
-        all_items = sorted(
-            list(photos) + list(videos), key=lambda x: x.date, reverse=True
-        )
+        all_items = sorted(list(photos) + list(videos), key=lambda x: x.date, reverse=True)
         return all_items
 
     def get_context(self, request):
@@ -201,14 +186,8 @@ class VideoPage(CommonContextMixin, Page):
         try:
             self_index = siblings.index(self)
             if len(siblings) > 1:
-                context["previous"] = (
-                    siblings[self_index - 1] if self_index > 0 else siblings[-1]
-                )
-                context["next"] = (
-                    siblings[self_index + 1]
-                    if self_index < len(siblings) - 1
-                    else siblings[0]
-                )
+                context["previous"] = siblings[self_index - 1] if self_index > 0 else siblings[-1]
+                context["next"] = siblings[self_index + 1] if self_index < len(siblings) - 1 else siblings[0]
             else:
                 context["previous"] = None
                 context["next"] = None
@@ -244,9 +223,7 @@ class GalleryPage(CommonContextMixin, SidebarPromotionMixin, Page):
         videos = VideoPage.objects.child_of(self).live().order_by("-date")
 
         # Combine and sort by date
-        all_items = sorted(
-            list(photos) + list(videos), key=lambda x: x.date, reverse=True
-        )
+        all_items = sorted(list(photos) + list(videos), key=lambda x: x.date, reverse=True)
         context["photos"] = all_items
         return context
 

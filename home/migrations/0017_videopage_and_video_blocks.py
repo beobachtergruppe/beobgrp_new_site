@@ -3,10 +3,11 @@
 # PhotoPage.photo FK fix, and updated StreamFields (video_with_caption block).
 
 import django.db.models.deletion
-import home.models.common
-import home.models.gallery
 import wagtail.fields
 from django.db import migrations, models
+
+import home.models.common
+import home.models.gallery
 
 
 class Migration(migrations.Migration):

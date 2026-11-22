@@ -71,6 +71,10 @@ echo "Build version: $BUILD_VERSION"
 echo "Image name: $IMAGE_NAME"
 echo ""
 
+# Run the test suite before building or pushing the image.
+echo "Running tests..."
+python manage.py test home.tests
+
 # Build image
 docker build -t "$IMAGE_NAME" .
 
