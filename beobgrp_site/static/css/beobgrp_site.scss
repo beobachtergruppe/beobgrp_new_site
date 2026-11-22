@@ -605,4 +605,10 @@ $title-bottom-padding: 0.2em;
 .development-banner {
   background-color: #b00000;
   color: #ffff00;
+  font-size: 1.2rem;
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+  }
 }

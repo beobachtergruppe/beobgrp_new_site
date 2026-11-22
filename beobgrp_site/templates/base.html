@@ -19,8 +19,8 @@
         {% wagtailuserbar %}
         <header>
             {% if show_development_banner %}
-                <div class="development-banner has-text-weight-bold has-text-centered is-size-4 p-3">
-                    <img src="{% static 'images/Paomedia_small-n-flat_sign-warning.svg' %}" alt="" style="height:1.5em; vertical-align:middle; margin-right:0.5em;">Entwicklungsversion {{ app_version }} – nicht die Produktionsseite<img src="{% static 'images/Paomedia_small-n-flat_sign-warning.svg' %}" alt="" style="height:1.5em; vertical-align:middle; margin-left:0.5em;">
+                <div class="development-banner has-text-weight-bold has-text-centered p-3">
+                    <img src="{% static 'images/Paomedia_small-n-flat_sign-warning.svg' %}" alt="" style="height:1.5em; vertical-align:middle; margin-right:0.5em;">                    Diese Website ist eine Testversion {{ app_version }}. Bitte besuchen Sie die reguläre Website auf <a href="https://www.beobachtergruppe.de">www.beobachtergruppe.de</a><img src="{% static 'images/Paomedia_small-n-flat_sign-warning.svg' %}" alt="" style="height:1.5em; vertical-align:middle; margin-left:0.5em;">
                 </div>
             {% endif %}
             {% get_site_root as site_root %}
