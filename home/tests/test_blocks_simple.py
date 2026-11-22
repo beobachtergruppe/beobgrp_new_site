@@ -4,6 +4,7 @@ Simplified tests for common blocks
 
 from datetime import timedelta
 
+from django.template import Context, Template
 from django.test import TestCase
 from django.utils import timezone
 from wagtail.models import Page
@@ -89,6 +90,44 @@ class BlogListBlockTests(TestCase):
 
         self.assertIn("blog_list", body_block.child_blocks)
         self.assertIn("blog_list", multi_column.child_blocks["content"].child_blocks)
+
+    def test_blog_list_renders_when_nested_in_multi_column(self):
+        root_page = Page.get_first_root_node()
+        parent_page = root_page.add_child(
+            instance=HomePage(
+                title="Parent",
+                slug="parent",
+                body=[
+                    (
+                        "multi_column",
+                        {
+                            "max_columns": "1",
+                            "min_columns": "1",
+                            "width": "full",
+                            "content": [
+                                ("blog_list", {"excerpt_length": 200}),
+                            ],
+                        },
+                    ),
+                ],
+            )
+        )
+        child_page = HomePage(
+            title="Nested story",
+            slug="nested-story",
+            body=[("paragraph", "<p>A nested excerpt</p>")],
+        )
+        parent_page.add_child(instance=child_page)
+        child_page.live = True
+        child_page.save()
+
+        rendered = Template("{% load wagtailcore_tags %}{% include_block page.body %}").render(
+            Context({"page": parent_page})
+        )
+
+        self.assertIn("Nested story", rendered)
+        self.assertIn("A nested excerpt", rendered)
+        self.assertIn("Weiterlesen", rendered)
 
     def test_excerpt_length_is_limited_to_200_characters(self):
         excerpt_length = BlogListBlock().child_blocks["excerpt_length"]
