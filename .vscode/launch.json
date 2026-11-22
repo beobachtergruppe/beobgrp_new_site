@@ -15,7 +15,10 @@
             "autoStartBrowser": false,
             "program": "${workspaceFolder}/manage.py",
             "env": {
-                "PRODUCTION_VERSION": "false"
+                "PRODUCTION_VERSION": "false",
+                "APP_VERSION": "local_dev",
+                "SITE_PORT": "8001",
+                "SITE_HOSTNAME": "localhost"
             }
         }
     ]

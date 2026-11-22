@@ -14,10 +14,25 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("PRODUCTION_VERSION", "false").lower() != "true"
+IS_PRODUCTION_VERSION = os.environ.get("PRODUCTION_VERSION", "false").lower() == "true"
+DEBUG = not IS_PRODUCTION_VERSION
 
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = os.path.dirname(PROJECT_DIR)
+
+
+def _read_version_file():
+    version_file = os.path.join(BASE_DIR, "VERSION")
+    with open(version_file, encoding="utf-8") as f:
+        for line in f:
+            if line.startswith("VERSION="):
+                return line.split("=", 1)[1].strip()
+    return "unknown"
+
+
+# The Docker build sets APP_VERSION to the actual build tag (e.g. 1.7.0.dev).
+# Without it (e.g. when started from the IDE), the VERSION file is used.
+APP_VERSION = os.environ.get("APP_VERSION") or _read_version_file()
 
 
 # Quick-start development settings - unsuitable for production
@@ -103,6 +118,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "beobgrp_site.context_processors.development_build.development_build",
             ]
         },
     }

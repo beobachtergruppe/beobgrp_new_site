@@ -27,6 +27,10 @@ ENV DJANGO_MEDIA_DIR=/media
 # Tell Django to use production settings
 ENV PRODUCTION_VERSION=true
 
+# Build version shown in the development banner (set by build_and_push.sh)
+ARG APP_VERSION
+ENV APP_VERSION=${APP_VERSION}
+
 # Set static root for Django to match container path
 ENV DJANGO_STATIC_ROOT=/app/static
 

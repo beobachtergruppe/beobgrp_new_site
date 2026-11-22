@@ -31,6 +31,7 @@ case "$SITE_INIT_MODE" in
     ;;
 esac
 
+python manage.py configure_default_site
 python manage.py clearsessions
 gunicorn beobgrp_site.wsgi:application --bind 0.0.0.0:${WAGTAIL_PORT:-8000}
 '

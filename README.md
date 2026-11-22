@@ -24,6 +24,7 @@ A good entrypoint for getting to know wagtail better is this page: [Wagtail gett
   - [Overview](#overview)
   - [Environment Variables](#environment-variables)
   - [Version Management](#version-management)
+  - [Default Site and Development Banner](#default-site-and-development-banner)
   - [Local Docker Registry](#local-docker-registry)
   - [Building Images](#building-images)
   - [Starting Instances](#starting-instances)
@@ -169,6 +170,8 @@ source venv/bin/activate
 export WAGTAIL_DB_PASSWORD="your_password"
 export DJANGO_BACKUP_DIR=/path/to/backup
 export WAGTAIL_DB_HOST=localhost        # default if not set
+export SITE_HOSTNAME=localhost          # required: hostname of the default site
+export SITE_PORT=8001                   # required: port of the default site
 ./restore.sh
 ```
 
@@ -177,6 +180,7 @@ export WAGTAIL_DB_HOST=localhost        # default if not set
 2. Restores the database backup with `manage.py dbrestore`.
 3. Restores the media files with `manage.py mediarestore` (into `media/`, or `DJANGO_MEDIA_DIR` if set).
 4. Runs `manage.py migrate`.
+5. Sets the default site to `SITE_HOSTNAME` and `SITE_PORT` with `manage.py configure_default_site`, so you don't have to change it in the Admin UI.
 
 Never point `restore.sh` at the production database.
 
@@ -262,6 +266,8 @@ Set the following required environment variables:
 - `WAGTAIL_EMAIL_PASSWORD`: SMTP password for email notifications (the email address is configured in Django settings)
 - `DJANGO_BACKUP_DIR`: Directory path for storing backups (optional, defaults to `../beobgrp_site_backup`)
 - `DOCKER_REGISTRY`: Docker registry URL (optional, defaults to `localhost:5000`)
+- `SITE_HOSTNAME`: Hostname of the default Wagtail site. **Required on a developer laptop** (`localhost`); on the server it is set by `docker-compose.yml` (see [Default Site and Development Banner](#default-site-and-development-banner))
+- `SITE_PORT`: Public port of the default Wagtail site. **Required on a developer laptop** (`8001`); on the server it is set by `docker-compose.yml` (defaults to `443`)
 
 ### Version Management
 
@@ -272,6 +278,24 @@ VERSION=1.2.2  # Example version
 ```
 
 Both development and production builds use this same version. Update this file when you want to build and deploy new versions.
+
+### Default Site and Development Banner
+
+The default Wagtail site (the hostname and port in the database) differs per server, so it is set automatically at every start by the `configure_default_site` management command. It reads two environment variables:
+
+- `SITE_HOSTNAME`: hostname of the default site. If unset, `testwww.beobachtergruppe.de` is used.
+- `SITE_PORT`: public port of the default site. If unset, `443` (https) is used.
+
+Per service in [docker-compose.yml](docker-compose.yml):
+- **Production (`wagtail`)**: `SITE_HOSTNAME` is fixed to `beobachtergruppe.de` and `SITE_PORT` to `443`. Values from your shell or `.env` cannot override them.
+- **Development (`wagtail_dev`)**: uses `SITE_HOSTNAME` and `SITE_PORT` from your environment, with the defaults above. On the server this gives `https://testwww.beobachtergruppe.de` behind Apache.
+
+The port `443` is the public https port. Apache forwards requests to the containers, so the internal container ports (8000 for production, 8001 for development) are not used in the site URL.
+
+`configure_default_site` runs after the database restore/migrate step in `docker_start_server.sh` and at the end of `restore.sh`. Because it runs at every container start, a hostname changed by hand in the Admin UI is reset on the next restart.
+
+**Development banner:** the site shows a red banner with the version number above the navigation when it is not running in production mode, or when the image version ends in `.dev`. The version comes from the `APP_VERSION` build argument, which `build_and_push.sh` sets to the build tag. Without it (for example when started from the IDE), the `VERSION` file is used.
+
 
 ### Local Docker Registry (Optional)
 
@@ -324,6 +348,8 @@ The `build_and_push.sh` script builds a Docker image and optionally pushes it to
 - **On feature branches**: Automatically appends `.dev` suffix (e.g., `1.2.2.dev`)
 
 This ensures release versions can only be built from the main branch.
+
+The build passes the version to the image as the `APP_VERSION` build argument. This is the version shown in the development banner (see [Default Site and Development Banner](#default-site-and-development-banner)).
 
 **For local development (build only, no registry needed):**
 ```bash
@@ -471,8 +497,11 @@ For a local development registry, see [REGISTRY_SETUP.md](REGISTRY_SETUP.md) for
 ### Access URLs
 
 Once started, the website is available at:
-- **Production**: http://localhost:8000
-- **Development**: http://localhost:8001 (if started with `--dev`)
+- **Production (server)**: https://www.beobachtergruppe.de (Apache forwards to the container on port 8000)
+- **Development (server)**: https://testwww.beobachtergruppe.de (`--dev`, Apache forwards to the container on port 8001)
+- **Development (laptop)**: http://localhost:8001 (with `SITE_HOSTNAME=localhost` and `SITE_PORT=8001` set)
+
+The container ports 8000 and 8001 are internal. Apache handles the public https port on the server.
 
 ### Database and Media
 

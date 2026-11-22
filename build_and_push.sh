@@ -72,7 +72,7 @@ echo "Image name: $IMAGE_NAME"
 echo ""
 
 # Build image
-docker build -t "$IMAGE_NAME" .
+docker build --build-arg APP_VERSION="$BUILD_VERSION" -t "$IMAGE_NAME" .
 
 if [ -n "$REGISTRY" ]; then
   echo ""

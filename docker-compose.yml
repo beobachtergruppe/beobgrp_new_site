@@ -15,6 +15,8 @@ services:
       SECRET_KEY: ${SECRET_KEY}
       DJANGO_SECURE_SSL_REDIRECT: ${DJANGO_SECURE_SSL_REDIRECT:-"false"}
       WAGTAIL_PORT: 8000
+      SITE_HOSTNAME: beobachtergruppe.de
+      SITE_PORT: 443
       WAGTAIL_DB_HOST: postgres
     volumes:
       - ${DJANGO_BACKUP_DIR}:/site_backup
@@ -40,6 +42,8 @@ services:
       SECRET_KEY: ${SECRET_KEY}
       DJANGO_SECURE_SSL_REDIRECT: "false"
       WAGTAIL_PORT: 8001
+      SITE_HOSTNAME: ${SITE_HOSTNAME:-testwww.beobachtergruppe.de}
+      SITE_PORT: ${SITE_PORT:-443}
       WAGTAIL_DB_HOST: postgres_dev
     volumes:
       - ${DJANGO_BACKUP_DIR}:/site_backup
