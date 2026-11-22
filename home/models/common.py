@@ -314,7 +314,7 @@ def _stream_text(stream_value) -> str:
             text = _plain_text(value)
             if text:
                 text_parts.append(text)
-        elif block_type == "image_with_caption" and value:
+        elif block_type in {"image_with_caption", "video_with_caption"} and value:
             text = _plain_text(value.get("caption"))
             if text:
                 text_parts.append(text)

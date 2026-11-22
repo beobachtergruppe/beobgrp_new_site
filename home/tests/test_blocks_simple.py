@@ -19,6 +19,7 @@ from home.models.common import (
     LinkBlock,
     VideoWithCaptionBlock,
     _page_preview_image,
+    _page_preview_text,
 )
 
 
@@ -63,6 +64,25 @@ class ImageWithCaptionBlockSimpleTests(TestCase):
 
 
 class BlogListBlockTests(TestCase):
+    def test_caption_only_pages_use_image_and_video_captions_as_preview_text(self):
+        captions = (
+            ("image_with_caption", "An image caption"),
+            ("video_with_caption", "A video caption"),
+        )
+
+        for block_type, caption in captions:
+            with self.subTest(block_type=block_type):
+                page = SimpleNamespace(
+                    body=[
+                        SimpleNamespace(
+                            block_type=block_type,
+                            value={"caption": f"<p>{caption}</p>"},
+                        )
+                    ]
+                )
+
+                self.assertEqual(_page_preview_text(page), caption)
+
     def test_sidebar_icon_is_used_for_video_only_blog_preview(self):
         sidebar_icon = object()
         page = SimpleNamespace(
