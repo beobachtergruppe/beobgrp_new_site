@@ -3,20 +3,29 @@
 <div class="blog-list">
     {% for entry in blog_entries %}
         <article class="blog-list__item">
-            {% if entry.image %}
-                <div class="blog-list__media">
-                    {% image entry.image fill-480x320 class="blog-list__image" %}
-                </div>
-            {% endif %}
-            <div class="blog-list__content">
-                <header class="blog-list__header">
-                    <h2 class="blog-list__title">{{ entry.page.title }}</h2>
-                </header>
-                {% if entry.excerpt %}
-                    <p class="blog-list__excerpt">{{ entry.excerpt }}</p>
+            <header class="blog-list__header">
+                <h3 class="w-block-h3 blog-list__title">{{ entry.page.title }}</h3>
+            </header>
+            <div class="blog-list__body">
+                {% if entry.image %}
+                    <div class="blog-list__media">
+                        {% image entry.image fill-480x320 class="blog-list__image" %}
+                    </div>
                 {% endif %}
-                {% pageurl entry.page as page_url %}
-                <a class="button is-link blog-list__read-more" href="{{ page_url }}">Weiterlesen</a>
+                <div class="blog-list__content">
+                    {% with publication_date=entry.page.publication_date|default:entry.page.first_published_at %}
+                        {% if publication_date %}
+                            <p class="blog-list__date">
+                                <time datetime="{{ publication_date|date:'Y-m-d' }}">{{ publication_date|date:"d.m.Y" }}</time>
+                            </p>
+                        {% endif %}
+                    {% endwith %}
+                    {% if entry.excerpt %}
+                        <p class="blog-list__excerpt">{{ entry.excerpt }}</p>
+                    {% endif %}
+                    {% pageurl entry.page as page_url %}
+                    <a class="button is-link blog-list__read-more" href="{{ page_url }}">Weiterlesen</a>
+                </div>
             </div>
         </article>
     {% empty %}
